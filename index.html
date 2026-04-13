@@ -1,0 +1,3131 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suno Hebrew Lyrics Studio</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* ── Neutral Professional Palette ── */
+  --bg0: #0d0d0f;   /* deepest — editor canvas */
+  --bg1: #141416;   /* app shell, sidebars */
+  --bg2: #1c1c1f;   /* panels, cards */
+  --bg3: #242428;   /* elevated, hover bg */
+  --bg4: #2e2e34;   /* active / selected */
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+
+  /* ── Text — warm off-white, great contrast ── */
+  --txt0: #ededf0;  /* primary */
+  --txt1: #8a8a9c;  /* secondary */
+  --txt2: #46464f;  /* muted / disabled */
+
+  /* ── Accents — professional, not neon ── */
+  --blue:   #5b9cf6;
+  --blue2:  #3d7cf4;
+  --pink:   #e0709a;
+  --green:  #2ec491;
+  --orange: #e8924a;
+  --purple: #9b72ef;
+  --yellow: #d9a73a;
+  --red:    #e85c6a;
+  --teal:   #28c4af;
+
+  /* ── Gradients ── */
+  --grad-main:   linear-gradient(135deg, #5b9cf6 0%, #9b72ef 55%, #e0709a 100%);
+  --grad-blue:   linear-gradient(135deg, #3d7cf4, #2563eb);
+  --grad-purple: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  --grad-green:  linear-gradient(135deg, #2ec491, #059669);
+  --grad-card:   linear-gradient(145deg, rgba(28,28,31,0.95), rgba(20,20,22,0.98));
+
+  /* ── Glows — subtle ── */
+  --glow-blue:   0 0 14px rgba(91,156,246,0.22), 0 0 28px rgba(61,124,244,0.08);
+  --glow-purple: 0 0 14px rgba(155,114,239,0.22), 0 0 28px rgba(139,92,246,0.08);
+  --glow-pink:   0 0 14px rgba(224,112,154,0.22), 0 0 28px rgba(224,112,154,0.08);
+  --glow-green:  0 0 14px rgba(46,196,145,0.22),  0 0 28px rgba(46,196,145,0.08);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  background: var(--bg0);
+  color: var(--txt0);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+/* ─── SCROLLBARS ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ─── LEFT COMMANDS PANEL ─── */
+#commands {
+  width: 235px;
+  min-width: 190px;
+  max-width: 320px;
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  resize: horizontal;
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  padding: 13px 14px 11px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--txt2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.sidebar-title svg { opacity: 0.4; }
+
+.search-wrap {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.search-wrap input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 10px 6px 28px;
+  color: var(--txt0);
+  font-size: 12px;
+  outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2344447a' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 8px center;
+  transition: border-color .2s, box-shadow .2s;
+  font-family: inherit;
+}
+.search-wrap input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,204,255,0.12); }
+.search-wrap input::placeholder { color: var(--txt2); }
+
+.categories { overflow-y: auto; flex: 1; }
+
+.cat {
+  border-bottom: 1px solid var(--border);
+}
+.cat-header {
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s;
+}
+.cat-header:hover { background: rgba(110,80,255,0.08); }
+.cat-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.cat-name {
+  flex: 1;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: var(--txt1);
+}
+.cat-count {
+  font-size: 10px;
+  color: var(--txt2);
+  background: var(--bg3);
+  padding: 1px 5px;
+  border-radius: 8px;
+}
+.cat-chevron {
+  color: var(--txt2);
+  transition: transform .2s;
+  font-size: 9px;
+}
+.cat.open .cat-chevron { transform: rotate(90deg); }
+
+.cat-tags {
+  padding: 5px 10px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.cat.closed .cat-tags { display: none; }
+
+.tag {
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  border: 1px solid transparent;
+  user-select: none;
+  white-space: nowrap;
+  line-height: 1.6;
+  letter-spacing: 0.2px;
+}
+.tag:hover {
+  filter: brightness(1.25);
+  transform: translateY(-1px);
+}
+.tag:active { transform: scale(0.95); }
+.tag.in-prompt { box-shadow: 0 0 0 2px rgba(255,255,255,.2); }
+
+/* ─── MAIN EDITOR ─── */
+#editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.top-bar {
+  padding: 0 16px;
+  height: 54px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg1);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: 2px;
+  filter: drop-shadow(0 0 8px rgba(0,180,255,0.4));
+  transition: filter .2s;
+}
+.logo-wrap:hover { filter: drop-shadow(0 0 14px rgba(0,200,255,0.7)); }
+.top-bar::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--grad-main);
+  opacity: 0.25;
+}
+
+#song-title {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 700;
+  background: none;
+  border: none;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  background-image: var(--grad-main);
+  outline: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  min-width: 0;
+  transition: background-color .15s;
+  letter-spacing: -0.3px;
+}
+#song-title:hover, #song-title:focus {
+  background-color: rgba(255,255,255,0.04);
+  color: var(--txt0);
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  background-image: none;
+}
+
+.tbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid var(--border2);
+  background: var(--bg2);
+  color: var(--txt1);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all .15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.2px;
+  font-family: inherit;
+}
+.tbtn:hover {
+  background: var(--bg3);
+  border-color: rgba(255,255,255,0.2);
+  color: var(--txt0);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.tbtn:active { transform: scale(.97) translateY(0); }
+
+.tbtn.undo-btn { color: var(--txt2); border-color: var(--border); background: transparent; }
+.tbtn.undo-btn:hover { color: var(--txt1); box-shadow: none; background: var(--bg2); }
+.tbtn.undo-btn:disabled { opacity: .3; cursor: not-allowed; }
+.tbtn.undo-btn:disabled:hover { background: transparent; border-color: var(--border); transform: none; box-shadow: none; color: var(--txt2); }
+.tbtn.nikud {
+  background: rgba(20,44,36,0.9);
+  border-color: rgba(46,196,145,0.35);
+  color: var(--green);
+}
+.tbtn.nikud:hover {
+  background: rgba(24,56,44,0.95);
+  border-color: var(--green);
+  box-shadow: var(--glow-green);
+}
+.tbtn.latinize {
+  background: rgba(28,20,46,0.9);
+  border-color: rgba(155,114,239,0.35);
+  color: var(--purple);
+  text-shadow: 0 0 8px rgba(170,85,255,0.5);
+}
+.tbtn.latinize:hover {
+  background: rgba(36,24,58,0.95);
+  border-color: var(--purple);
+  box-shadow: var(--glow-purple);
+}
+.tbtn.add-line {
+  border-style: dashed;
+  border-color: rgba(255,255,255,0.12);
+  color: var(--txt2);
+  background: transparent;
+}
+.tbtn.add-line:hover { border-color: rgba(255,255,255,0.25); color: var(--txt1); background: var(--bg2); }
+.tbtn.templates { position: relative; }
+
+.templates-dd {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 5px;
+  z-index: 99;
+  min-width: 200px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.6);
+}
+.templates-dd.open { display: block; }
+.tpl-item {
+  padding: 7px 11px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background .1s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tpl-item:hover { background: var(--bg4); }
+.tpl-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--blue);
+  flex-shrink: 0;
+}
+
+.editor-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 26px 48px;
+  background: var(--bg0);
+}
+
+.section-block {
+  margin-bottom: 18px;
+  position: relative;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px 16px;
+  transition: border-color .2s;
+}
+.section-block:hover { border-color: var(--border2); }
+
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: default;
+  flex-shrink: 0;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+.section-badge .x {
+  cursor: pointer;
+  opacity: .65;
+  transition: opacity .1s;
+  font-size: 13px;
+  line-height: 1;
+}
+.section-badge .x:hover { opacity: 1; }
+
+.section-actions {
+  display: flex;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.section-block:hover .section-actions { opacity: 1; }
+
+.sact {
+  padding: 3px 9px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--txt1);
+  cursor: pointer;
+  font-size: 11px;
+  transition: all .15s;
+  font-family: inherit;
+}
+.sact:hover { background: var(--bg4); color: var(--txt0); border-color: var(--border2); }
+
+.sec-nikud, .sec-latin, .sec-dir { font-size: 10px; padding: 3px 8px; }
+.sec-nikud { color: var(--green); border-color: rgba(0,200,120,0.3); background: rgba(0,30,18,0.7); }
+.sec-nikud:hover { color: var(--green); border-color: var(--green); box-shadow: 0 0 8px rgba(0,255,180,0.2); }
+.sec-latin { color: var(--purple); border-color: rgba(130,80,255,0.3); background: rgba(20,10,45,0.7); }
+.sec-latin:hover { color: var(--purple); border-color: var(--purple); box-shadow: 0 0 8px rgba(150,80,255,0.2); }
+.sec-dir { color: var(--blue); border-color: rgba(0,180,255,0.3); background: rgba(0,20,40,0.7); font-family: 'Consolas','Courier New',monospace; letter-spacing: 0.5px; }
+.sec-dir:hover { color: var(--blue); border-color: var(--blue); box-shadow: 0 0 8px rgba(0,180,255,0.2); }
+
+.lyrics-ta {
+  width: 100%;
+  min-height: 90px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 4px 2px;
+  color: var(--txt0);
+  font-size: 15px;
+  line-height: 1.85;
+  resize: vertical;
+  overflow-y: hidden;
+  outline: none;
+  direction: rtl;
+  font-family: 'David Libre', 'Frank Ruehl CLM', 'Noto Serif Hebrew', 'Times New Roman', serif;
+  transition: none;
+  tab-size: 2;
+}
+.lyrics-ta:focus { outline: none; }
+.lyrics-ta::placeholder { color: var(--txt2); direction: rtl; }
+
+.add-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.add-sec-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  border-radius: 7px;
+  border: 1px dashed var(--border2);
+  background: transparent;
+  color: var(--txt2);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all .15s;
+  font-family: inherit;
+}
+.add-sec-btn:hover {
+  border-color: rgba(255,255,255,0.22);
+  color: var(--txt1);
+  background: var(--bg2);
+  transform: translateY(-1px);
+}
+
+/* ─── RIGHT PANEL ─── */
+#output {
+  width: 300px;
+  min-width: 240px;
+  background: var(--bg1);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.panel-hdr {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.panel-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--txt2);
+}
+
+.copy-btn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 1px solid rgba(91,156,246,0.4);
+  background: rgba(61,124,244,0.15);
+  color: var(--blue);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  transition: all .15s;
+  font-family: inherit;
+}
+.copy-btn:hover {
+  background: rgba(61,124,244,0.25);
+  border-color: var(--blue);
+  box-shadow: var(--glow-blue);
+  transform: translateY(-1px);
+}
+.copy-btn.ok {
+  background: rgba(46,196,145,0.15);
+  border-color: rgba(46,196,145,0.4);
+  color: var(--green);
+}
+
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pcard {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.pcard:hover { border-color: var(--border2); }
+.pcard-hdr {
+  padding: 8px 12px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--txt2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pcard-clear {
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--txt2);
+  background: none;
+  border: none;
+  padding: 1px 5px;
+  border-radius: 3px;
+  transition: color .1s;
+}
+.pcard-clear:hover { color: var(--txt1); }
+
+#style-prompt {
+  width: 100%;
+  min-height: 70px;
+  background: transparent;
+  border: none;
+  padding: 9px 11px;
+  color: var(--txt0);
+  font-size: 12px;
+  line-height: 1.65;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+}
+.char-counter {
+  padding: 4px 11px;
+  font-size: 10px;
+  color: var(--txt2);
+  border-top: 1px solid var(--border);
+  text-align: right;
+}
+.char-counter.warn { color: var(--orange); }
+.char-counter.over { color: var(--red); }
+
+#full-lyrics-out {
+  padding: 9px 11px;
+  font-size: 12px;
+  line-height: 1.85;
+  color: var(--txt1);
+  direction: rtl;
+  font-family: 'David Libre', 'Frank Ruehl CLM', 'Noto Serif Hebrew', serif;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 60px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+.sec-lbl-out {
+  color: var(--blue);
+  font-weight: 700;
+  font-family: -apple-system, sans-serif;
+  direction: ltr;
+  display: inline-block;
+}
+
+.lyrics-char-counter {
+  padding: 4px 11px;
+  font-size: 10px;
+  color: var(--txt2);
+  border-top: 1px solid var(--border);
+  text-align: right;
+}
+.lyrics-char-counter.warn { color: var(--orange); }
+.lyrics-char-counter.over { color: var(--red); }
+
+/* ─── TOAST ─── */
+#toast {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-size: 12.5px;
+  font-weight: 500;
+  z-index: 999;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+  color: var(--txt0);
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+#toast.success {
+  border-color: rgba(46,196,145,0.4);
+  color: var(--green);
+}
+#toast.error {
+  border-color: rgba(232,92,106,0.4);
+  color: var(--red);
+}
+
+/* ─── SPINNER ─── */
+.spin {
+  display: inline-block;
+  width: 11px; height: 11px;
+  border: 2px solid rgba(255,255,255,.2);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── MODAL (section picker) ─── */
+#modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  justify-content: center;
+  align-items: center;
+}
+#modal-overlay.open { display: flex; }
+#modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 22px;
+  width: 380px;
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,.7);
+}
+#modal h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: var(--txt0);
+}
+.modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.modal-tag {
+  padding: 6px 13px;
+  border-radius: 7px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--txt1);
+  transition: all .15s;
+  font-family: inherit;
+}
+.modal-tag:hover {
+  background: var(--bg4);
+  border-color: rgba(255,255,255,0.2);
+  color: var(--txt0);
+  transform: translateY(-1px);
+}
+
+/* ─── DRAG OVER ─── */
+.drag-over { border-color: var(--blue) !important; }
+
+/* ─── LYRICS WRAPPER + MIRROR OVERLAY ─── */
+.lyrics-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.lyrics-mirror {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  min-height: 100%;
+  pointer-events: none;
+  font-family: 'David Libre', 'Frank Ruehl CLM', 'Noto Serif Hebrew', 'Times New Roman', serif;
+  font-size: 15px;
+  line-height: 1.8;
+  padding: 13px 17px;
+  direction: rtl;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--txt0);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 5;
+  box-sizing: border-box;
+}
+
+.lyrics-ta.has-ambig {
+  color: transparent !important;
+  caret-color: var(--txt0);
+}
+
+.ambig-word {
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background .12s;
+}
+.ambig-masc {
+  border-bottom: 2px solid var(--blue);
+  color: #9dd5ff;
+}
+.ambig-masc:hover { background: rgba(0,200,255,0.12); }
+.ambig-fem {
+  border-bottom: 2px solid var(--pink);
+  color: #ffaacc;
+}
+.ambig-fem:hover { background: rgba(255,63,160,0.12); }
+
+/* ─── INLINE GENDER POPUP ─── */
+#ambig-popup {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  background: rgba(10,8,32,0.97);
+  border: 1px solid rgba(130,90,255,0.5);
+  border-radius: 12px;
+  padding: 10px 12px 12px;
+  box-shadow: 0 8px 36px rgba(0,0,0,0.8), 0 0 24px rgba(100,60,200,0.25);
+  backdrop-filter: blur(16px);
+  min-width: 210px;
+}
+#ambig-popup::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(130,90,255,0.5);
+}
+.ap-title {
+  font-size: 10px;
+  color: var(--txt2);
+  text-align: center;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+  font-family: inherit;
+}
+.ap-word-orig {
+  font-family: 'David Libre', 'Frank Ruehl CLM', 'Noto Serif Hebrew', serif;
+  color: var(--txt1);
+  font-size: 13px;
+  direction: rtl;
+}
+.ap-opts {
+  display: flex;
+  gap: 8px;
+}
+.ap-opt {
+  flex: 1;
+  padding: 9px 10px 7px;
+  border-radius: 9px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: all .15s;
+  background: rgba(20,16,50,0.7);
+  font-family: inherit;
+}
+.ap-nikud {
+  font-family: 'David Libre', 'Frank Ruehl CLM', 'Noto Serif Hebrew', serif;
+  font-size: 17px;
+  direction: rtl;
+  line-height: 1.4;
+}
+.ap-label {
+  font-size: 10px;
+  letter-spacing: 0.2px;
+  opacity: 0.8;
+}
+.ap-masc { color: #7ac4ff; border-color: rgba(0,180,255,0.25); }
+.ap-masc:hover { border-color: var(--blue); background: rgba(0,150,255,0.14); box-shadow: 0 0 10px rgba(0,180,255,0.2); }
+.ap-masc.ap-selected { border-color: var(--blue); background: rgba(0,140,255,0.18); box-shadow: 0 0 14px rgba(0,180,255,0.3); }
+.ap-fem  { color: #ff99cc; border-color: rgba(255,63,160,0.25); }
+.ap-fem:hover  { border-color: var(--pink); background: rgba(255,63,160,0.14); box-shadow: 0 0 10px rgba(255,63,160,0.2); }
+.ap-fem.ap-selected  { border-color: var(--pink); background: rgba(255,63,160,0.18); box-shadow: 0 0 14px rgba(255,63,160,0.3); }
+
+/* ─── SELECTION highlight ─── */
+::selection { background: rgba(74,158,255,.25); }
+
+/* ─── COMMANDS PANEL — TABS ─── */
+.cmd-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--bg0);
+}
+.cmd-tab {
+  flex: 1;
+  padding: 8px 6px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--txt2);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all .18s;
+  font-family: inherit;
+}
+.cmd-tab:hover { color: var(--txt1); background: var(--bg2); }
+.cmd-tab.active {
+  color: var(--txt0);
+  border-bottom-color: var(--blue);
+  background: var(--bg1);
+}
+
+/* ─── COMMANDS PANEL — SCROLL + GROUPS ─── */
+.cmd-scroll { overflow-y: auto; flex: 1; }
+
+.cmd-group { border-bottom: 1px solid var(--border); }
+.cmd-group-hdr {
+  padding: 6px 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--txt1);
+}
+.cmd-group-hdr:hover { background: var(--bg3); }
+.cmd-group-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.cmd-group-chevron { color: var(--txt2); transition: transform .2s; margin-left: auto; font-size: 9px; }
+.cmd-group.open  .cmd-group-chevron { transform: rotate(90deg); }
+.cmd-chips { padding: 4px 8px 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+.cmd-group.closed .cmd-chips { display: none; }
+
+/* ─── COMMAND CHIPS ─── */
+.cmd-chip {
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+  border: 1px solid var(--border2);
+  user-select: none;
+  white-space: nowrap;
+  line-height: 1.5;
+  background: var(--bg3);
+  color: var(--txt1);
+  font-family: inherit;
+}
+.cmd-chip:hover {
+  background: var(--bg4);
+  border-color: rgba(255,255,255,0.2);
+  color: var(--txt0);
+  transform: translateY(-1px);
+}
+.cmd-chip:active { transform: scale(0.95); }
+.cmd-chip.lyrics-chip {
+  background: var(--bg3);
+  border-color: var(--border2);
+  color: var(--blue);
+  font-family: 'Consolas','Courier New',monospace;
+  font-size: 10.5px;
+}
+.cmd-chip.lyrics-chip:hover {
+  background: var(--bg4);
+  border-color: rgba(91,156,246,0.4);
+  color: var(--txt0);
+}
+
+/* ─── TAG LIBRARY IN RIGHT PANEL ─── */
+.tag-lib-toggle { cursor: pointer; }
+.tag-lib-toggle:hover { background: rgba(110,80,255,0.08); }
+.tag-lib-body {
+  display: flex;
+  flex-direction: column;
+  max-height: 310px;
+  overflow: hidden;
+}
+.tag-lib-body.collapsed { max-height: 0; }
+.tag-lib-search-wrap {
+  padding: 7px 8px 2px;
+  flex-shrink: 0;
+}
+.tag-lib-search-wrap input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 9px 5px 25px;
+  color: var(--txt0);
+  font-size: 11px;
+  outline: none;
+  font-family: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2344447a' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 7px center;
+  transition: border-color .2s;
+}
+.tag-lib-search-wrap input:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,204,255,0.1); }
+.tag-lib-search-wrap input::placeholder { color: var(--txt2); }
+
+.pcard-chevron {
+  color: var(--txt2);
+  font-size: 13px;
+  transition: transform .2s;
+  line-height: 1;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0 3px;
+}
+.pcard-chevron.open { transform: rotate(90deg); }
+
+/* ─── IMPORT MODAL ─── */
+#import-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  justify-content: center;
+  align-items: center;
+}
+#import-overlay.open { display: flex; }
+#import-modal {
+  background: rgba(14,12,40,0.97);
+  border: 1px solid rgba(130,90,255,0.35);
+  border-radius: 16px;
+  padding: 22px;
+  width: 580px;
+  max-width: 95vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  box-shadow: 0 20px 70px rgba(0,0,0,.8), 0 0 40px rgba(100,60,200,0.15), inset 0 1px 0 rgba(150,120,255,0.08);
+}
+#import-modal h3 {
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--grad-main);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 2px;
+}
+#import-modal .import-hint {
+  font-size: 11px;
+  color: var(--txt2);
+  line-height: 1.5;
+}
+#import-modal .import-hint code {
+  background: rgba(130,90,255,0.15);
+  border: 1px solid rgba(130,90,255,0.25);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 10.5px;
+  color: var(--purple);
+  font-family: 'Consolas','Courier New',monospace;
+}
+#import-ta {
+  flex: 1;
+  min-height: 340px;
+  background: rgba(8,8,25,0.85);
+  border: 1px solid rgba(100,75,200,0.3);
+  border-radius: 10px;
+  padding: 13px 15px;
+  color: var(--txt0);
+  font-size: 12.5px;
+  line-height: 1.75;
+  resize: none;
+  outline: none;
+  font-family: 'Consolas','Courier New',monospace;
+  direction: ltr;
+  transition: border-color .2s, box-shadow .2s;
+}
+#import-ta:focus {
+  border-color: rgba(130,80,255,0.5);
+  box-shadow: 0 0 0 2px rgba(130,80,255,0.08);
+}
+#import-ta::placeholder { color: var(--txt2); }
+.import-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+.import-parsed-count {
+  flex: 1;
+  font-size: 11px;
+  color: var(--txt2);
+}
+.import-cancel {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(100,75,200,0.3);
+  background: transparent;
+  color: var(--txt1);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: all .15s;
+}
+.import-cancel:hover { background: rgba(30,22,65,0.8); color: var(--txt0); }
+.import-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--grad-purple);
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  transition: all .15s;
+  box-shadow: 0 2px 10px rgba(130,80,255,0.35);
+}
+.import-confirm:hover { filter: brightness(1.15); box-shadow: var(--glow-purple); transform: translateY(-1px); }
+.import-confirm:active { transform: scale(.97); }
+
+/* Responsive: smaller screens */
+@media (max-width: 900px) {
+  #commands { width: 190px; }
+  #output { width: 240px; }
+}
+@media (max-width: 700px) {
+  #output { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- LEFT: SUNO COMMANDS PANEL -->
+<div id="commands">
+  <div class="sidebar-title">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+    Suno Commands
+  </div>
+  <div class="cmd-tabs">
+    <button class="cmd-tab active" id="tab-style"  data-tab="style"  onclick="switchCmdTab('style')">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77A5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+      Style
+    </button>
+    <button class="cmd-tab" id="tab-lyrics" data-tab="lyrics" onclick="switchCmdTab('lyrics')">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      Lyrics
+    </button>
+  </div>
+  <div class="cmd-scroll">
+    <div id="cmd-style-panel"></div>
+    <div id="cmd-lyrics-panel" style="display:none"></div>
+  </div>
+</div>
+
+<!-- MAIN EDITOR -->
+<div id="editor">
+  <div class="top-bar">
+    <!-- Logo -->
+    <div class="logo-wrap" title="Suno Hebrew Lyrics Studio">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lg-wave" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#00ccff"/>
+            <stop offset="35%" stop-color="#7744ff"/>
+            <stop offset="65%" stop-color="#aa55ff"/>
+            <stop offset="100%" stop-color="#ff3fa0"/>
+          </linearGradient>
+          <linearGradient id="lg-spark" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#00eedd"/>
+            <stop offset="100%" stop-color="#aa55ff"/>
+          </linearGradient>
+          <filter id="glow-f" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="1.5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Waveform bars -->
+        <g filter="url(#glow-f)" stroke="url(#lg-wave)" stroke-width="2.2" stroke-linecap="round">
+          <line x1="4"  y1="20" x2="4"  y2="14"/>
+          <line x1="8"  y1="22" x2="8"  y2="10"/>
+          <line x1="12" y1="25" x2="12" y2="7"/>
+          <line x1="16" y1="28" x2="16" y2="4"/>
+          <line x1="20" y1="25" x2="20" y2="8"/>
+          <line x1="24" y1="22" x2="24" y2="12"/>
+          <line x1="28" y1="20" x2="28" y2="16"/>
+        </g>
+        <!-- Sparkle top-right -->
+        <g fill="url(#lg-spark)" opacity="0.95">
+          <polygon points="30,3 30.9,5.1 33,6 30.9,6.9 30,9 29.1,6.9 27,6 29.1,5.1" transform="scale(0.85) translate(4,0)"/>
+        </g>
+        <!-- Small sparkle -->
+        <g fill="#00ccff" opacity="0.75">
+          <polygon points="5,3 5.5,4.2 6.7,4.7 5.5,5.2 5,6.4 4.5,5.2 3.3,4.7 4.5,4.2" transform="scale(0.7)"/>
+        </g>
+      </svg>
+    </div>
+
+    <input id="song-title" type="text" placeholder="שם השיר..." value="Untitled Song">
+
+    <button class="tbtn undo-btn" id="btn-undo" onclick="undo()" title="בטל (Ctrl+Z)" disabled>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v6h6"/><path d="M3 13C5 8 9.5 5 15 5a9 9 0 0 1 0 18c-3.4 0-6.4-1.5-8.5-4"/></svg>
+      ביטול
+    </button>
+    <button class="tbtn undo-btn" id="btn-redo" onclick="redo()" title="שחזר (Ctrl+Y)" disabled>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 7v6h-6"/><path d="M21 13c-2 5-6.5 8-12 8a9 9 0 0 1 0-18c3.4 0 6.4 1.5 8.5 4"/></svg>
+    </button>
+    <button class="tbtn nikud" id="btn-nikud" onclick="nikudSelected()">
+      <span id="nikud-icon">נ׳</span> ניקוד
+    </button>
+    <button class="tbtn latinize" id="btn-latin" onclick="latinizeSelected()">
+      <span>Aa</span> לטינזציה
+    </button>
+    <button class="tbtn add-line" onclick="openModal()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      + שורת תג
+    </button>
+    <button class="tbtn" id="btn-global-dir" onclick="toggleAllDir()" title="שנה כיוון לכל התיבות">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10H7M21 6H7M21 14H7M21 18H7"/><path d="M3 6l3-3-3-3M3 18l3 3-3 3" stroke-width="0"/><polyline points="3 3 3 21"/></svg>
+      <span id="global-dir-lbl">RTL</span>
+    </button>
+    <button class="tbtn" onclick="openImportModal()" title="ייבוא שיר שלם">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      ייבוא
+    </button>
+    <div class="tbtn templates" id="tpl-wrap">
+      <button style="background:none;border:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;" onclick="toggleTemplates()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        תבניות
+      </button>
+      <div class="templates-dd" id="tpl-dd">
+        <div class="tpl-item" onclick="loadTemplate('pop')"><span class="tpl-dot" style="background:var(--pink)"></span>Pop Song</div>
+        <div class="tpl-item" onclick="loadTemplate('rock')"><span class="tpl-dot" style="background:var(--red)"></span>Rock Song</div>
+        <div class="tpl-item" onclick="loadTemplate('hiphop')"><span class="tpl-dot" style="background:var(--orange)"></span>Hip-Hop</div>
+        <div class="tpl-item" onclick="loadTemplate('mizrahi')"><span class="tpl-dot" style="background:var(--yellow)"></span>מזרחי</div>
+        <div class="tpl-item" onclick="loadTemplate('ballad')"><span class="tpl-dot" style="background:var(--teal)"></span>Ballad</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="editor-scroll" id="editor-scroll">
+    <div id="sections-container"></div>
+    <div class="add-row" id="add-row">
+      <!-- quick add buttons rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT OUTPUT PANEL -->
+<div id="output">
+  <div class="panel-hdr">
+    <span class="panel-lbl">Style Studio</span>
+    <button class="copy-btn" id="copy-btn" onclick="copyOutput()">COPY</button>
+  </div>
+  <div class="panel-body">
+
+    <div class="pcard">
+      <div class="pcard-hdr">
+        <span>Style Prompt</span>
+        <button class="pcard-clear" onclick="clearStylePrompt()">נקה</button>
+      </div>
+      <textarea id="style-prompt" placeholder="לחץ על שבבים בצד שמאל..." oninput="updateStyleCounter()"></textarea>
+      <div class="char-counter" id="style-counter">0 / 120</div>
+    </div>
+
+    <div class="pcard">
+      <div class="pcard-hdr tag-lib-toggle" onclick="toggleTagLibCard()">
+        <span>Tag Library</span>
+        <span class="pcard-chevron open" id="tag-lib-chevron">›</span>
+      </div>
+      <div class="tag-lib-body" id="tag-lib-body">
+        <div class="tag-lib-search-wrap">
+          <input type="text" id="tag-search" placeholder="חיפוש תג..." oninput="filterTags(this.value)">
+        </div>
+        <div class="categories" id="categories"></div>
+      </div>
+    </div>
+
+    <div class="pcard" style="flex:1;display:flex;flex-direction:column;min-height:0;">
+      <div class="pcard-hdr">
+        <span>Full Lyrics</span>
+      </div>
+      <div id="full-lyrics-out"></div>
+      <div class="lyrics-char-counter" id="lyrics-counter">0 / 3000 תווים</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- INLINE GENDER POPUP -->
+<div id="ambig-popup"></div>
+
+<!-- IMPORT MODAL -->
+<div id="import-overlay" onclick="closeImportModal(event)">
+  <div id="import-modal">
+    <h3>ייבוא שיר שלם</h3>
+    <div class="import-hint">
+      הדבק שיר בפורמט Suno — יחולק אוטומטית למקטעים לפי תגיות כמו
+      <code>[Verse 1]</code> <code>[Chorus]</code> <code>[Bridge: תיאור]</code>
+    </div>
+    <textarea id="import-ta" placeholder="[Verse 1: description]&#10;מילות הבית...&#10;&#10;[Chorus]&#10;מילות הפזמון..."></textarea>
+    <div class="import-actions">
+      <span class="import-parsed-count" id="import-count"></span>
+      <button class="import-cancel" onclick="closeImportModal()">ביטול</button>
+      <button class="import-confirm" onclick="doImport()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        ייבוא שיר
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Section -->
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div id="modal">
+    <h3>בחר סוג מקטע</h3>
+    <div class="modal-tags" id="modal-tags"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+//  TAG LIBRARY DATA
+// ════════════════════════════════════════════
+const TAG_LIBRARY = [
+  {
+    name: 'מבנה', en: 'Structure', color: '#4a9eff',
+    tags: ['Intro','Inst. Intro','Spoken Intro','Verse','Verse 1','Verse 2','Verse 3',
+           'Rap Verse','Pre-Chorus','Chorus','Power Chorus','Final Chorus',
+           'Post-Chorus','Hook','Catchy Hook','Inst. Hook','Refrain','Bridge',
+           'Break','Breakdown','Drop','Build Up','Interlude','Instrumental',
+           'Solo','Guitar Solo','Piano Solo','Synth Solo','Outro','Outro (Fade)',
+           'Coda','A Cappella','Anthem','Overture','Ad-libs','Freestyle']
+  },
+  {
+    name: 'פקודות', en: 'Commands', color: '#ff5c5c',
+    tags: ['[BPM: 80]','[BPM: 100]','[BPM: 120]','[BPM: 140]','[BPM: 160]',
+           '[Key: C Major]','[Key: A Minor]','[Key: D Minor]','[Key: G Major]',
+           '[Time: 4/4]','[Time: 3/4]','[Time: 6/8]',
+           '[Fade In]','[Fade Out]','[Silence]','[Build]','[Repeat x2]',
+           '[Repeat x3]','[spoken]','[whispered]','[shouted]']
+  },
+  {
+    name: 'שירה', en: 'Vocals', color: '#b66dff',
+    tags: ['Male vocals','Female vocals','Male singer','Female singer',
+           'Duet','Mixed duet','Choir','Harmony','Falsetto','Tenor',
+           'Bass voice','Soprano','Mezzo-soprano','Whisper vocals',
+           'Spoken word','Rap','Trap vocals','Screamo','Operatic',
+           'Country twang','Soulful','Gospel vocals','Ad-libs']
+  },
+  {
+    name: 'מצב רוח', en: 'Mood', color: '#ff9f43',
+    tags: ['Energetic','Melancholic','Uplifting','Dark','Happy','Sad',
+           'Romantic','Aggressive','Peaceful','Nostalgic','Haunting',
+           'Dreamy','Mysterious','Epic','Emotional','Playful','Intense',
+           'Chill','Groovy','Hypnotic','Introspective','Triumphant',
+           'Bittersweet','Sensual','Rebellious','Yearning']
+  },
+  {
+    name: 'כלי נגינה', en: 'Instruments', color: '#1dd1a1',
+    tags: ['Acoustic guitar','Electric guitar','Bass guitar','Clean guitar',
+           'Distorted guitar','Piano','Grand piano','Rhodes piano','Keyboard',
+           'Synthesizer','Drums','Drum machine','808 bass','Hi-hats','Snare',
+           'Kick drum','Violin','Cello','Viola','String quartet','Orchestra',
+           'Strings','Trumpet','Saxophone','Flute','Clarinet','Trombone',
+           'Bassoon','Choir pads','Synth pad','Arpeggiated synth']
+  },
+  {
+    name: 'ים תיכוני / מזרחי', en: 'Mediterranean', color: '#ffd060',
+    tags: ['Oud','Darbuka','Qanun','Ney','Tabla','Saz','Buzuq','Riq',
+           'Middle Eastern','Oriental','Israeli folk','Mizrahi',
+           'Arabic scales','Maqam Hijaz','Maqam Rast','Maqam Bayat',
+           'Sephardic','Yemenite','Moroccan','Persian','Turkish music',
+           'Flamenco','Greek folk','Belly dance beat','Debka']
+  },
+  {
+    name: 'פרודקשן / FX', en: 'Production', color: '#ff6b9d',
+    tags: ['Reverb','Heavy reverb','Echo','Delay','Distortion','Overdrive',
+           'Lo-fi','Hi-fi','Studio quality','Live feel','Vinyl crackle',
+           'Auto-tune','Vocal harmony','Pitch shift','Bass boost','Sub bass',
+           'Layered vocals','Double tracked','Wide stereo','Sidechain',
+           'Glitchy','Ambient wash','Compression','Tape saturation']
+  },
+  {
+    name: 'סימון קצב', en: 'Notation', color: '#54a0ff',
+    tags: ['60 BPM','80 BPM','90 BPM','100 BPM','110 BPM','120 BPM',
+           '128 BPM','140 BPM','160 BPM','175 BPM',
+           '4/4','3/4','6/8','7/8','5/4',
+           'Upbeat','Half time','Double time','Swing','Shuffle','Straight']
+  },
+  {
+    name: "ז'אנר", en: 'Genre', color: '#ee5a24',
+    tags: ['Pop','Indie pop','Synth pop','Art pop','K-pop',
+           'Rock','Indie rock','Alternative rock','Hard rock',
+           'Metal','Heavy metal','Nu metal','Post-rock',
+           'Hip-hop','Trap','Drill','Boom bap','Lo-fi hip-hop',
+           'R&B','Neo soul','Soul','Funk','Disco',
+           'Jazz','Blues','Gospel','Folk','Country',
+           'Electronic','House','Deep house','Techno','Trance',
+           'Drum and bass','Dubstep','Ambient','Chillwave',
+           'Reggae','Reggaeton','Afrobeats','Bossa nova',
+           'Classical','Cinematic','Orchestral','Celtic']
+  },
+  {
+    name: 'הופעה חיה', en: 'Live', color: '#c44569',
+    tags: ['Live performance','Concert','Acoustic live','Unplugged',
+           'Arena rock','Intimate venue','Festival vibe','Stadium crowd',
+           'Crowd noise','Applause','Live band','Live drums','One take']
+  }
+];
+
+// Section badge colors
+const SECTION_COLORS = {
+  'Verse': '#3a5cbf', 'Verse 1': '#3a5cbf', 'Verse 2': '#2d4eaa', 'Verse 3': '#2a4899',
+  'Chorus': '#8b2252', 'Power Chorus': '#a0284a', 'Final Chorus': '#992040',
+  'Pre-Chorus': '#663388', 'Post-Chorus': '#5a2d80',
+  'Bridge': '#1a7a5a', 'Hook': '#7a4a10', 'Catchy Hook': '#8a5010',
+  'Intro': '#2d6b3a', 'Outro': '#4a3060', 'Outro (Fade)': '#3a2454',
+  'Breakdown': '#7a3030', 'Drop': '#8a1a1a', 'Build Up': '#5a4a10',
+  'Instrumental': '#1a5070', 'Interlude': '#1a4060', 'Solo': '#4a4a10',
+  'Rap Verse': '#3a5030', 'Freestyle': '#5a3a10', 'Ad-libs': '#3a3a60',
+  'A Cappella': '#2d5050', 'Refrain': '#4a2d5a', 'Coda': '#303060',
+  'default': '#3a3a4a'
+};
+
+// Nikud codepoints
+const NIKUD_CP_START = 0x05B0, NIKUD_CP_END = 0x05C7;
+const isNikud = cp => cp >= NIKUD_CP_START && cp <= NIKUD_CP_END;
+const isHebLetter = cp => cp >= 0x05D0 && cp <= 0x05EA;
+
+// Hebrew transliteration tables
+const HEB_CONSONANTS = {
+  'א':'', 'ב':'b','ג':'g','ד':'d','ה':'h','ו':'v','ז':'z','ח':'ch',
+  'ט':'t','י':'y','כ':'k','ך':'ch','ל':'l','מ':'m','ם':'m','נ':'n',
+  'ן':'n','ס':'s','ע':'' ,'פ':'p','ף':'f','צ':'ts','ץ':'ts','ק':'k',
+  'ר':'r','ש':'sh','ת':'t'
+};
+const HEB_VOWELS = {
+  '\u05B0': '',  // שְׁוָא נח — silent
+  '\u05B1': 'e', // חָטֶף סֶגּוֹל
+  '\u05B2': 'a', // חָטֶף פַּתָּח
+  '\u05B3': 'o', // חָטֶף קָמָץ
+  '\u05B4': 'i', // חִירִיק
+  '\u05B5': 'e', // צֵרֵי
+  '\u05B6': 'e', // סֶגּוֹל
+  '\u05B7': 'a', // פַּתָּח
+  '\u05B8': 'a', // קָמָץ
+  '\u05B9': 'o', // חֹלֶם (on non-ו letter)
+  '\u05BA': 'o', // חֹלֶם וָו (on ו — ו IS the vowel, no consonant)
+  '\u05BB': 'u', // קִבּוּץ / שׁוּרוּק
+  '\u05BC': '',  // דָּגֵשׁ — silent
+  '\u05BD': '',  // מֵתֵג — silent
+  '\u05BF': '',  // רָפֶה — silent
+  '\u05C1': '',  // שִׁין dot — handled separately
+  '\u05C2': '',  // שִׂין dot — handled separately
+};
+
+// ════════════════════════════════════════════
+//  UNDO HISTORY
+// ════════════════════════════════════════════
+const UNDO_LIMIT = 50;
+let undoStack = [];   // array of snapshots
+let undoPointer = -1; // current position in stack
+let undoPaused = false;
+
+function snapshotState() {
+  return {
+    sections: sections.map(s => ({ ...s })),
+    sectionIdCounter,
+    stylePrompt: document.getElementById('style-prompt')?.value ?? ''
+  };
+}
+
+function pushUndo() {
+  if (undoPaused) return;
+  // Drop any redo states ahead of pointer
+  undoStack = undoStack.slice(0, undoPointer + 1);
+  undoStack.push(snapshotState());
+  if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+  undoPointer = undoStack.length - 1;
+  updateUndoBtn();
+}
+
+function undo() {
+  if (undoPointer <= 0) { showToast('אין מה לבטל', ''); return; }
+  clearAllAmbigStates();
+  undoPointer--;
+  restoreSnapshot(undoStack[undoPointer]);
+  showToast('בוטל ↩', '');
+  updateUndoBtn();
+}
+
+function redo() {
+  if (undoPointer >= undoStack.length - 1) { showToast('אין מה לשחזר', ''); return; }
+  clearAllAmbigStates();
+  undoPointer++;
+  restoreSnapshot(undoStack[undoPointer]);
+  showToast('שוחזר ↪', '');
+  updateUndoBtn();
+}
+
+function restoreSnapshot(snap) {
+  undoPaused = true;
+  sections = snap.sections.map(s => ({ ...s }));
+  sectionIdCounter = snap.sectionIdCounter;
+  const sp = document.getElementById('style-prompt');
+  if (sp) sp.value = snap.stylePrompt;
+  renderSections();
+  updateOutput();
+  updateStyleCounter();
+  undoPaused = false;
+}
+
+function updateUndoBtn() {
+  const btn = document.getElementById('btn-undo');
+  const redoBtn = document.getElementById('btn-redo');
+  if (btn) btn.disabled = undoPointer <= 0;
+  if (redoBtn) redoBtn.disabled = undoPointer >= undoStack.length - 1;
+}
+
+// ════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════
+let sections = [];
+let sectionIdCounter = 0;
+
+// ════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  renderTagLibrary();
+  renderCommandPanel('style');
+  renderCommandPanel('lyrics');
+  renderQuickAddButtons();
+  // Build initial sections without polluting undo stack
+  undoPaused = true;
+  const id1 = ++sectionIdCounter; sections.push({ id: id1, name: 'Verse 1', text: '' });
+  const id2 = ++sectionIdCounter; sections.push({ id: id2, name: 'Chorus',  text: '' });
+  const id3 = ++sectionIdCounter; sections.push({ id: id3, name: 'Verse 2', text: '' });
+  renderSections(); updateOutput();
+  undoPaused = false;
+  pushUndo(); // initial snapshot
+  updateUndoBtn();
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#tpl-wrap')) {
+      document.getElementById('tpl-dd').classList.remove('open');
+    }
+    // Close ambig popup when clicking outside
+    if (activeAmbigPopup && !e.target.closest('#ambig-popup') && !e.target.classList.contains('ambig-word')) {
+      hideAmbigPopup();
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && activeAmbigPopup) hideAmbigPopup();
+    if (e.key === 'Escape' && document.getElementById('import-overlay').classList.contains('open')) closeImportModal();
+  });
+});
+
+// ════════════════════════════════════════════
+//  TAG LIBRARY RENDER
+// ════════════════════════════════════════════
+function renderTagLibrary(filter = '') {
+  const container = document.getElementById('categories');
+  container.innerHTML = '';
+  const f = filter.toLowerCase().trim();
+
+  TAG_LIBRARY.forEach((cat, ci) => {
+    const filteredTags = f
+      ? cat.tags.filter(t => t.toLowerCase().includes(f))
+      : cat.tags;
+    if (filteredTags.length === 0) return;
+
+    const catEl = document.createElement('div');
+    catEl.className = 'cat ' + (f ? 'open' : (ci < 3 ? 'open' : 'closed'));
+    catEl.innerHTML = `
+      <div class="cat-header" onclick="this.parentElement.classList.toggle('open'); this.parentElement.classList.toggle('closed')">
+        <span class="cat-dot" style="background:${cat.color}"></span>
+        <span class="cat-name">${cat.name}</span>
+        <span class="cat-count">${filteredTags.length}</span>
+        <span class="cat-chevron">›</span>
+      </div>
+      <div class="cat-tags" id="cat-tags-${ci}"></div>
+    `;
+    container.appendChild(catEl);
+
+    const tagsEl = catEl.querySelector('.cat-tags');
+    filteredTags.forEach(tag => {
+      const pill = document.createElement('span');
+      pill.className = 'tag';
+      pill.textContent = tag;
+      const bg = cat.color + '28';
+      const border = cat.color + '60';
+      pill.style.cssText = `background:${bg};border-color:${border};color:${cat.color}`;
+      pill.title = `לחץ להוסיף ל-Style Prompt • לחץ פעמיים להוסיף מקטע`;
+      pill.onclick = () => addTagToPrompt(tag, cat.color, pill);
+      pill.ondblclick = e => { e.preventDefault(); addSectionFromTag(tag); };
+      tagsEl.appendChild(pill);
+    });
+  });
+}
+
+function filterTags(val) {
+  renderTagLibrary(val);
+}
+
+function addTagToPrompt(tag, color, el) {
+  const ta = document.getElementById('style-prompt');
+  const cur = ta.value.trim();
+  if (!cur.includes(tag)) {
+    ta.value = cur ? cur + ', ' + tag : tag;
+    el && el.classList.toggle('in-prompt');
+    updateStyleCounter();
+    showToast(`נוסף: ${tag}`, 'success');
+  } else {
+    // Remove if already present
+    ta.value = ta.value.replace(new RegExp(',?\\s*' + escapeRe(tag) + ',?\\s*', 'g'), ', ').replace(/^,\s*|,\s*$/g, '').trim();
+    el && el.classList.remove('in-prompt');
+    updateStyleCounter();
+  }
+}
+
+function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+// ════════════════════════════════════════════
+//  SECTIONS
+// ════════════════════════════════════════════
+function addSection(name, text = '') {
+  pushUndo();
+  const id = ++sectionIdCounter;
+  sections.push({ id, name, text });
+  renderSections();
+  updateOutput();
+  // Auto focus new section
+  setTimeout(() => {
+    const ta = document.getElementById('ta-' + id);
+    if (ta) ta.focus();
+  }, 50);
+}
+
+function removeSection(id) {
+  pushUndo();
+  sections = sections.filter(s => s.id !== id);
+  renderSections();
+  updateOutput();
+}
+
+function moveSectionUp(id) {
+  const idx = sections.findIndex(s => s.id === id);
+  if (idx > 0) { pushUndo(); [sections[idx-1], sections[idx]] = [sections[idx], sections[idx-1]]; renderSections(); updateOutput(); }
+}
+
+function moveSectionDown(id) {
+  const idx = sections.findIndex(s => s.id === id);
+  if (idx < sections.length - 1) { pushUndo(); [sections[idx], sections[idx+1]] = [sections[idx+1], sections[idx]]; renderSections(); updateOutput(); }
+}
+
+// Debounced push for text typing (don't push on every keystroke)
+let textUndoTimer;
+function updateSectionText(id, text) {
+  const sec = sections.find(s => s.id === id);
+  if (sec) {
+    sec.text = text;
+    updateOutput();
+    clearTimeout(textUndoTimer);
+    textUndoTimer = setTimeout(pushUndo, 800);
+  }
+}
+
+function renderSections() {
+  const container = document.getElementById('sections-container');
+  // Save cursor positions before re-render
+  const focusId = document.activeElement && document.activeElement.id && document.activeElement.id.startsWith('ta-')
+    ? parseInt(document.activeElement.id.replace('ta-','')) : null;
+  const sel = focusId ? { start: document.activeElement.selectionStart, end: document.activeElement.selectionEnd } : null;
+
+  container.innerHTML = '';
+  sections.forEach(sec => {
+    const baseName = sec.name.includes(':') ? sec.name.split(':')[0].trim() : sec.name;
+    const color = SECTION_COLORS[sec.name] || SECTION_COLORS[baseName] || SECTION_COLORS['default'];
+    const block = document.createElement('div');
+    block.className = 'section-block';
+    block.innerHTML = `
+      <div class="section-head">
+        <span class="section-badge" style="background:${color}28;border:1px solid ${color}60;color:${color}bf" title="${escHtml(sec.name)}">
+          ${escHtml(baseName)}
+          <span class="x" onclick="removeSection(${sec.id})">×</span>
+        </span>
+        <div class="section-actions">
+          <button class="sact sec-nikud" onclick="nikudSection(${sec.id})" title="ניקוד המקטע">נ׳ ניקוד</button>
+          <button class="sact sec-latin" onclick="latinizeSection(${sec.id})" title="לטינזציה למקטע">Aa לטין</button>
+          <button class="sact sec-dir" id="dir-btn-${sec.id}" onclick="toggleDir(${sec.id})" title="שנה כיוון טקסט">${(sec.dir||'rtl').toUpperCase()}</button>
+          <button class="sact" onclick="moveSectionUp(${sec.id})" title="העבר למעלה">↑</button>
+          <button class="sact" onclick="moveSectionDown(${sec.id})" title="העבר למטה">↓</button>
+        </div>
+      </div>
+      <div class="lyrics-wrapper">
+        <textarea class="lyrics-ta" id="ta-${sec.id}"
+          placeholder="הקלד מילים..."
+          style="direction:${sec.dir||'rtl'}"
+          oninput="updateSectionText(${sec.id}, this.value); autoResizeTa(this)"
+          onpaste="setTimeout(()=>{ updateSectionText(${sec.id}, this.value); autoResizeTa(this); },0)"
+        >${escHtml(sec.text)}</textarea>
+        <div class="lyrics-mirror" id="mirror-${sec.id}" style="direction:${sec.dir||'rtl'}"></div>
+      </div>
+    `;
+    container.appendChild(block);
+  });
+
+  // Restore focus + selection
+  if (focusId) {
+    const el = document.getElementById('ta-' + focusId);
+    if (el && sel) {
+      el.focus();
+      el.setSelectionRange(sel.start, sel.end);
+    }
+  }
+
+  // Re-attach ambig listeners after DOM rebuild
+  restoreAmbigListeners();
+
+  // Auto-size all textareas to fit their content
+  setTimeout(autoResizeAll, 0);
+
+  // Sync global dir button label to majority direction
+  const dirs = sections.map(s => s.dir || 'rtl');
+  const majority = dirs.filter(d => d === 'rtl').length >= dirs.length / 2 ? 'rtl' : 'ltr';
+  const lbl = document.getElementById('global-dir-lbl');
+  if (lbl) lbl.textContent = majority.toUpperCase();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleAllDir() {
+  // Determine new direction: flip whatever the majority currently is
+  const dirs = sections.map(s => s.dir || 'rtl');
+  const newDir = dirs.filter(d => d === 'rtl').length >= dirs.length / 2 ? 'ltr' : 'rtl';
+  pushUndo();
+  sections.forEach(s => {
+    s.dir = newDir;
+    const ta     = document.getElementById('ta-'      + s.id);
+    const mirror = document.getElementById('mirror-'  + s.id);
+    const btn    = document.getElementById('dir-btn-' + s.id);
+    if (ta)     ta.style.direction     = newDir;
+    if (mirror) mirror.style.direction = newDir;
+    if (btn)    btn.textContent        = newDir.toUpperCase();
+  });
+  const lbl = document.getElementById('global-dir-lbl');
+  if (lbl) lbl.textContent = newDir.toUpperCase();
+}
+
+function toggleDir(id) {
+  const sec = sections.find(s => s.id === id);
+  if (!sec) return;
+  sec.dir = (sec.dir || 'rtl') === 'rtl' ? 'ltr' : 'rtl';
+  const ta     = document.getElementById('ta-'     + id);
+  const mirror = document.getElementById('mirror-' + id);
+  const btn    = document.getElementById('dir-btn-' + id);
+  if (ta)     ta.style.direction     = sec.dir;
+  if (mirror) mirror.style.direction = sec.dir;
+  if (btn)    btn.textContent        = sec.dir.toUpperCase();
+  pushUndo();
+}
+
+function autoResizeTa(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+}
+
+function autoResizeAll() {
+  document.querySelectorAll('.lyrics-ta').forEach(autoResizeTa);
+}
+
+// ════════════════════════════════════════════
+//  QUICK ADD BUTTONS
+// ════════════════════════════════════════════
+const QUICK_SECTIONS = ['Verse','Chorus','Bridge','Pre-Chorus','Outro','Hook','Breakdown','Instrumental'];
+
+function renderQuickAddButtons() {
+  const row = document.getElementById('add-row');
+  QUICK_SECTIONS.forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'add-sec-btn';
+    btn.innerHTML = `<span style="color:var(--blue)">+</span> ${name}`;
+    btn.onclick = () => addSection(name);
+    row.appendChild(btn);
+  });
+  const moreBtn = document.createElement('button');
+  moreBtn.className = 'add-sec-btn';
+  moreBtn.innerHTML = `<span style="color:var(--blue)">+</span> אחר...`;
+  moreBtn.onclick = openModal;
+  row.appendChild(moreBtn);
+}
+
+// ════════════════════════════════════════════
+//  MODAL
+// ════════════════════════════════════════════
+function openModal() {
+  const modal = document.getElementById('modal-overlay');
+  const tagsEl = document.getElementById('modal-tags');
+  tagsEl.innerHTML = '';
+  const allTags = TAG_LIBRARY.find(c => c.en === 'Structure').tags;
+  allTags.forEach(t => {
+    const el = document.createElement('button');
+    el.className = 'modal-tag';
+    el.textContent = t;
+    const color = SECTION_COLORS[t] || SECTION_COLORS['default'];
+    el.style.cssText = `background:${color}30;border-color:${color}70;color:${color}cc`;
+    el.onclick = () => { addSection(t); closeModal(); };
+    tagsEl.appendChild(el);
+  });
+  modal.classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+function addSectionFromTag(tag) {
+  // Only add as section if it's a structural tag
+  const structTags = TAG_LIBRARY.find(c => c.en === 'Structure').tags;
+  if (structTags.includes(tag)) {
+    addSection(tag);
+    showToast(`מקטע "${tag}" נוסף`, 'success');
+  } else {
+    addTagToPrompt(tag);
+  }
+}
+
+// ════════════════════════════════════════════
+//  NIKUD (Dicta API — multiple endpoints + CORS proxy fallback)
+// ════════════════════════════════════════════
+const NAKDAN_BODY = t => ({
+  task: 'nakdan', data: t, genre: 'modern', addmorph: false
+});
+
+async function callDictaNakdan(text) {
+  const resp = await fetch('/api/nikud', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(NAKDAN_BODY(text))
+  });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  return parseDictaResponse(data, text);
+}
+
+// Returns raw array for gender detection
+async function callDictaNakdanRaw(text) {
+  const resp = await fetch('/api/nikud', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(NAKDAN_BODY(text))
+  });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  return await resp.json();
+}
+
+function parseDictaResponse(data, fallback) {
+  if (!data) return fallback;
+  if (typeof data === 'string') return data || fallback;
+  if (!Array.isArray(data)) return fallback;
+
+  // Real API format: [{word, sep, options:["מנוקד1","מנוקד2"], ...}, ...]
+  // sep:true = whitespace/punctuation token, sep:false = Hebrew word
+  const parts = [];
+  for (const item of data) {
+    if (typeof item === 'string') { parts.push(item); continue; }
+    if (!item || typeof item !== 'object') continue;
+
+    if (item.sep) {
+      // whitespace / punctuation — use the original word
+      parts.push(item.word ?? '');
+    } else {
+      // Hebrew word — take first nikud option
+      if (item.options?.length)       parts.push(item.options[0]);
+      else if (item.nakdan)           parts.push(item.nakdan);
+      else if (item.withNikud)        parts.push(item.withNikud);
+      else                            parts.push(item.word ?? '');
+    }
+  }
+  const result = parts.join('').trim();
+  return result || fallback;
+}
+
+// ════════════════════════════════════════════
+//  GENDER DETECTION
+// ════════════════════════════════════════════
+
+// Detect if two nikud options differ in gender (masc vs fem).
+// Heuristic: feminine forms typically end with ת+ָּ (patach), or ָה, or have צֵרֵי vs פַּתָּח pattern.
+// More reliably: compare stripped consonants — if identical, it's same word different gender.
+function stripNikud(str) {
+  return str.replace(/[\u05B0-\u05C7]/g, '');
+}
+
+// Classify which option is masculine and which is feminine.
+// Strategy: fem usually ends with ת with patach (תָ→masc, תְ→fem),
+// or with ָה (fem) vs ֶה (masc), or ִי (fem) vs ֶה / empty (masc).
+function classifyGender(opt1, opt2) {
+  // Last chars of each option
+  const endOf = s => [...s].slice(-3).join('');
+  const e1 = endOf(opt1), e2 = endOf(opt2);
+
+  // Pattern: ת+ָּ (ta) = masc, ת+ְ (t) = fem — common in past tense 2nd person
+  const taMasc = /תָּ$|תָ$/.test(opt1) || /תַּ$/.test(opt1);
+  const taFem  = /תְּ$|תְ$/.test(opt1);
+  if (taMasc) return { masc: opt1, fem: opt2 };
+  if (taFem)  return { masc: opt2, fem: opt1 };
+  if (/תָּ$|תָ$/.test(opt2)) return { masc: opt2, fem: opt1 };
+  if (/תְּ$|תְ$/.test(opt2)) return { masc: opt1, fem: opt2 };
+
+  // Pattern: ָה (ah fem ending) vs no ה or other ending
+  if (/[^ה]ָה$/.test(opt1) || /ָה$/.test(opt1)) return { masc: opt2, fem: opt1 };
+  if (/[^ה]ָה$/.test(opt2) || /ָה$/.test(opt2)) return { masc: opt1, fem: opt2 };
+
+  // Pattern: ֶת (et) = fem
+  if (/\u05B6ת$/.test(opt1)) return { masc: opt2, fem: opt1 };
+  if (/\u05B6ת$/.test(opt2)) return { masc: opt1, fem: opt2 };
+
+  // Pattern: ִים or ִים-like = masc plural; וֹת = fem plural
+  if (/\u05B4ים$/.test(opt1)) return { masc: opt1, fem: opt2 };
+  if (/\u05B4ים$/.test(opt2)) return { masc: opt2, fem: opt1 };
+
+  // Default: shorter = masc (heuristic)
+  return opt1.length <= opt2.length
+    ? { masc: opt1, fem: opt2 }
+    : { masc: opt2, fem: opt1 };
+}
+
+// ════════════════════════════════════════════
+//  HOMOGRAPH DICTIONARY
+//  מילים הומוגרפיות — כתיב זהה, ניקוד שונה לזכר/נקבה
+// ════════════════════════════════════════════
+const HOMOGRAPH_DICT = {
+  // ── בינוני קל / ל"ה — זכר: ֶה, נקבה: ָה ──────────────────────────
+  'רוצה':  { masc: 'רוֹצֶה',    fem: 'רוֹצָה'    }, // רוצה
+  'עושה':  { masc: 'עוֹשֶׂה',   fem: 'עוֹשָׂה'   }, // עושה
+  'רואה':  { masc: 'רוֹאֶה',    fem: 'רוֹאָה'    }, // רואה
+  'קונה':  { masc: 'קוֹנֶה',    fem: 'קוֹנָה'    }, // קונה
+  'בונה':  { masc: 'בּוֹנֶה',   fem: 'בּוֹנָה'   }, // בונה
+  'פונה':  { masc: 'פּוֹנֶה',   fem: 'פּוֹנָה'   }, // פונה
+  'עונה':  { masc: 'עוֹנֶה',    fem: 'עוֹנָה'    }, // עונה
+  'עולה':  { masc: 'עוֹלֶה',    fem: 'עוֹלָה'    }, // עולה
+  'שותה':  { masc: 'שׁוֹתֶה',   fem: 'שׁוֹתָה'   }, // שותה
+  'קורה':  { masc: 'קוֹרֶה',    fem: 'קוֹרָה'    }, // קורה
+  'צופה':  { masc: 'צוֹפֶה',    fem: 'צוֹפָה'    }, // צופה
+  'חוזה':  { masc: 'חוֹזֶה',    fem: 'חוֹזָה'    }, // חוזה
+  'גולה':  { masc: 'גּוֹלֶה',   fem: 'גּוֹלָה'   }, // גולה
+  'בוכה':  { masc: 'בּוֹכֶה',   fem: 'בּוֹכָה'   }, // בוכה
+  'יורה':  { masc: 'יוֹרֶה',    fem: 'יוֹרָה'    }, // יורה
+  'חיה':   { masc: 'חָיֶה',     fem: 'חָיָה'     }, // חי/חיה
+  'כלה':   { masc: 'כָּלֶה',    fem: 'כָּלָה'    }, // נגמר / כלה
+  'שרה':   { masc: 'שָׁרֶה',    fem: 'שָׁרָה'    }, // שר/שרה (זמר)
+  'גדה':   { masc: 'גָּדֶה',    fem: 'גָּדָה'    }, // גדה
+  'מורה':  { masc: 'מוֹרֶה',    fem: 'מוֹרָה'    }, // מורה (שם עצם)
+
+  // ── בינוני פיעל / ל"ה — זכר: ֶּה, נקבה: ָּה ─────────────────────
+  'מנסה':  { masc: 'מְנַסֶּה',  fem: 'מְנַסָּה'  }, // מנסה
+  'מחכה':  { masc: 'מְחַכֶּה',  fem: 'מְחַכָּה'  }, // מחכה
+  'מגלה':  { masc: 'מְגַלֶּה',  fem: 'מְגַלָּה'  }, // מגלה
+  'מקווה': { masc: 'מְקַוֶּה',  fem: 'מְקַוָּה'  }, // מקווה
+  'משנה':  { masc: 'מְשַׁנֶּה', fem: 'מְשַׁנָּה' }, // משנה
+  'מכסה':  { masc: 'מְכַסֶּה',  fem: 'מְכַסָּה'  }, // מכסה
+  'מקשה':  { masc: 'מַקְשֶׁה',  fem: 'מַקְשָׁה'  }, // מקשה
+
+  // ── גוף שני עבר — קל רגיל: זכר תָּ, נקבה תְּ ───────────────────
+  'הלכת':  { masc: 'הָלַכְתָּ',  fem: 'הָלַכְתְּ'  },
+  'ידעת':  { masc: 'יָדַעְתָּ',  fem: 'יָדַעְתְּ'  },
+  'אמרת':  { masc: 'אָמַרְתָּ',  fem: 'אָמַרְתְּ'  },
+  'שמעת':  { masc: 'שָׁמַעְתָּ', fem: 'שָׁמַעְתְּ' },
+  'שמרת':  { masc: 'שָׁמַרְתָּ', fem: 'שָׁמַרְתְּ' },
+  'כתבת':  { masc: 'כָּתַבְתָּ', fem: 'כָּתַבְתְּ' },
+  'אהבת':  { masc: 'אָהַבְתָּ',  fem: 'אָהַבְתְּ'  },
+  'חשבת':  { masc: 'חָשַׁבְתָּ', fem: 'חָשַׁבְתְּ' },
+  'פגשת':  { masc: 'פָּגַשְׁתָּ', fem: 'פָּגַשְׁתְּ' },
+  'זכרת':  { masc: 'זָכַרְתָּ',  fem: 'זָכַרְתְּ'  },
+  'שכחת':  { masc: 'שָׁכַחְתָּ', fem: 'שָׁכַחְתְּ' },
+  'גמרת':  { masc: 'גָּמַרְתָּ', fem: 'גָּמַרְתְּ' },
+  'נפלת':  { masc: 'נָפַלְתָּ',  fem: 'נָפַלְתְּ'  },
+  'ישנת':  { masc: 'יָשַׁנְתָּ', fem: 'יָשַׁנְתְּ' },
+  'נתת':   { masc: 'נָתַתָּ',    fem: 'נָתַתְּ'    },
+  'לקחת':  { masc: 'לָקַחְתָּ',  fem: 'לָקַחְתְּ'  },
+  'ישבת':  { masc: 'יָשַׁבְתָּ', fem: 'יָשַׁבְתְּ' },
+  'עמדת':  { masc: 'עָמַדְתָּ',  fem: 'עָמַדְתְּ'  },
+  'קמת':   { masc: 'קַמְתָּ',    fem: 'קַמְתְּ'    },
+  'נסעת':  { masc: 'נָסַעְתָּ',  fem: 'נָסַעְתְּ'  },
+  'ירדת':  { masc: 'יָרַדְתָּ',  fem: 'יָרַדְתְּ'  },
+  'עזבת':  { masc: 'עָזַבְתָּ',  fem: 'עָזַבְתְּ'  },
+  'נגעת':  { masc: 'נָגַעְתָּ',  fem: 'נָגַעְתְּ'  },
+  'שרת':   { masc: 'שַׁרְתָּ',   fem: 'שַׁרְתְּ'   },
+
+  // ── גוף שני עבר — ל"ה: זכר יתָ, נקבה ית ───────────────────────
+  'ראית':  { masc: 'רָאִיתָ',   fem: 'רָאִית'   },
+  'רצית':  { masc: 'רָצִיתָ',   fem: 'רָצִית'   },
+  'עשית':  { masc: 'עָשִׂיתָ',  fem: 'עָשִׂית'  },
+  'בנית':  { masc: 'בָּנִיתָ',   fem: 'בָּנִית'   },
+  'קנית':  { masc: 'קָנִיתָ',   fem: 'קָנִית'   },
+  'שתית':  { masc: 'שָׁתִיתָ',  fem: 'שָׁתִית'  },
+  'בכית':  { masc: 'בָּכִיתָ',   fem: 'בָּכִית'   },
+  'עליית': { masc: 'עָלִיתָ',   fem: 'עָלִית'   },
+  'חייתָ': { masc: 'חָיִיתָ',   fem: 'חָיִית'   },
+
+  // ── גוף שני עבר — פיעל ל"ה ───────────────────────────────────
+  'ניסית': { masc: 'נִיסִּיתָ',  fem: 'נִיסִּית'  },
+  'חיכית': { masc: 'חִיכִּיתָ',  fem: 'חִיכִּית'  },
+  'ציפית': { masc: 'צִיפִּיתָ',  fem: 'צִיפִּית'  },
+
+  // ── גוף שני עבר — פיעל רגיל ─────────────────────────────────
+  'דיברת': { masc: 'דִּיבַּרְתָּ', fem: 'דִּיבַּרְתְּ' },
+  'בקשת':  { masc: 'בִּקַּשְׁתָּ', fem: 'בִּקַּשְׁתְּ' },
+  'חיפשת': { masc: 'חִיפַּשְׁתָּ', fem: 'חִיפַּשְׁתְּ' },
+  'ניגנת': { masc: 'נִיגַּנְתָּ', fem: 'נִיגַּנְתְּ' },
+
+  // ── גוף שני עבר — הפעיל ─────────────────────────────────────
+  'הבנת':  { masc: 'הֵבַנְתָּ',  fem: 'הֵבַנְתְּ'  },
+  'הרגשת': { masc: 'הִרְגַּשְׁתָּ',fem:'הִרְגַּשְׁתְּ'},
+  'הבאת':  { masc: 'הֵבֵאתָ',   fem: 'הֵבֵאת'   },
+
+  // ── גוף שני עבר — התפעל ─────────────────────────────────────
+  'התחלת': { masc: 'הִתְחַלְתָּ', fem: 'הִתְחַלְתְּ' },
+  'התעלת': { masc: 'הִתְעַלְתָּ', fem: 'הִתְעַלְתְּ' },
+};
+
+// Given raw Dicta response, find homographic words (dict first, then Dicta top-2 fallback)
+function findGenderAmbiguous(rawData) {
+  const ambiguous = [];
+  const seen = new Set();
+  if (!Array.isArray(rawData)) return ambiguous;
+
+  for (const item of rawData) {
+    if (!item || item.sep) continue;
+    const word = item.word ?? '';
+    if (!word || seen.has(word)) continue;
+
+    // ── Primary: known homograph dictionary ──
+    const dictEntry = HOMOGRAPH_DICT[word];
+    if (dictEntry) {
+      seen.add(word);
+      ambiguous.push({ word, masc: dictEntry.masc, fem: dictEntry.fem });
+      continue;
+    }
+
+    // ── Fallback: Dicta top-2 same-consonant detection ──
+    const opts = item.options;
+    if (!opts || opts.length < 2) continue;
+    const s0 = stripNikud(opts[0]);
+    const s1 = stripNikud(opts[1]);
+    if (s0 !== s1 || opts[0] === opts[1]) continue;
+    const { masc, fem } = classifyGender(opts[0], opts[1]);
+    if (masc === fem) continue;
+    seen.add(word);
+    ambiguous.push({ word, masc, fem });
+  }
+  return ambiguous;
+}
+
+// Build final text from raw data, substituting gender choices.
+// For known homographs, uses dict.masc as default (consistent baseline).
+function buildNikudText(rawData, genderChoices) {
+  // genderChoices: Map<originalWord, chosenNikud>
+  const parts = [];
+  for (const item of rawData) {
+    if (!item || typeof item !== 'object') continue;
+    if (item.sep) { parts.push(item.word ?? ''); continue; }
+    const chosen = genderChoices?.get(item.word);
+    if (chosen)                          { parts.push(chosen); continue; }
+    const dictEntry = HOMOGRAPH_DICT[item.word ?? ''];
+    if (dictEntry)                       { parts.push(dictEntry.masc); continue; }
+    if (item.options?.length)            parts.push(item.options[0]);
+    else if (item.nakdan)                parts.push(item.nakdan);
+    else                                 parts.push(item.word ?? '');
+  }
+  return parts.join('').trim();
+}
+
+// ════════════════════════════════════════════
+//  INLINE GENDER DISAMBIGUATION
+// ════════════════════════════════════════════
+
+// Map<sectionId, { items: [{word, masc, fem, currentGender, currentNikud}] }>
+const ambigStates = new Map();
+let activeAmbigPopup = null; // { word, sectionId }
+
+// Set up inline ambig state after nikud is applied.
+// ta.value must already contain the default nikud.
+function setupAmbigState(sectionId, ambiguous) {
+  const ta = document.getElementById('ta-' + sectionId);
+  if (!ta || ambiguous.length === 0) { clearAmbigState(sectionId); return; }
+
+  // Remove old listeners before re-setting (in case of re-nikud)
+  if (ta._ambigInputHandler)  { ta.removeEventListener('input',  ta._ambigInputHandler);  delete ta._ambigInputHandler; }
+  if (ta._ambigScrollHandler) { ta.removeEventListener('scroll', ta._ambigScrollHandler); delete ta._ambigScrollHandler; }
+
+  ambigStates.set(sectionId, {
+    items: ambiguous.map(a => ({
+      word: a.word,
+      masc: a.masc,
+      fem: a.fem,
+      currentGender: 'masc',
+      currentNikud: a.masc   // default is option[0] which we classified as masc
+    }))
+  });
+
+  ta.classList.add('has-ambig');
+  renderMirror(sectionId);
+
+  // User types → just re-render the mirror (keep ambig state alive)
+  ta._ambigInputHandler = () => renderMirror(sectionId);
+  ta.addEventListener('input', ta._ambigInputHandler);
+
+  // Sync scroll between textarea and mirror
+  ta._ambigScrollHandler = () => {
+    const mirror = document.getElementById('mirror-' + sectionId);
+    if (mirror) mirror.scrollTop = ta.scrollTop;
+  };
+  ta.addEventListener('scroll', ta._ambigScrollHandler);
+}
+
+// Re-attach listeners after renderSections() rebuilds DOM
+function restoreAmbigListeners() {
+  for (const [sectionId] of ambigStates) {
+    const ta = document.getElementById('ta-' + sectionId);
+    if (!ta) continue;
+    ta.classList.add('has-ambig');
+    ta._ambigInputHandler = () => renderMirror(sectionId);
+    ta.addEventListener('input', ta._ambigInputHandler);
+    ta._ambigScrollHandler = () => {
+      const mirror = document.getElementById('mirror-' + sectionId);
+      if (mirror) mirror.scrollTop = ta.scrollTop;
+    };
+    ta.addEventListener('scroll', ta._ambigScrollHandler);
+    renderMirror(sectionId);
+  }
+}
+
+function clearAmbigState(sectionId) {
+  ambigStates.delete(sectionId);
+  const ta = document.getElementById('ta-' + sectionId);
+  const mirror = document.getElementById('mirror-' + sectionId);
+  if (ta) {
+    ta.classList.remove('has-ambig');
+    if (ta._ambigInputHandler) { ta.removeEventListener('input', ta._ambigInputHandler); delete ta._ambigInputHandler; }
+    if (ta._ambigScrollHandler) { ta.removeEventListener('scroll', ta._ambigScrollHandler); delete ta._ambigScrollHandler; }
+  }
+  if (mirror) mirror.innerHTML = '';
+  if (activeAmbigPopup?.sectionId === sectionId) hideAmbigPopup();
+}
+
+function clearAllAmbigStates() {
+  for (const id of [...ambigStates.keys()]) clearAmbigState(id);
+}
+
+// Render the mirror overlay: plain text + clickable spans for ambig words
+function renderMirror(sectionId) {
+  const ta = document.getElementById('ta-' + sectionId);
+  const mirror = document.getElementById('mirror-' + sectionId);
+  const state = ambigStates.get(sectionId);
+  if (!ta || !mirror || !state) return;
+
+  const text = ta.value;
+
+  // Find all occurrences of each ambig word's current nikud
+  const ranges = [];
+  for (const item of state.items) {
+    const needle = item.currentNikud;
+    let pos = 0;
+    while (true) {
+      const idx = text.indexOf(needle, pos);
+      if (idx === -1) break;
+      ranges.push({ start: idx, end: idx + needle.length, item });
+      pos = idx + needle.length;
+    }
+  }
+  ranges.sort((a, b) => a.start - b.start);
+
+  // Build HTML: plain segments + ambig spans
+  let html = '';
+  let cursor = 0;
+  for (const r of ranges) {
+    if (r.start < cursor) continue;
+    if (r.start > cursor) html += escHtmlMirror(text.substring(cursor, r.start));
+    const gCls = r.item.currentGender === 'masc' ? 'ambig-masc' : 'ambig-fem';
+    const wordEsc = r.item.word.replace(/'/g, "\\'");
+    const wordData = r.item.word.replace(/"/g, '&quot;');
+    html += `<span class="ambig-word ${gCls}" data-word="${wordData}" onclick="ambigWordClick(event,'${wordEsc}',${sectionId})">${escHtmlMirror(r.item.currentNikud)}</span>`;
+    cursor = r.end;
+  }
+  if (cursor < text.length) html += escHtmlMirror(text.substring(cursor));
+
+  mirror.innerHTML = html;
+  mirror.scrollTop = ta.scrollTop;
+}
+
+function escHtmlMirror(s) {
+  return s
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+}
+
+// Click on an underlined ambig word → show popup above it
+function ambigWordClick(event, word, sectionId) {
+  event.stopPropagation();
+  const state = ambigStates.get(sectionId);
+  if (!state) return;
+  const item = state.items.find(i => i.word === word);
+  if (!item) return;
+  hideAmbigPopup();
+  showAmbigPopup(event.currentTarget, item, sectionId);
+}
+
+function showAmbigPopup(spanEl, item, sectionId) {
+  const popup = document.getElementById('ambig-popup');
+
+  popup.innerHTML = `
+    <div class="ap-title">הומוגרף — <span class="ap-word-orig">${escHtml(item.word)}</span></div>
+    <div class="ap-opts">
+      <button class="ap-opt ap-masc ${item.currentGender === 'masc' ? 'ap-selected' : ''}"
+              onclick="setAmbigGender('${item.word.replace(/'/g,"\\'")}','masc',${sectionId})">
+        <span class="ap-nikud">${escHtml(item.masc)}</span>
+        <span class="ap-label">זכר ♂</span>
+      </button>
+      <button class="ap-opt ap-fem ${item.currentGender === 'fem' ? 'ap-selected' : ''}"
+              onclick="setAmbigGender('${item.word.replace(/'/g,"\\'")}','fem',${sectionId})">
+        <span class="ap-nikud">${escHtml(item.fem)}</span>
+        <span class="ap-label">נקבה ♀</span>
+      </button>
+    </div>`;
+
+  popup.style.cssText = 'display:block;visibility:hidden;';
+  const ph = popup.offsetHeight || 100;
+  const pw = popup.offsetWidth || 220;
+  const rect = spanEl.getBoundingClientRect();
+
+  let left = rect.left + rect.width / 2 - pw / 2;
+  let top  = rect.top - ph - 14;
+  // Flip below if no room above
+  if (top < 8) { top = rect.bottom + 14; popup.style.setProperty('--arrow-dir','down'); }
+
+  left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+  popup.style.cssText = `display:block;left:${left}px;top:${top}px;`;
+
+  activeAmbigPopup = { word: item.word, sectionId };
+}
+
+function hideAmbigPopup() {
+  document.getElementById('ambig-popup').style.display = 'none';
+  activeAmbigPopup = null;
+}
+
+// Apply the chosen gender: replace old nikud with new in textarea
+function setAmbigGender(word, gender, sectionId) {
+  const state = ambigStates.get(sectionId);
+  if (!state) return;
+  const ta = document.getElementById('ta-' + sectionId);
+  if (!ta) return;
+  const item = state.items.find(i => i.word === word);
+  if (!item) return;
+
+  const oldNikud = item.currentNikud;
+  const newNikud = gender === 'masc' ? item.masc : item.fem;
+
+  if (oldNikud !== newNikud) {
+    // Replace all occurrences (no input event fires on programmatic ta.value change)
+    ta.value = ta.value.split(oldNikud).join(newNikud);
+    item.currentGender = gender;
+    item.currentNikud  = newNikud;
+
+    // Update section data without triggering ambig clear
+    const sec = sections.find(s => s.id === sectionId);
+    if (sec) sec.text = ta.value;
+    updateOutput();
+    pushUndo();
+
+    renderMirror(sectionId);
+    showToast(gender === 'masc' ? '♂ זכר' : '♀ נקבה', 'success');
+  }
+
+  // Re-render popup pointing at first occurrence of this word
+  const mirror = document.getElementById('mirror-' + sectionId);
+  const found = mirror ? mirror.querySelector(`.ambig-word[data-word="${word.replace(/"/g, '\\"')}"]`) : null;
+  if (found) showAmbigPopup(found, item, sectionId);
+  else hideAmbigPopup();
+}
+
+// ════════════════════════════════════════════
+//  NIKUD (with gender picker)
+// ════════════════════════════════════════════
+async function nikudSelected() {
+  const ta = getFocusedTextarea();
+  if (!ta) { showToast('לחץ בתוך תיבת טקסט תחילה', 'error'); return; }
+
+  const sectionId  = parseInt(ta.id.replace('ta-', ''));
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const hasSelection = start !== end;
+  const text = hasSelection ? ta.value.substring(start, end) : ta.value;
+  if (!text.trim()) { showToast('אין טקסט לניקוד', 'error'); return; }
+
+  const btn = document.getElementById('btn-nikud');
+  btn.innerHTML = '<span class="spin"></span> מנקד...';
+  btn.disabled = true;
+
+  try {
+    const rawData  = await callDictaNakdanRaw(text);
+    const ambiguous = findGenderAmbiguous(rawData);
+    const nikudded  = buildNikudText(rawData, null); // default (masc) for all words
+
+    // Apply nikud to textarea (programmatic — no 'input' event)
+    if (hasSelection) {
+      ta.setRangeText(nikudded, start, end, 'select');
+    } else {
+      ta.value = nikudded;
+    }
+    // Keep section data in sync (without triggering ambig clear via input event)
+    const sec = sections.find(s => s.id === sectionId);
+    if (sec) sec.text = ta.value;
+    updateOutput();
+    pushUndo();
+
+    if (ambiguous.length > 0) {
+      setupAmbigState(sectionId, ambiguous);
+      showToast(`${ambiguous.length} מילה${ambiguous.length > 1 ? 'ות' : ''} הומוגרפיות — לחץ על מילה מסומנת לבחירת מין`, 'success');
+    } else {
+      clearAmbigState(sectionId);
+      showToast('ניקוד בוצע!', 'success');
+    }
+  } catch (e) {
+    console.error('[nikud]', e);
+    showToast('ניקוד נכשל – בדוק חיבור', 'error');
+    showNikudHelp();
+  } finally {
+    btn.innerHTML = '<span>נ׳</span> ניקוד';
+    btn.disabled = false;
+  }
+}
+
+// Nikud on full section
+async function nikudSection(id) {
+  const ta = document.getElementById('ta-' + id);
+  if (!ta || !ta.value.trim()) { showToast('המקטע ריק', 'error'); return; }
+
+  showToast('מנקד...', '');
+  try {
+    const rawData  = await callDictaNakdanRaw(ta.value);
+    const nikudded = buildNikudText(rawData, null);
+    ta.value = nikudded;
+    const sec = sections.find(s => s.id === id);
+    if (sec) sec.text = nikudded;
+    updateOutput();
+    pushUndo();
+
+    const ambiguous = findGenderAmbiguous(rawData);
+    if (ambiguous.length > 0) {
+      setupAmbigState(id, ambiguous);
+      showToast(`${ambiguous.length} מילה${ambiguous.length > 1 ? 'ות' : ''} הומוגרפיות — לחץ על מילה מסומנת`, 'success');
+    } else {
+      clearAmbigState(id);
+      showToast('ניקוד בוצע!', 'success');
+    }
+  } catch(e) {
+    showToast('שגיאה בניקוד', 'error');
+  }
+}
+
+// ════════════════════════════════════════════
+//  LATINIZE (phonetic transliteration)
+// ════════════════════════════════════════════
+function transliterateHebrew(text) {
+  const chars = [...text];
+  let out = '';
+  let i = 0;
+
+  while (i < chars.length) {
+    const c = chars[i];
+    const cp = c.codePointAt(0);
+
+    // ── Skip standalone nikud (shouldn't appear alone) ──────────
+    if (isNikud(cp)) { i++; continue; }
+
+    // ── Non-Hebrew: pass through ─────────────────────────────────
+    if (!isHebLetter(cp)) { out += c; i++; continue; }
+
+    // ── Collect all nikud that follow this letter ────────────────
+    let j = i + 1;
+    const nikudList = [];
+    while (j < chars.length && isNikud(chars[j].codePointAt(0))) {
+      nikudList.push(chars[j]);
+      j++;
+    }
+
+    // ── ו — can be consonant or vowel letter ─────────────────────
+    if (c === 'ו') {
+      // וּ (shuruk \u05BC after ו) or וֹ (cholam \u05BA) → pure vowel
+      const hasShuruk  = nikudList.includes('\u05BC');
+      const hasCholam  = nikudList.includes('\u05BA') || nikudList.includes('\u05B9');
+      if (hasShuruk)  { out += 'u'; i = j; continue; }
+      if (hasCholam)  { out += 'o'; i = j; continue; }
+      // ו with other nikud → consonant + vowel
+      out += 'v';
+      for (const n of nikudList) { const v = HEB_VOWELS[n]; if (v) out += v; }
+      i = j; continue;
+    }
+
+    // ── י — can be consonant or vowel letter ─────────────────────
+    if (c === 'י') {
+      const hasHiriq = nikudList.includes('\u05B4');
+      if (hasHiriq) {
+        // יִ hiriq — don't double 'i' if previous char already 'i'
+        const lastCh = out[out.length - 1] ?? '';
+        if (lastCh !== 'i') out += 'i';
+        i = j; continue;
+      }
+      if (nikudList.length === 0) {
+        // bare י after vowel → mater lectionis 'i', but don't double
+        const lastCh = out[out.length - 1] ?? '';
+        if ('aeiou'.includes(lastCh)) {
+          if (lastCh !== 'i') out += 'i';
+          i = j; continue;
+        }
+      }
+      // Otherwise consonant 'y'
+      out += 'y';
+      for (const n of nikudList) { const v = HEB_VOWELS[n]; if (v) out += v; }
+      i = j; continue;
+    }
+
+    // ── ש — shin or sin depending on dot ─────────────────────────
+    if (c === 'ש') {
+      const hasShinDot = nikudList.includes('\u05C1');
+      const hasSinDot  = nikudList.includes('\u05C2');
+      out += hasSinDot ? 's' : 'sh';
+      for (const n of nikudList) { const v = HEB_VOWELS[n]; if (v !== undefined) out += v; }
+      i = j; continue;
+    }
+
+    // ── ה at word end with no nikud → 'a' (feminine ending) ──────
+    // Only add 'a' if previous output char is a consonant (not already a vowel)
+    if (c === 'ה' && nikudList.length === 0 && !isHebLetter((chars[j] ?? ' ').codePointAt(0))) {
+      const lastCh = out[out.length - 1] ?? '';
+      if (!'aeiou'.includes(lastCh)) out += 'a';
+      i = j; continue;
+    }
+
+    // ── Regular consonant + nikud ────────────────────────────────
+    // ב without dagesh → 'v' ; פ without dagesh → 'f'
+    const hasDagesh = nikudList.includes('\u05BC');
+    let con = HEB_CONSONANTS[c] ?? c;
+    if (c === 'ב' && !hasDagesh) con = 'v';
+    if (c === 'פ' && !hasDagesh) con = 'f';
+    out += con;
+    // For ע / א with patach genuvah (\u05B7 after word-final): add 'a' before consonant
+    let vowelStr = '';
+    for (const n of nikudList) {
+      const v = HEB_VOWELS[n];
+      if (v !== undefined) vowelStr += v;
+    }
+    out += vowelStr;
+    i = j;
+  }
+
+  // Clean up (don't collapse aa/oo — they may be phonetically distinct)
+  return out
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Rough phonetic latinization without nikud.
+// Strategy: insert default vowel 'a' after each consonant unless:
+//   - followed by ו (→ 'o') or י (→ 'i')
+//   - ה at word-end → 'a' (silent/feminine ending)
+//   - word-final consonant → no trailing vowel
+//   - cluster of ש/ת after ה at start → likely hitpa'el, so 'i' for prefix ה
+function roughLatinize(text) {
+  const isHeb = cp => cp >= 0x05D0 && cp <= 0x05EA;
+  let out = '';
+
+  const words = text.split(/(\s+|\n)/);
+  for (const word of words) {
+    if (!/[\u05D0-\u05EA]/.test(word)) { out += word; continue; }
+
+    const chars = [...word];
+    let w = '';
+
+    for (let i = 0; i < chars.length; i++) {
+      const c = chars[i];
+      const cp = c.codePointAt(0);
+
+      // Non-Hebrew character: pass through
+      if (!isHeb(cp)) { w += c; continue; }
+
+      // Strip nikud if any slipped through (shouldn't happen in rough mode)
+      if (cp >= 0x05B0 && cp <= 0x05C7) continue;
+
+      const next  = chars[i + 1];
+      const prev  = chars[i - 1];
+      const nextCp = next?.codePointAt(0);
+      const prevCp = prev?.codePointAt(0);
+      const nextIsHeb = next && isHeb(nextCp);
+      const prevIsHeb = prev && isHeb(prevCp);
+      const isLast = !nextIsHeb;
+
+      // ─── Special vowel-letters ─────────────────────────────────
+      // ו as vowel (mater lectionis)
+      if (c === 'ו') {
+        if (prevIsHeb) { w += 'o'; continue; }  // after consonant = vowel 'o'
+        w += 'v'; continue;                        // at word start = consonant
+      }
+      // י as vowel
+      if (c === 'י') {
+        if (prevIsHeb) { w += 'i'; continue; }
+        w += 'y'; continue;
+      }
+      // ה at word end → 'a' (silent feminine marker)
+      if (c === 'ה' && isLast) { w += 'a'; continue; }
+
+      // ─── Consonant → its phonetic value ───────────────────────
+      let con = HEB_CONSONANTS[c] ?? '';
+      if (c === 'ש') con = 'sh';
+
+      // Prefix ה before ש+ת cluster → hitpa'el/nif'al prefix → 'hi'
+      if (c === 'ה' && i === 0 && next === 'ש' && chars[i+2] === 'ת') {
+        w += 'hi'; continue;
+      }
+      // Prefix ה at start (definite article / causative) → 'ha'
+      if (c === 'ה' && i === 0 && nextIsHeb) {
+        w += 'ha'; continue;
+      }
+
+      // Silent alef / ayin at word start → 'a'
+      if ((c === 'א' || c === 'ע') && i === 0) { w += 'a'; continue; }
+      // Silent alef / ayin mid-word → skip (acts as vowel holder)
+      if ((c === 'א' || c === 'ע') && prevIsHeb) { w += 'a'; continue; }
+
+      // Append consonant
+      w += con;
+
+      // ─── Default vowel 'a' between consecutive consonants ─────
+      // Skip if: last consonant in word, or next is ו/י (already vowel), or con is empty
+      if (con && !isLast && next !== 'ו' && next !== 'י' && next !== 'ה') {
+        w += 'a';
+      }
+    }
+
+    // Clean: remove double vowels (aa→a, oo→o, ii→i), collapse 'aha'→'a' etc.
+    w = w.replace(/([aeiou])\1+/gi, '$1');
+    out += w;
+  }
+  return out.trim();
+}
+
+async function latinizeSelected() {
+  const ta = getFocusedTextarea();
+  if (!ta) { showToast('לחץ בתוך תיבת טקסט תחילה', 'error'); return; }
+
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const hasSelection = start !== end;
+  const text = hasSelection ? ta.value.substring(start, end) : ta.value;
+  if (!text.trim()) { showToast('אין טקסט ללטינזציה', 'error'); return; }
+
+  const btn = document.getElementById('btn-latin');
+  btn.innerHTML = '<span class="spin"></span> ממיר...';
+  btn.disabled = true;
+
+  try {
+    // Try nikud first for best results
+    let source = text;
+    try {
+      source = await callDictaNakdan(text);
+    } catch {}
+
+    const hasNikud = /[\u05B0-\u05C7]/.test(source);
+    const result = hasNikud ? transliterateHebrew(source) : roughLatinize(source);
+
+    if (hasSelection) {
+      ta.setRangeText(result, start, end, 'select');
+    } else {
+      ta.value = result;
+    }
+    ta.dispatchEvent(new Event('input'));
+    showToast('לטינזציה בוצעה!', 'success');
+  } catch(e) {
+    showToast('שגיאה בהמרה', 'error');
+  } finally {
+    btn.innerHTML = '<span>Aa</span> לטינזציה';
+    btn.disabled = false;
+  }
+}
+
+async function latinizeSection(id) {
+  const ta = document.getElementById('ta-' + id);
+  if (!ta || !ta.value.trim()) { showToast('המקטע ריק', 'error'); return; }
+  showToast('ממיר...', '');
+  let source = ta.value;
+  try { source = await callDictaNakdan(ta.value); } catch {}
+  const hasNikud = /[\u05B0-\u05C7]/.test(source);
+  const result = hasNikud ? transliterateHebrew(source) : roughLatinize(source);
+  ta.value = result;
+  updateSectionText(id, result);
+  showToast('לטינזציה בוצעה!', 'success');
+}
+
+// ════════════════════════════════════════════
+//  HELPER: focused textarea
+// ════════════════════════════════════════════
+let lastFocusedTa = null;
+
+document.addEventListener('focusin', e => {
+  if (e.target.classList.contains('lyrics-ta')) lastFocusedTa = e.target;
+});
+
+function getFocusedTextarea() {
+  const active = document.activeElement;
+  if (active && active.classList.contains('lyrics-ta')) return active;
+  return lastFocusedTa;
+}
+
+// ════════════════════════════════════════════
+//  OUTPUT
+// ════════════════════════════════════════════
+function updateOutput() {
+  const out = document.getElementById('full-lyrics-out');
+  let html = '';
+  let rawText = '';
+  sections.forEach(sec => {
+    const text = sec.text || '';
+    const hasOwnHeader = text.trimStart().startsWith('[');
+    if (hasOwnHeader) {
+      rawText += text + '\n\n';
+      // Show first line (the tag) as the coloured header, rest as body
+      const nl = text.indexOf('\n');
+      const headerLine = nl >= 0 ? text.substring(0, nl) : text;
+      const body       = nl >= 0 ? text.substring(nl + 1) : '';
+      html += `<span class="sec-lbl-out">${escHtml(headerLine)}</span>\n${escHtml(body)}\n\n`;
+    } else {
+      const label = `[${sec.name}]`;
+      rawText += label + '\n' + text + '\n\n';
+      html += `<span class="sec-lbl-out">${escHtml(label)}</span>\n${escHtml(text)}\n\n`;
+    }
+  });
+  out.innerHTML = html.trim();
+
+  const lyricsLen = rawText.trim().length;
+  const counter = document.getElementById('lyrics-counter');
+  counter.textContent = `${lyricsLen} / 3000 תווים`;
+  counter.className = 'lyrics-char-counter' + (lyricsLen > 3000 ? ' over' : lyricsLen > 2500 ? ' warn' : '');
+}
+
+function updateStyleCounter() {
+  const ta = document.getElementById('style-prompt');
+  const len = ta.value.length;
+  const counter = document.getElementById('style-counter');
+  counter.textContent = `${len} / 120`;
+  counter.className = 'char-counter' + (len > 120 ? ' over' : len > 100 ? ' warn' : '');
+}
+
+function clearStylePrompt() {
+  document.getElementById('style-prompt').value = '';
+  updateStyleCounter();
+  document.querySelectorAll('.tag.in-prompt').forEach(el => el.classList.remove('in-prompt'));
+}
+
+// ════════════════════════════════════════════
+//  COPY
+// ════════════════════════════════════════════
+function copyOutput() {
+  const style = document.getElementById('style-prompt').value.trim();
+  let lyrics = '';
+  sections.forEach(sec => {
+    const text = sec.text || '';
+    lyrics += text.trimStart().startsWith('[')
+      ? text + '\n\n'
+      : `[${sec.name}]\n${text}\n\n`;
+  });
+  const full = (style ? style + '\n\n' : '') + lyrics.trim();
+  navigator.clipboard.writeText(full).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'COPIED!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('ok'); }, 2000);
+    showToast('הועתק!', 'success');
+  });
+}
+
+// ════════════════════════════════════════════
+//  TEMPLATES
+// ════════════════════════════════════════════
+function toggleTemplates() {
+  document.getElementById('tpl-dd').classList.toggle('open');
+}
+
+const TEMPLATES = {
+  pop: {
+    style: 'Pop, Upbeat, Female vocals, Piano, Synthesizer, 120 BPM',
+    sections: [
+      { name: 'Verse 1', text: '' },
+      { name: 'Pre-Chorus', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Pre-Chorus', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Bridge', text: '' },
+      { name: 'Final Chorus', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
+  rock: {
+    style: 'Rock, Energetic, Male vocals, Electric guitar, Drums, 140 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Solo', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
+  hiphop: {
+    style: 'Hip-hop, Trap, Male vocals, Rap, 808 bass, 90 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Bridge', text: '' },
+      { name: 'Verse 3', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
+  mizrahi: {
+    style: 'Mizrahi, Oriental, Oud, Darbuka, Maqam Hijaz, Male vocals, 100 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Bridge', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Outro (Fade)', text: '' },
+    ]
+  },
+  ballad: {
+    style: 'Ballad, Melancholic, Emotional, Female vocals, Piano, Strings, 70 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Bridge', text: '' },
+      { name: 'Final Chorus', text: '' },
+      { name: 'Outro (Fade)', text: '' },
+    ]
+  }
+};
+
+function loadTemplate(key) {
+  const tpl = TEMPLATES[key];
+  if (!tpl) return;
+  sections = [];
+  sectionIdCounter = 0;
+  tpl.sections.forEach(s => {
+    sections.push({ id: ++sectionIdCounter, name: s.name, text: s.text });
+  });
+  document.getElementById('style-prompt').value = tpl.style;
+  updateStyleCounter();
+  renderSections();
+  updateOutput();
+  document.getElementById('tpl-dd').classList.remove('open');
+  showToast('תבנית נטענה!', 'success');
+}
+
+// ════════════════════════════════════════════
+//  SUNO COMMANDS DATA
+// ════════════════════════════════════════════
+const SUNO_COMMANDS = {
+  style: [
+    {
+      name: 'קולות וביצוע', color: '#b66dff', open: true,
+      chips: ['Deep voice','Bass vocals','Baritone','Low register',
+              'High tenor','Falsetto','Soprano','High register',
+              'Choir','Duet','Mixed duet','Harmony','Background vocals',
+              'Rap','Spoken word','Whisper vocals','Breathy','Operatic',
+              'Country twang','Gospel','Melodic rap','Soulful']
+    },
+    {
+      name: 'אווירה', color: '#ff9f43', open: false,
+      chips: ['Live performance','Concert feel','Crowd noise','Unplugged','Acoustic live','Stadium',
+              'Epic','Cinematic','Film score','Dramatic','Dark atmosphere','Triumphant','Tension',
+              'Heavy reverb','Echo','Lo-fi','Auto-tune','Wide stereo','Vinyl crackle','Tape saturation','Distortion']
+    },
+    {
+      name: 'כלי נגינה', color: '#1dd1a1', open: false,
+      chips: ['Acoustic guitar','Electric guitar','Bass guitar','Clean guitar','Distorted guitar',
+              'Grand piano','Rhodes piano','Keyboard',
+              'Violin','Cello','Strings','Oud','Darbuka','Flute','Nylon guitar',
+              'Synthesizer','Drum machine','808 bass','Arpeggiated synth','Synth pad',
+              'Orchestra','Brass section','Trumpet','Saxophone','French horn']
+    },
+    {
+      name: 'פופ', color: '#e070a0', open: false,
+      chips: ['Acoustic guitar','Ukulele','Grand piano','Rhodes piano','Synth lead',
+              'Bass guitar','String quartet','Brass section','Choir','Background vocals',
+              'Handclaps','Tambourine','Drum machine','Glockenspiel','Wurlitzer']
+    },
+    {
+      name: 'היפ הופ', color: '#e8922a', open: false,
+      chips: ['808 bass','Boom bap drums','Sample chops','Vinyl crackle','Lo-fi drums',
+              'Hi-hats','Snare crack','Kick drum','Rhodes keys','Brass horns',
+              'Record scratch','Sub bass','Soul sample','Jazz sample','Organ stab']
+    },
+    {
+      name: 'אלקטרוני', color: '#28c4af', open: false,
+      chips: ['Synth lead','Synth bass','Arpeggiator','LFO filter','Sidechain compression',
+              'Four-on-the-floor','Drum machine','Vocoder','Synth pad','FM synthesis',
+              'Modular synth','White noise sweep','Stutter edit','Glitch','Polysynth']
+    },
+    {
+      name: 'דאבסטפ', color: '#c84040', open: false,
+      chips: ['Wobble bass','Wub bass','Growl bass','Reese bass','Half-time drums',
+              'Snare crack','Sub bass','Distorted synth','Brostep','Filtered lead',
+              'Screeching synth','Bass drop','Drum breaks','Laser sfx','Glitch fx']
+    },
+    {
+      name: 'טראנס', color: '#9b72ef', open: false,
+      chips: ['Supersaw lead','Trance arp','Trance gate','Pad strings','Kick drum',
+              'Hi-hat rolls','Bassline','Melody riff','Synth stabs','Build up sweep',
+              'Euphoric lead','138 BPM','Reverse cymbal','Pluck synth','Choir pad']
+    },
+    {
+      name: 'טראפ', color: '#4a9eff', open: false,
+      chips: ['808 bass','Trap hi-hats','Triplet hi-hats','Snare rolls','Dark strings',
+              'Piano melody','Brass stabs','Ominous pad','Sub bass','Drum machine',
+              'Flute melody','Bell melody','Distorted 808','Vocal chop','Dark atmosphere']
+    },
+    {
+      name: 'ים תיכוני', color: '#d4a017', open: false,
+      chips: ['Oud','Darbuka','Qanun','Ney flute','Riq','Saz','Buzuq','Tabla',
+              'Oriental strings','Maqam Hijaz','Maqam Rast','Maqam Bayat',
+              'Belly dance rhythm','Debka beat','Greek bouzouki','Flamenco guitar','Mizrahi vocals']
+    },
+    {
+      name: 'אסייתי', color: '#e85c5c', open: false,
+      chips: ['Koto','Shamisen','Shakuhachi','Erhu','Pipa','Taiko drums','Guzheng',
+              'Bamboo flute','Biwa','Pentatonic scale','Chinese strings',
+              'Japanese drums','K-pop synths','Gayageum','Tsugaru']
+    },
+    {
+      name: 'הודי', color: '#e8924a', open: false,
+      chips: ['Sitar','Tabla','Tanpura','Bansuri flute','Sarod','Harmonium',
+              'Mridangam','Veena','Dhol','Raga scale','Bollywood strings',
+              'Carnatic vocals','Bhangra rhythm','Santoor','Shehnai']
+    },
+    {
+      name: 'מדיטציה', color: '#5bc4c4', open: false,
+      chips: ['Singing bowls','Crystal bowls','Tibetan bells','Ambient pad','Drone',
+              'Wind chimes','Rain sounds','Ocean waves','Nature sounds',
+              '432Hz tuning','Binaural beats','Healing frequency','Soft piano',
+              'Gentle flute','Om tone','Soft strings']
+    },
+    {
+      name: 'ג׳אז ובלוז', color: '#c8a050', open: false,
+      chips: ['Upright bass','Jazz piano','Brushed drums','Trumpet','Trombone',
+              'Saxophone','Clarinet','Vibraphone','Walking bass','Swing rhythm',
+              'Blues guitar','Wah guitar','Hammond organ','Bebop','Smooth jazz']
+    },
+    {
+      name: 'רוק ומטאל', color: '#e05050', open: false,
+      chips: ['Power chords','Distorted guitar','Double kick drums','Palm muting',
+              'Guitar riff','Shredding solo','Drop D tuning','Blast beat',
+              'Heavy riff','Wall of sound','Feedback guitar','Whammy bar',
+              'Breakdown riff','Chugging guitars','Pinch harmonic']
+    },
+    {
+      name: 'R&B וסול', color: '#d070c0', open: false,
+      chips: ['Rhodes piano','Warm bass','Funk guitar','Smooth strings','Gospel choir',
+              'Wah guitar','Slap bass','Drum groove','Neo soul chords',
+              'Vocal runs','Falsetto','Electric piano','Synth bass','Brass horns','Clavinet']
+    },
+    {
+      name: 'FX מיוחדים', color: '#7bc8f0', open: false,
+      chips: ['Vinyl scratching','Vocal chops','Reversed vocals','Pitch bend',
+              'Tape stop','Record skip','Glitch stutter','Bitcrusher','Ring modulator',
+              'Vocoder','Talkbox','Sidechain pump','Reverse reverb','Granular texture',
+              'Radio effect','Telephone filter','Underwater effect','Crowd cheer',
+              'Orchestra hit','Air horn','Laser blast','Wind sweep','Thunder crack',
+              'Clock tick','Heartbeat','Glass shatter','Typewriter']
+    }
+  ],
+  lyrics: [
+    {
+      name: 'פתיחות', color: '#4a9eff', open: true,
+      chips: ['[Intro]','[Verse]','[Verse 1]','[Spoken Intro]','[Inst. Intro]','[Build Up]','[Overture]']
+    },
+    {
+      name: 'הפסקות וסולו', color: '#ff5c5c', open: false,
+      chips: ['[Break]','[Breakdown]','[Guitar Solo]','[Piano Solo]','[Synth Solo]','[Instrumental]','[Interlude]','[Drop]']
+    },
+    {
+      name: 'שינויי אנרגיה', color: '#ff9f43', open: false,
+      chips: ['[Pre-Chorus]','[Chorus]','[Power Chorus]','[Hook]','[Catchy Hook]','[Refrain]','[Bridge]']
+    },
+    {
+      name: 'דינמיקת קול', color: '#b66dff', open: false,
+      chips: ['[Ad-libs]','[Freestyle]','[spoken]','[whispered]','[shouted]','[Emotional]','[Intense]','[Soft]','[Powerful]']
+    },
+    {
+      name: 'סיומות', color: '#1dd1a1', open: false,
+      chips: ['[Outro]','[Outro (Fade)]','[Coda]','[Final Chorus]','[A Cappella]','[Anthem]']
+    },
+    {
+      name: 'מיוחד', color: '#ffd060', open: false,
+      chips: ['[Repeat x2]','[Repeat x3]','[Fade Out]','[Fade In]','[Silence]',
+              '[BPM: 80]','[BPM: 100]','[BPM: 120]','[BPM: 140]',
+              '[Key: C Major]','[Key: A Minor]','[Key: G Major]','[Key: D Minor]',
+              '[Time: 4/4]','[Time: 3/4]','[Time: 6/8]']
+    }
+  ]
+};
+
+// ════════════════════════════════════════════
+//  COMMANDS PANEL RENDER & INTERACTION
+// ════════════════════════════════════════════
+function renderCommandPanel(tab) {
+  const panelId = tab === 'style' ? 'cmd-style-panel' : 'cmd-lyrics-panel';
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const groups = SUNO_COMMANDS[tab];
+  panel.innerHTML = '';
+  groups.forEach((group, gi) => {
+    const el = document.createElement('div');
+    el.className = 'cmd-group ' + (group.open ? 'open' : 'closed');
+    el.id = `cmd-group-${tab}-${gi}`;
+    el.innerHTML = `
+      <div class="cmd-group-hdr" onclick="toggleCmdGroup('${tab}',${gi})">
+        <span class="cmd-group-dot" style="background:${group.color}"></span>
+        <span>${group.name}</span>
+        <span class="cmd-group-chevron">›</span>
+      </div>
+      <div class="cmd-chips"></div>`;
+    const chipsEl = el.querySelector('.cmd-chips');
+    group.chips.forEach(chip => {
+      const btn = document.createElement('button');
+      btn.className = 'cmd-chip' + (tab === 'lyrics' ? ' lyrics-chip' : '');
+      btn.textContent = chip;
+      if (tab === 'style') {
+        const bg = group.color + '20';
+        const bc = group.color + '50';
+        btn.style.cssText = `background:${bg};border-color:${bc};color:${group.color}`;
+      }
+      // Both tabs insert [chip] at cursor in the focused lyrics textarea
+      btn.onclick = () => insertCommandToLyrics(`[${chip}]`);
+      chipsEl.appendChild(btn);
+    });
+    panel.appendChild(el);
+  });
+}
+
+function toggleCmdGroup(tab, gi) {
+  const el = document.getElementById(`cmd-group-${tab}-${gi}`);
+  if (el) { el.classList.toggle('open'); el.classList.toggle('closed'); }
+}
+
+function switchCmdTab(tab) {
+  document.getElementById('cmd-style-panel').style.display  = tab === 'style'  ? '' : 'none';
+  document.getElementById('cmd-lyrics-panel').style.display = tab === 'lyrics' ? '' : 'none';
+  document.querySelectorAll('.cmd-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+}
+
+function addStyleCommand(cmd) {
+  const ta = document.getElementById('style-prompt');
+  const cur = ta.value.trim();
+  if (!cur.includes(cmd)) {
+    ta.value = cur ? cur + ', ' + cmd : cmd;
+    updateStyleCounter();
+    showToast(`נוסף: ${cmd}`, 'success');
+  }
+}
+
+function insertCommandToLyrics(cmd) {
+  const ta = getFocusedTextarea();
+  if (!ta) { showToast('לחץ בתוך תיבת מילים תחילה', 'error'); return; }
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  ta.value = ta.value.substring(0, start) + cmd + ta.value.substring(end);
+  ta.selectionStart = ta.selectionEnd = start + cmd.length;
+  ta.focus();
+  updateSectionText(parseInt(ta.id.replace('ta-', '')), ta.value);
+  showToast(`הוכנס: ${cmd}`, 'success');
+}
+
+function toggleTagLibCard() {
+  const body = document.getElementById('tag-lib-body');
+  const chevron = document.getElementById('tag-lib-chevron');
+  if (!body) return;
+  body.classList.toggle('collapsed');
+  if (chevron) chevron.classList.toggle('open', !body.classList.contains('collapsed'));
+}
+
+// ════════════════════════════════════════════
+//  SONG IMPORT
+// ════════════════════════════════════════════
+function openImportModal() {
+  document.getElementById('import-overlay').classList.add('open');
+  document.getElementById('import-count').textContent = '';
+  setTimeout(() => document.getElementById('import-ta').focus(), 50);
+}
+
+function closeImportModal(e) {
+  if (!e || e.target === document.getElementById('import-overlay')) {
+    document.getElementById('import-overlay').classList.remove('open');
+  }
+}
+
+// Parse a full Suno-format song text into sections.
+// Lines that are ONLY "[Tag]" or "[Tag: description]" are treated as section headers.
+// The section name is the part before the colon. "[End]" is skipped.
+function parseImportedSong(text) {
+  const result = [];
+  let currentName = null;
+  let currentTag  = null;
+  let currentLines = [];
+
+  for (const line of text.split('\n')) {
+    // A section header is a line whose entire content is [something]
+    const m = line.trim().match(/^\[([^\]]+)\]$/);
+    if (m) {
+      if (currentName !== null) {
+        // Prepend the full tag line as first line of textarea content
+        const tagLine = currentTag !== currentName ? `[${currentTag}]\n` : '';
+        result.push({ name: currentName, text: (tagLine + currentLines.join('\n')).trim() });
+      }
+      const tag = m[1].trim();
+      const baseName = (tag.indexOf(':') >= 0 ? tag.substring(0, tag.indexOf(':')) : tag).trim();
+      if (baseName.toLowerCase() === 'end') { currentName = null; currentLines = []; continue; }
+      currentName = baseName;   // badge/colors use only "Verse 1"
+      currentTag  = tag;        // full tag preserved for first line of textarea
+      currentLines = [];
+    } else {
+      if (currentName !== null) currentLines.push(line);
+    }
+  }
+  if (currentName !== null) {
+    const tagLine = currentTag !== currentName ? `[${currentTag}]\n` : '';
+    result.push({ name: currentName, text: (tagLine + currentLines.join('\n')).trim() });
+  }
+
+  // Drop sections that have no lyrics AND whose name looks like a production note
+  // (not in our known section list). E.g. [Final Electronic Distortion] with no text.
+  const knownNames = new Set(TAG_LIBRARY.find(c => c.en === 'Structure')?.tags ?? []);
+  return result.filter(s => {
+    const base = s.name.includes(':') ? s.name.split(':')[0].trim() : s.name;
+    return s.text.trim().length > 0 || knownNames.has(s.name) || knownNames.has(base);
+  });
+}
+
+function doImport() {
+  const ta = document.getElementById('import-ta');
+  const text = ta.value.trim();
+  if (!text) { showToast('אין טקסט לייבוא', 'error'); return; }
+
+  const parsed = parseImportedSong(text);
+  if (parsed.length === 0) {
+    showToast('לא נמצאו מקטעים — ודא שהטקסט מכיל תגיות כמו [Verse 1]', 'error');
+    return;
+  }
+
+  pushUndo();
+  clearAllAmbigStates();
+  sections = [];
+  sectionIdCounter = 0;
+  parsed.forEach(s => sections.push({ id: ++sectionIdCounter, name: s.name, text: s.text }));
+
+  renderSections();
+  updateOutput();
+  closeImportModal();
+  ta.value = '';
+  showToast(`${parsed.length} מקטעים יובאו בהצלחה`, 'success');
+}
+
+// Live section count preview while typing in import textarea
+document.addEventListener('DOMContentLoaded', () => {
+  const importTa = document.getElementById('import-ta');
+  if (importTa) {
+    importTa.addEventListener('input', () => {
+      const parsed = parseImportedSong(importTa.value);
+      const el = document.getElementById('import-count');
+      if (el) el.textContent = parsed.length > 0 ? `${parsed.length} מקטעים זוהו` : '';
+    });
+  }
+});
+
+// ════════════════════════════════════════════
+//  NIKUD HELP BANNER
+// ════════════════════════════════════════════
+function showNikudHelp() {
+  if (document.getElementById('nikud-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'nikud-banner';
+  banner.style.cssText = `
+    position:fixed;top:0;left:0;right:0;z-index:500;
+    background:#1a1000;border-bottom:2px solid var(--orange);
+    padding:10px 20px;display:flex;align-items:center;gap:12px;
+    font-size:12px;color:var(--orange);
+  `;
+  banner.innerHTML = `
+    <span style="font-size:16px">⚠️</span>
+    <span style="flex:1">
+      <strong>הניקוד נחסם על ידי הדפדפן (CORS)</strong> כי הקובץ נפתח ישירות כ-file://.
+      פתרון: פתח טרמינל בתיקייה והרץ <code style="background:#2a1800;padding:2px 6px;border-radius:3px">npx serve .</code>
+      ואז פתח <strong>localhost:3000</strong>
+    </span>
+    <a href="https://nakdan.dicta.org.il" target="_blank"
+       style="color:var(--blue);text-decoration:none;white-space:nowrap;border:1px solid var(--blue);padding:4px 10px;border-radius:5px">
+      נקד ידנית ↗
+    </a>
+    <button onclick="document.getElementById('nikud-banner').remove()"
+            style="background:none;border:none;color:var(--txt2);cursor:pointer;font-size:18px;line-height:1">×</button>
+  `;
+  document.body.prepend(banner);
+}
+
+// ════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════
+let toastTimer;
+function showToast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = 'toast', 2500);
+}
+
+// ════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  // Undo / Redo — intercept before browser handles it on non-textarea focus
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+    // Only intercept if focus is NOT inside a textarea (let native undo work there)
+    if (!(document.activeElement && document.activeElement.tagName === 'TEXTAREA')) {
+      e.preventDefault(); undo();
+    }
+  }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'z'))) {
+    if (!(document.activeElement && document.activeElement.tagName === 'TEXTAREA')) {
+      e.preventDefault(); redo();
+    }
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); openModal(); }
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'N') { e.preventDefault(); nikudSelected(); }
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'L') { e.preventDefault(); latinizeSelected(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'c' && e.shiftKey) { e.preventDefault(); copyOutput(); }
+});
+</script>
+</body>
+</html>
