@@ -1,7 +1,6 @@
 // api/auth.js — JWT auth with Upstash Redis (no npm deps, only Node built-ins + fetch)
 const crypto = require('crypto');
 
-// ── helpers ────────────────────────────────────────────────────────────────
 const b64url = buf =>
   (Buffer.isBuffer(buf) ? buf : Buffer.from(buf))
     .toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
@@ -50,7 +49,6 @@ function checkPwd(pwd, stored) {
   });
 }
 
-// ── Upstash Redis REST (GET/SET only) ──────────────────────────────────────
 async function kv(cmd, ...args) {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const tok = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -64,7 +62,6 @@ async function kv(cmd, ...args) {
   return j.result;
 }
 
-// ── main handler ───────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -114,9 +111,11 @@ module.exports = async function handler(req, res) {
 
   // ── register ──────────────────────────────────────────────────
   if (action === 'register') {
-    const { username, password } = body;
+    const { username, password, email } = body;
     if (!username || !password)
       return res.status(400).json({ ok: false, error: 'חסרים שם משתמש או סיסמה' });
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return res.status(400).json({ ok: false, error: 'כתובת מייל לא תקינה' });
     if (username.length < 3)
       return res.status(400).json({ ok: false, error: 'שם משתמש קצר מדי (מינימום 3 תווים)' });
     if (password.length < 6)
@@ -128,11 +127,9 @@ module.exports = async function handler(req, res) {
     const isAdmin = adminUsername && username.toLowerCase() === adminUsername;
 
     try {
-      // Block duplicate usernames
       const existing = await kv('GET', `user:${username.toLowerCase()}`);
       if (existing) return res.status(409).json({ ok: false, error: 'שם המשתמש תפוס' });
 
-      // Non-admin can only register after admin exists AND open registration is on
       if (!isAdmin) {
         const adminCreated = await kv('GET', 'system:admin_created');
         if (!adminCreated)
@@ -143,7 +140,13 @@ module.exports = async function handler(req, res) {
       }
 
       const passwordHash = await hashPwd(password);
-      const user = { username, passwordHash, role: isAdmin ? 'admin' : 'user', createdAt: Date.now() };
+      const user = {
+        username,
+        passwordHash,
+        email: email.toLowerCase().trim(),
+        role: isAdmin ? 'admin' : 'user',
+        createdAt: Date.now()
+      };
       await kv('SET', `user:${username.toLowerCase()}`, JSON.stringify(user));
       if (isAdmin) await kv('SET', 'system:admin_created', '1');
 

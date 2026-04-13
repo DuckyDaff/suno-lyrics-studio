@@ -1083,6 +1083,88 @@ body {
 .import-confirm:hover { filter: brightness(1.15); box-shadow: var(--glow-purple); transform: translateY(-1px); }
 .import-confirm:active { transform: scale(.97); }
 
+/* ─── ADMIN MODAL ─── */
+.adm-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(6px);
+  z-index: 300;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+.adm-overlay.open { display: flex; }
+.adm-box {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,.7);
+}
+.adm-hdr {
+  display: flex;
+  align-items: center;
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.adm-title { flex: 1; font-size: 14px; font-weight: 700; }
+.adm-close {
+  background: none; border: none; color: var(--txt1);
+  font-size: 20px; cursor: pointer; line-height: 1; padding: 0 2px;
+}
+.adm-close:hover { color: var(--txt0); }
+.adm-body { overflow-y: auto; padding: 16px 18px 20px; flex: 1; }
+.adm-section-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--txt2); margin-bottom: 8px;
+}
+.adm-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; background: var(--bg3);
+  border-radius: 8px; margin-bottom: 6px;
+}
+.adm-row-info { flex: 1; min-width: 0; }
+.adm-row-name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.adm-row-email { font-size: 11px; color: var(--txt1); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-row-date  { font-size: 10px; color: var(--txt2); margin-top: 1px; }
+.adm-badge {
+  font-size: 10px; padding: 1px 7px; border-radius: 10px;
+  background: var(--bg4); color: var(--txt1);
+}
+.adm-badge.admin { background: rgba(217,167,58,0.15); color: var(--yellow); }
+.adm-del-btn {
+  padding: 4px 10px; background: rgba(232,85,85,0.1);
+  border: 1px solid rgba(232,85,85,0.25); border-radius: 6px;
+  color: var(--red); cursor: pointer; font-size: 11px; font-family: inherit;
+  white-space: nowrap; flex-shrink: 0; transition: background .15s;
+}
+.adm-del-btn:hover { background: rgba(232,85,85,0.22); }
+/* toggle switch */
+.tog-wrap { display: flex; align-items: center; gap: 10px; padding: 11px 13px; background: var(--bg3); border-radius: 8px; margin-bottom: 16px; }
+.tog-label { flex: 1; font-size: 13px; font-weight: 600; }
+.tog-sub { font-size: 11px; color: var(--txt1); margin-top: 1px; }
+.toggle { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-sl {
+  position: absolute; inset: 0; background: var(--bg4);
+  border-radius: 22px; cursor: pointer; transition: background .2s;
+  border: 1px solid var(--border2);
+}
+.toggle-sl:before {
+  content: ''; position: absolute; width: 14px; height: 14px;
+  left: 3px; top: 3px; background: var(--txt1);
+  border-radius: 50%; transition: transform .2s, background .2s;
+}
+.toggle input:checked + .toggle-sl { background: rgba(155,114,239,0.35); border-color: var(--purple); }
+.toggle input:checked + .toggle-sl:before { transform: translateX(16px); background: var(--purple); }
+
 /* ─── MOBILE NAV BAR ─── */
 #mobile-nav {
   display: none;
@@ -1293,6 +1375,12 @@ body {
         <div class="tpl-item" onclick="loadTemplate('ballad')"><span class="tpl-dot" style="background:var(--teal)"></span>Ballad</div>
       </div>
     </div>
+
+    <!-- Admin button (shown only to admin role) -->
+    <button class="tbtn" id="btn-admin" onclick="openAdminPanel()" title="ניהול משתמשים" style="display:none;color:var(--yellow);border-color:rgba(217,167,58,0.25);">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      ניהול
+    </button>
 
     <!-- User info + logout -->
     <div id="user-info">
@@ -3244,11 +3332,85 @@ function initAuth() {
   if (!token) { window.location.replace('/login.html'); return; }
   const badge = document.getElementById('user-badge');
   if (badge && username) badge.textContent = (role === 'admin' ? '★ ' : '') + username;
-  // Background server-side verification
+  if (role === 'admin') {
+    const btn = document.getElementById('btn-admin');
+    if (btn) btn.style.display = '';
+  }
   fetch('/api/auth?action=verify&token=' + encodeURIComponent(token))
     .then(r => r.json())
     .then(d => { if (!d.ok) logout(); })
-    .catch(() => {}); // keep working offline if server unreachable
+    .catch(() => {});
+}
+
+// ── Admin panel ──────────────────────────────────────────────────────────────
+function openAdminPanel() {
+  document.getElementById('adm-overlay').classList.add('open');
+  loadAdminPanel();
+}
+function closeAdminPanel() {
+  document.getElementById('adm-overlay').classList.remove('open');
+}
+
+async function adminAPI(action, body) {
+  const token = localStorage.getItem('suno_token');
+  const isGet = !body;
+  const url   = isGet
+    ? `/api/admin?action=${encodeURIComponent(action)}&token=${encodeURIComponent(token)}`
+    : `/api/admin?token=${encodeURIComponent(token)}`;
+  const r = await fetch(url, {
+    method: isGet ? 'GET' : 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: isGet ? undefined : JSON.stringify({ action, ...body })
+  });
+  return r.json();
+}
+
+async function loadAdminPanel() {
+  const container = document.getElementById('adm-users');
+  container.innerHTML = '<div style="color:var(--txt2);font-size:13px;text-align:center;padding:20px;">טוען...</div>';
+  try {
+    const [usersRes, regRes] = await Promise.all([
+      adminAPI('users'),
+      adminAPI('get_registration')
+    ]);
+    if (regRes.ok) document.getElementById('reg-toggle').checked = regRes.open;
+    if (!usersRes.ok) {
+      container.innerHTML = `<div style="color:var(--red);font-size:13px;padding:8px;">${escHtml(usersRes.error)}</div>`;
+      return;
+    }
+    const users = usersRes.users;
+    if (!users.length) {
+      container.innerHTML = '<div style="color:var(--txt2);font-size:13px;text-align:center;padding:16px;">אין משתמשים</div>';
+      return;
+    }
+    container.innerHTML = users.map(u => `
+      <div class="adm-row">
+        <div class="adm-row-info">
+          <div class="adm-row-name">
+            ${u.role === 'admin' ? '<span style="color:var(--yellow)">★</span>' : ''}
+            ${escHtml(u.username)}
+            <span class="adm-badge ${u.role}">${u.role}</span>
+          </div>
+          ${u.email ? `<div class="adm-row-email">${escHtml(u.email)}</div>` : ''}
+          <div class="adm-row-date">${u.createdAt ? new Date(u.createdAt).toLocaleDateString('he-IL') : ''}</div>
+        </div>
+        ${u.role !== 'admin' ? `<button class="adm-del-btn" onclick="adminDelete('${escHtml(u.username)}')">מחק</button>` : ''}
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = `<div style="color:var(--red);font-size:13px;padding:8px;">שגיאה: ${e.message}</div>`;
+  }
+}
+
+async function adminDelete(username) {
+  if (!confirm(`למחוק את המשתמש "${username}"?`)) return;
+  const d = await adminAPI('delete', { username });
+  if (d.ok) loadAdminPanel();
+  else alert(d.error);
+}
+
+async function setRegistration(open) {
+  await adminAPI('set_registration', { open });
 }
 
 // ── Mobile panel switcher ───────────────────────────────────────────────────
@@ -3272,6 +3434,32 @@ document.addEventListener('DOMContentLoaded', function() {
   initMobile();
 });
 </script>
+
+<!-- Admin panel modal -->
+<div class="adm-overlay" id="adm-overlay" onclick="if(event.target===this)closeAdminPanel()">
+  <div class="adm-box">
+    <div class="adm-hdr">
+      <span class="adm-title">⚙ ניהול משתמשים</span>
+      <button class="adm-close" onclick="closeAdminPanel()">×</button>
+    </div>
+    <div class="adm-body">
+      <!-- Registration toggle -->
+      <div class="tog-wrap">
+        <div>
+          <div class="tog-label">הרשמה פתוחה</div>
+          <div class="tog-sub">אפשר למשתמשים חדשים להירשם</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="reg-toggle" onchange="setRegistration(this.checked)">
+          <span class="toggle-sl"></span>
+        </label>
+      </div>
+      <!-- Users list -->
+      <div class="adm-section-title">משתמשים רשומים</div>
+      <div id="adm-users"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Mobile bottom navigation -->
 <div id="mobile-nav">
