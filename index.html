@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Suno Hebrew Lyrics Studio</title>
+<title>MeloDraft</title>
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -1249,43 +1249,8 @@ body {
 <div id="editor">
   <div class="top-bar">
     <!-- Logo -->
-    <div class="logo-wrap" title="Suno Hebrew Lyrics Studio">
-      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="lg-wave" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#00ccff"/>
-            <stop offset="35%" stop-color="#7744ff"/>
-            <stop offset="65%" stop-color="#aa55ff"/>
-            <stop offset="100%" stop-color="#ff3fa0"/>
-          </linearGradient>
-          <linearGradient id="lg-spark" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#00eedd"/>
-            <stop offset="100%" stop-color="#aa55ff"/>
-          </linearGradient>
-          <filter id="glow-f" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="1.5" result="blur"/>
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-        <!-- Waveform bars -->
-        <g filter="url(#glow-f)" stroke="url(#lg-wave)" stroke-width="2.2" stroke-linecap="round">
-          <line x1="4"  y1="20" x2="4"  y2="14"/>
-          <line x1="8"  y1="22" x2="8"  y2="10"/>
-          <line x1="12" y1="25" x2="12" y2="7"/>
-          <line x1="16" y1="28" x2="16" y2="4"/>
-          <line x1="20" y1="25" x2="20" y2="8"/>
-          <line x1="24" y1="22" x2="24" y2="12"/>
-          <line x1="28" y1="20" x2="28" y2="16"/>
-        </g>
-        <!-- Sparkle top-right -->
-        <g fill="url(#lg-spark)" opacity="0.95">
-          <polygon points="30,3 30.9,5.1 33,6 30.9,6.9 30,9 29.1,6.9 27,6 29.1,5.1" transform="scale(0.85) translate(4,0)"/>
-        </g>
-        <!-- Small sparkle -->
-        <g fill="#00ccff" opacity="0.75">
-          <polygon points="5,3 5.5,4.2 6.7,4.7 5.5,5.2 5,6.4 4.5,5.2 3.3,4.7 4.5,4.2" transform="scale(0.7)"/>
-        </g>
-      </svg>
+    <div class="logo-wrap" title="MeloDraft">
+      <img src="/logo.png" width="36" height="36" alt="MeloDraft" style="display:block;border-radius:7px;object-fit:contain;">
     </div>
 
     <input id="song-title" type="text" placeholder="שם השיר..." value="Untitled Song">

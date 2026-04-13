@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Suno Studio — התחברות</title>
+  <title>MeloDraft — התחברות</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -198,31 +198,8 @@
 <body>
 
   <div class="logo-area">
-    <!-- waveform icon -->
-    <svg width="44" height="44" viewBox="0 0 34 34" fill="none">
-      <defs>
-        <linearGradient id="lg" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#00ccff"/>
-          <stop offset="35%" stop-color="#7744ff"/>
-          <stop offset="65%" stop-color="#aa55ff"/>
-          <stop offset="100%" stop-color="#ff3fa0"/>
-        </linearGradient>
-        <filter id="gf" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="1.5" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <g filter="url(#gf)" stroke="url(#lg)" stroke-width="2.2" stroke-linecap="round">
-        <line x1="4"  y1="20" x2="4"  y2="14"/>
-        <line x1="8"  y1="22" x2="8"  y2="10"/>
-        <line x1="12" y1="25" x2="12" y2="7"/>
-        <line x1="16" y1="28" x2="16" y2="4"/>
-        <line x1="20" y1="25" x2="20" y2="8"/>
-        <line x1="24" y1="22" x2="24" y2="12"/>
-        <line x1="28" y1="20" x2="28" y2="16"/>
-      </g>
-    </svg>
-    <div class="logo-title">Suno Studio</div>
+    <img src="/logo.png" width="72" height="72" alt="MeloDraft" style="border-radius:16px;object-fit:contain;">
+    <div class="logo-title">MeloDraft</div>
     <div class="logo-sub">עורך טקסטים עברי-אנגלי</div>
   </div>
 
@@ -264,7 +241,7 @@
       <button class="btn-submit" type="submit" id="btn-reg">הרשם</button>
     </form>
 
-    <div class="card-footer">Suno Hebrew Lyrics Studio &copy; 2025</div>
+    <div class="card-footer">MeloDraft &copy; 2025</div>
   </div>
 
   <script>
