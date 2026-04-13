@@ -1083,17 +1083,145 @@ body {
 .import-confirm:hover { filter: brightness(1.15); box-shadow: var(--glow-purple); transform: translateY(-1px); }
 .import-confirm:active { transform: scale(.97); }
 
-/* Responsive: smaller screens */
+/* ─── MOBILE NAV BAR ─── */
+#mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 58px;
+  background: var(--bg1);
+  border-top: 1px solid var(--border2);
+  z-index: 200;
+  align-items: stretch;
+}
+.mnav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--txt2);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  transition: color 0.15s;
+  padding: 4px 0 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+.mnav-btn.active { color: var(--purple); }
+.mnav-btn svg { flex-shrink: 0; }
+
+/* ─── USER BADGE (top bar) ─── */
+#user-info {
+  margin-inline-start: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+#user-badge {
+  font-size: 11px;
+  color: var(--txt1);
+  padding: 3px 9px;
+  background: var(--bg3);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tbtn.logout-btn {
+  color: var(--red);
+  border-color: rgba(232,85,85,0.25);
+}
+.tbtn.logout-btn:hover {
+  background: rgba(232,85,85,0.12);
+  border-color: var(--red);
+  box-shadow: none;
+}
+
+/* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
   #commands { width: 190px; }
-  #output { width: 240px; }
+  #output   { width: 240px; }
 }
-@media (max-width: 700px) {
-  #output { display: none; }
+
+@media (max-width: 640px) {
+  body { height: 100dvh; overflow: hidden; }
+
+  /* all three panels become full-screen layers */
+  #commands, #editor, #output {
+    position: fixed !important;
+    inset: 0 0 58px 0 !important;   /* leave room for nav bar */
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    display: none !important;
+    resize: none !important;
+    z-index: 50;
+    border: none !important;
+  }
+  #commands.m-show, #editor.m-show, #output.m-show {
+    display: flex !important;
+  }
+  #editor { flex-direction: column; }
+  #output { flex-direction: column; }
+
+  /* show mobile nav */
+  #mobile-nav { display: flex; }
+
+  /* top bar: scrollable strip */
+  .top-bar {
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: auto !important;
+    min-height: 48px;
+    padding: 6px 10px;
+    gap: 5px;
+    flex-shrink: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .top-bar::-webkit-scrollbar { display: none; }
+  #song-title { font-size: 15px; min-width: 90px; }
+  .tbtn { padding: 5px 8px; font-size: 11px; gap: 3px; }
+  #user-badge { display: none; }   /* save space on mobile */
+
+  /* editor scroll: add bottom padding for nav bar */
+  .editor-scroll { padding: 14px 12px 80px; }
+
+  /* section cards */
+  .section-block { padding: 10px 11px 12px; }
+  .lyrics-ta     { font-size: 14px; }
+
+  /* output panel */
+  .panel-body { padding: 14px; }
+  #output .pcard { margin-bottom: 12px; }
+}
+
+@media (max-width: 400px) {
+  .tbtn span, .tbtn > svg + * { display: none; }   /* icon-only on very small */
+  .tbtn { padding: 6px 7px; }
 }
 </style>
 </head>
 <body>
+<script>
+/* Blocking auth guard — runs before any content renders */
+(function(){
+  if(!localStorage.getItem('suno_token')){
+    window.location.replace('/login.html');
+  }
+})();
+</script>
 
 <!-- LEFT: SUNO COMMANDS PANEL -->
 <div id="commands">
@@ -1199,6 +1327,15 @@ body {
         <div class="tpl-item" onclick="loadTemplate('mizrahi')"><span class="tpl-dot" style="background:var(--yellow)"></span>מזרחי</div>
         <div class="tpl-item" onclick="loadTemplate('ballad')"><span class="tpl-dot" style="background:var(--teal)"></span>Ballad</div>
       </div>
+    </div>
+
+    <!-- User info + logout -->
+    <div id="user-info">
+      <span id="user-badge"></span>
+      <button class="tbtn logout-btn" onclick="logout()" title="התנתק">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        יציאה
+      </button>
     </div>
   </div>
 
@@ -3126,6 +3263,65 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'L') { e.preventDefault(); latinizeSelected(); }
   if ((e.ctrlKey || e.metaKey) && e.key === 'c' && e.shiftKey) { e.preventDefault(); copyOutput(); }
 });
+
+// ── Auth ────────────────────────────────────────────────────────────────────
+function logout() {
+  localStorage.removeItem('suno_token');
+  localStorage.removeItem('suno_username');
+  localStorage.removeItem('suno_role');
+  window.location.replace('/login.html');
+}
+
+function initAuth() {
+  const token    = localStorage.getItem('suno_token');
+  const username = localStorage.getItem('suno_username');
+  const role     = localStorage.getItem('suno_role');
+  if (!token) { window.location.replace('/login.html'); return; }
+  const badge = document.getElementById('user-badge');
+  if (badge && username) badge.textContent = (role === 'admin' ? '★ ' : '') + username;
+  // Background server-side verification
+  fetch('/api/auth?action=verify&token=' + encodeURIComponent(token))
+    .then(r => r.json())
+    .then(d => { if (!d.ok) logout(); })
+    .catch(() => {}); // keep working offline if server unreachable
+}
+
+// ── Mobile panel switcher ───────────────────────────────────────────────────
+function mobileTab(panel) {
+  ['commands','editor','output'].forEach(p => {
+    const el  = document.getElementById(p);
+    const btn = document.getElementById('mnav-' + p);
+    if (el)  el.classList.toggle('m-show', p === panel);
+    if (btn) btn.classList.toggle('active', p === panel);
+  });
+}
+
+function initMobile() {
+  if (window.matchMedia('(max-width: 640px)').matches) {
+    mobileTab('editor');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initAuth();
+  initMobile();
+});
 </script>
+
+<!-- Mobile bottom navigation -->
+<div id="mobile-nav">
+  <button class="mnav-btn" id="mnav-commands" onclick="mobileTab('commands')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M3 12h3m12 0h3M12 3v3m0 12v3"/></svg>
+    פקודות
+  </button>
+  <button class="mnav-btn active" id="mnav-editor" onclick="mobileTab('editor')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    עורך
+  </button>
+  <button class="mnav-btn" id="mnav-output" onclick="mobileTab('output')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    פלט
+  </button>
+</div>
 </body>
 </html>

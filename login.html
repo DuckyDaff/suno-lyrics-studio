@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Suno Studio — התחברות</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg0: #0d0d0f;
+      --bg1: #141416;
+      --bg2: #1c1c1f;
+      --bg3: #242428;
+      --bg4: #2e2e34;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.14);
+      --txt0: #ededf0;
+      --txt1: #8a8a9c;
+      --txt2: #46464f;
+      --blue: #5b9cf6;
+      --purple: #9b72ef;
+      --green: #2ec491;
+      --pink: #e0709a;
+      --red: #e05555;
+    }
+
+    body {
+      background: var(--bg0);
+      color: var(--txt0);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* ── logo ── */
+    .logo-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+    .logo-title {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #5b9cf6, #9b72ef, #e0709a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.3px;
+    }
+    .logo-sub {
+      font-size: 13px;
+      color: var(--txt1);
+    }
+
+    /* ── card ── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    /* ── tabs ── */
+    .tabs {
+      display: flex;
+      background: var(--bg1);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 28px;
+      border: 1px solid var(--border);
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 8px 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--txt1);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .tab.active {
+      background: var(--bg3);
+      color: var(--txt0);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    /* ── form ── */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--txt1);
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      background: var(--bg1);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      color: var(--txt0);
+      font-size: 14px;
+      padding: 10px 13px;
+      outline: none;
+      transition: border-color 0.2s;
+      direction: ltr;
+      text-align: left;
+    }
+    input:focus {
+      border-color: var(--purple);
+    }
+    input::placeholder { color: var(--txt2); }
+
+    /* ── submit button ── */
+    .btn-submit {
+      width: 100%;
+      padding: 11px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      border: none;
+      border-radius: 9px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+    .btn-submit:hover { opacity: 0.92; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── messages ── */
+    .msg {
+      font-size: 13px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .msg.error {
+      background: rgba(224,85,85,0.12);
+      border: 1px solid rgba(224,85,85,0.3);
+      color: #f08080;
+      display: block;
+    }
+    .msg.success {
+      background: rgba(46,196,145,0.12);
+      border: 1px solid rgba(46,196,145,0.3);
+      color: var(--green);
+      display: block;
+    }
+
+    /* ── footer ── */
+    .card-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--txt2);
+    }
+
+    /* ── spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── mobile ── */
+    @media (max-width: 420px) {
+      .card { padding: 24px 18px; }
+      .logo-title { font-size: 19px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-area">
+    <!-- waveform icon -->
+    <svg width="44" height="44" viewBox="0 0 34 34" fill="none">
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="34" y2="34" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#00ccff"/>
+          <stop offset="35%" stop-color="#7744ff"/>
+          <stop offset="65%" stop-color="#aa55ff"/>
+          <stop offset="100%" stop-color="#ff3fa0"/>
+        </linearGradient>
+        <filter id="gf" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <g filter="url(#gf)" stroke="url(#lg)" stroke-width="2.2" stroke-linecap="round">
+        <line x1="4"  y1="20" x2="4"  y2="14"/>
+        <line x1="8"  y1="22" x2="8"  y2="10"/>
+        <line x1="12" y1="25" x2="12" y2="7"/>
+        <line x1="16" y1="28" x2="16" y2="4"/>
+        <line x1="20" y1="25" x2="20" y2="8"/>
+        <line x1="24" y1="22" x2="24" y2="12"/>
+        <line x1="28" y1="20" x2="28" y2="16"/>
+      </g>
+    </svg>
+    <div class="logo-title">Suno Studio</div>
+    <div class="logo-sub">עורך טקסטים עברי-אנגלי</div>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" id="tab-login" onclick="switchTab('login')">התחברות</div>
+      <div class="tab"        id="tab-reg"   onclick="switchTab('register')">הרשמה</div>
+    </div>
+
+    <div id="msg" class="msg"></div>
+
+    <!-- LOGIN FORM -->
+    <form id="form-login" onsubmit="doLogin(event)">
+      <div class="form-group">
+        <label>שם משתמש</label>
+        <input type="text" id="l-user" placeholder="username" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label>סיסמה</label>
+        <input type="password" id="l-pass" placeholder="••••••" autocomplete="current-password" required>
+      </div>
+      <button class="btn-submit" type="submit" id="btn-login">התחבר</button>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form id="form-reg" style="display:none" onsubmit="doRegister(event)">
+      <div class="form-group">
+        <label>שם משתמש</label>
+        <input type="text" id="r-user" placeholder="username" autocomplete="username" required>
+      </div>
+      <div class="form-group">
+        <label>סיסמה</label>
+        <input type="password" id="r-pass" placeholder="מינימום 6 תווים" autocomplete="new-password" required>
+      </div>
+      <div class="form-group">
+        <label>אימות סיסמה</label>
+        <input type="password" id="r-pass2" placeholder="חזור על הסיסמה" autocomplete="new-password" required>
+      </div>
+      <button class="btn-submit" type="submit" id="btn-reg">הרשם</button>
+    </form>
+
+    <div class="card-footer">Suno Hebrew Lyrics Studio &copy; 2025</div>
+  </div>
+
+  <script>
+    // If already logged in, go to app
+    (function() {
+      const t = localStorage.getItem('suno_token');
+      if (t) {
+        fetch('/api/auth?action=verify&token=' + encodeURIComponent(t))
+          .then(r => r.json())
+          .then(d => { if (d.ok) window.location.replace('/'); })
+          .catch(() => {});
+      }
+    })();
+
+    let activeTab = 'login';
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-reg').classList.toggle('active', tab === 'register');
+      document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+      document.getElementById('form-reg').style.display  = tab === 'register' ? '' : 'none';
+      clearMsg();
+    }
+
+    function showMsg(text, type) {
+      const el = document.getElementById('msg');
+      el.textContent = text;
+      el.className = 'msg ' + type;
+    }
+    function clearMsg() {
+      const el = document.getElementById('msg');
+      el.textContent = '';
+      el.className = 'msg';
+    }
+
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      if (loading) {
+        btn.disabled = true;
+        btn.innerHTML = btn.textContent + '<span class="spinner"></span>';
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = btn.id === 'btn-login' ? 'התחבר' : 'הרשם';
+      }
+    }
+
+    async function doLogin(e) {
+      e.preventDefault();
+      clearMsg();
+      const username = document.getElementById('l-user').value.trim();
+      const password = document.getElementById('l-pass').value;
+      if (!username || !password) return showMsg('יש למלא שם משתמש וסיסמה', 'error');
+      setLoading('btn-login', true);
+      try {
+        const r = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'login', username, password })
+        });
+        const d = await r.json();
+        if (!d.ok) { showMsg(d.error || 'שגיאה', 'error'); return; }
+        localStorage.setItem('suno_token', d.token);
+        localStorage.setItem('suno_username', d.username);
+        localStorage.setItem('suno_role', d.role);
+        showMsg('מתחבר...', 'success');
+        setTimeout(() => window.location.replace('/'), 600);
+      } catch (err) {
+        showMsg('שגיאת רשת — נסה שוב', 'error');
+      } finally {
+        setLoading('btn-login', false);
+      }
+    }
+
+    async function doRegister(e) {
+      e.preventDefault();
+      clearMsg();
+      const username = document.getElementById('r-user').value.trim();
+      const password = document.getElementById('r-pass').value;
+      const pass2    = document.getElementById('r-pass2').value;
+      if (!username || !password) return showMsg('יש למלא את כל השדות', 'error');
+      if (password !== pass2) return showMsg('הסיסמאות אינן תואמות', 'error');
+      setLoading('btn-reg', true);
+      try {
+        const r = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'register', username, password })
+        });
+        const d = await r.json();
+        if (!d.ok) { showMsg(d.error || 'שגיאה', 'error'); return; }
+        localStorage.setItem('suno_token', d.token);
+        localStorage.setItem('suno_username', d.username);
+        localStorage.setItem('suno_role', d.role);
+        showMsg('ברוך הבא, ' + d.username + '! מעביר לאפליקציה...', 'success');
+        setTimeout(() => window.location.replace('/'), 800);
+      } catch (err) {
+        showMsg('שגיאת רשת — נסה שוב', 'error');
+      } finally {
+        setLoading('btn-reg', false);
+      }
+    }
+  </script>
+</body>
+</html>

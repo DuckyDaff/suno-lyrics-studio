@@ -1,7 +1,6 @@
 {
   "framework": null,
   "rewrites": [
-    { "source": "/api/nikud", "destination": "/api/nikud.js" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/((?!api/)(?!login\\.html).*)", "destination": "/index.html" }
   ]
 }
