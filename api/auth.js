@@ -115,6 +115,10 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ ok: false, error: 'שם משתמש קצר מדי (מינימום 3 תווים)' });
     if (password.length < 6)
       return res.status(400).json({ ok: false, error: 'סיסמה קצרה מדי (מינימום 6 תווים)' });
+    if (!/[A-Z]/.test(password))
+      return res.status(400).json({ ok: false, error: 'הסיסמה חייבת להכיל אות גדולה אחת לפחות' });
+    if (!/[^a-zA-Z0-9\u0590-\u05FF]/.test(password))
+      return res.status(400).json({ ok: false, error: 'הסיסמה חייבת להכיל סמל אחד לפחות (!@#$...)' });
     if (!/^[a-zA-Z0-9_\u0590-\u05FF]+$/.test(username))
       return res.status(400).json({ ok: false, error: 'שם משתמש: רק אותיות, ספרות או קו תחתי' });
 
