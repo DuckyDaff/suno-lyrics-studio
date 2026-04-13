@@ -1,8 +1,6 @@
-// api/admin.js — admin user management, backed by Vercel Blob
-const { put, list, del } = require('@vercel/blob');
+// api/admin.js — admin user management via Upstash Redis
 const crypto = require('crypto');
 
-// ── JWT verify (same as auth.js) ───────────────────────────────────────────
 const b64url = buf =>
   (Buffer.isBuffer(buf) ? buf : Buffer.from(buf))
     .toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
@@ -21,47 +19,17 @@ function verifyToken(token) {
   return payload;
 }
 
-// ── Blob helpers ───────────────────────────────────────────────────────────
-const BLOB_OPTS = { access: 'public', addRandomSuffix: false, contentType: 'application/json' };
-const userPath   = u => `melodraft/users/${u.toLowerCase()}.json`;
-const systemPath = 'melodraft/system.json';
-
-async function blobGet(path) {
-  const { blobs } = await list({ prefix: path, limit: 5 });
-  const match = blobs.find(b => b.pathname === path);
-  if (!match) return null;
-  const res = await fetch(match.url + '?_t=' + Date.now());
-  return res.ok ? res.json() : null;
-}
-async function blobPut(path, data) { await put(path, JSON.stringify(data), BLOB_OPTS); }
-async function blobDel(path) {
-  const { blobs } = await list({ prefix: path, limit: 5 });
-  const match = blobs.find(b => b.pathname === path);
-  if (match) await del(match.url);
+async function kv(cmd, ...args) {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const tok = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url) throw new Error('UPSTASH_REDIS_REST_URL is not set');
+  const path = [cmd, ...args].map(encodeURIComponent).join('/');
+  const r = await fetch(`${url}/${path}`, { headers: { Authorization: `Bearer ${tok}` } });
+  const j = await r.json();
+  if (j.error) throw new Error(j.error);
+  return j.result;
 }
 
-async function getSys() {
-  return (await blobGet(systemPath)) || { admin_created: false, open_registration: false };
-}
-async function saveSys(cfg) { return blobPut(systemPath, cfg); }
-
-async function listUsers() {
-  const { blobs } = await list({ prefix: 'melodraft/users/' });
-  const all = await Promise.all(
-    blobs
-      .filter(b => b.pathname.endsWith('.json'))
-      .map(async b => {
-        const res = await fetch(b.url + '?_t=' + Date.now());
-        return res.ok ? res.json() : null;
-      })
-  );
-  return all
-    .filter(Boolean)
-    .map(u => ({ username: u.username, email: u.email || null, role: u.role, createdAt: u.createdAt }))
-    .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-}
-
-// ── Handler ────────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -82,8 +50,20 @@ module.exports = async function handler(req, res) {
   const action = body.action || query.action;
 
   if (action === 'users') {
-    try { return res.json({ ok: true, users: await listUsers() }); }
-    catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
+    try {
+      const keys = await kv('KEYS', 'user:*');
+      if (!keys || !keys.length) return res.json({ ok: true, users: [] });
+      const users = [];
+      for (const key of keys) {
+        const raw = await kv('GET', key);
+        if (raw) {
+          const u = JSON.parse(raw);
+          users.push({ username: u.username, email: u.email || null, role: u.role, createdAt: u.createdAt });
+        }
+      }
+      users.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      return res.json({ ok: true, users });
+    } catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
   }
 
   if (action === 'delete') {
@@ -92,23 +72,22 @@ module.exports = async function handler(req, res) {
     if (username.toLowerCase() === payload.username.toLowerCase())
       return res.status(400).json({ ok: false, error: 'אי אפשר למחוק את עצמך' });
     try {
-      await blobDel(userPath(username));
+      await kv('DEL', `user:${username.toLowerCase()}`);
       return res.json({ ok: true });
     } catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
   }
 
   if (action === 'set_registration') {
     try {
-      const sys = await getSys();
-      await saveSys({ ...sys, open_registration: !!body.open });
+      await kv('SET', 'system:open_registration', body.open ? '1' : '0');
       return res.json({ ok: true, open: !!body.open });
     } catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
   }
 
   if (action === 'get_registration') {
     try {
-      const sys = await getSys();
-      return res.json({ ok: true, open: !!sys.open_registration });
+      const val = await kv('GET', 'system:open_registration');
+      return res.json({ ok: true, open: val === '1' });
     } catch (e) { return res.status(500).json({ ok: false, error: e.message }); }
   }
 
