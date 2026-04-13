@@ -2,5 +2,8 @@
   "name": "melodraft",
   "version": "1.0.0",
   "private": true,
-  "scripts": {}
+  "scripts": {},
+  "dependencies": {
+    "@vercel/blob": "^0.27.0"
+  }
 }
