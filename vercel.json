@@ -1,11 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "index.html", "use": "@vercel/static" },
-    { "src": "api/nikud.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/nikud", "dest": "/api/nikud.js" },
-    { "src": "/(.*)",      "dest": "/index.html"   }
+  "framework": null,
+  "rewrites": [
+    { "source": "/api/nikud", "destination": "/api/nikud.js" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
