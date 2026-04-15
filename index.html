@@ -60,6 +60,7 @@ body {
   background: var(--bg0);
   color: var(--txt0);
   display: flex;
+  flex-direction: column;
   height: 100vh;
   overflow: hidden;
   font-size: 14px;
@@ -72,19 +73,97 @@ body {
 ::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.15); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.28); }
 
-/* ─── RIGHT COMMANDS PANEL ─── */
-#commands {
-  width: 235px;
-  min-width: 190px;
-  max-width: 320px;
+/* ─── SPLIT STUDIO: EDITOR MAIN ROW ─── */
+.editor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ─── RIGHT SIDEBAR ─── */
+#sidebar {
+  width: 300px;
+  min-width: 200px;
   background: var(--bg1);
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  resize: horizontal;
   flex-shrink: 0;
-  order: 1;
+}
+
+/* ─── SIDEBAR CARDS ─── */
+.sb-card {
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.sb-card.sb-flex {
+  flex: 1;
+  min-height: 0;
+}
+.sb-card.sb-flex.sb-collapsed {
+  flex: 0 0 auto;
+}
+.sb-card-hdr {
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--bg1);
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--txt2);
+  border-bottom: 1px solid var(--border);
+}
+.sb-card-hdr:hover { background: rgba(0,212,255,0.04); }
+.sb-card-hdr svg { opacity: 0.4; flex-shrink: 0; }
+.sb-card-title { color: var(--txt2); }
+.sb-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-inline-start: auto;
+}
+.sb-card-body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+.sb-card-body.collapsed { display: none; }
+
+/* Commands body: tabs + scroll */
+#sb-body-commands .cmd-tabs { flex-shrink: 0; }
+#sb-body-commands .cmd-scroll { flex: 1; overflow-y: auto; min-height: 0; }
+
+/* Tags body: search + categories */
+#sb-body-tags .tag-lib-search-wrap { flex-shrink: 0; }
+#sb-body-tags .categories { flex: 1; overflow-y: auto; min-height: 0; }
+
+/* Style prompt body: auto-height textarea */
+#sb-body-style { flex: 0 0 auto; min-height: 0; overflow: visible; }
+
+/* ─── STATUS BAR ─── */
+#status-bar {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  background: var(--bg0);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  direction: ltr;
 }
 
 .sidebar-title {
@@ -365,8 +444,8 @@ body {
 
 /* ── User corner ─────────────────────────────────────── */
 #user-corner {
-  order: -1;           /* RTL flex: renders on the physical-right side */
   display: flex;
+  margin-inline-start: auto; /* push to the right end of top-bar */
   align-items: center;
   gap: 2px;
   background: rgba(255,255,255,0.04);
@@ -574,35 +653,6 @@ body {
   background: rgba(255,255,255,0.04);
 }
 
-/* ─── RIGHT PANEL ─── */
-#output {
-  width: 300px;
-  min-width: 240px;
-  background: var(--bg1);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex-shrink: 0;
-  order: -1;
-}
-
-.panel-hdr {
-  padding: 11px 14px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-shrink: 0;
-}
-.panel-lbl {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--txt2);
-}
-
 .copy-btn {
   padding: 5px 14px;
   border-radius: 6px;
@@ -625,15 +675,6 @@ body {
   background: rgba(26,173,122,0.12);
   border-color: rgba(26,173,122,0.4);
   color: var(--green);
-}
-
-.panel-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
 }
 
 .pcard {
@@ -1668,64 +1709,30 @@ body {
 /* ─── RESPONSIVE ─── */
 
 /* Prevent flex children from overflowing their container */
-#editor, #commands, #output { min-width: 0; }
+#editor, #sidebar { min-width: 0; }
 .section-block { min-width: 0; }
 
 /* Touch-device global improvements (phones + tablets) */
 @media (pointer: coarse) {
   .tbtn, .cmd-tab, .mnav-btn, button, [role="button"] {
-    touch-action: manipulation;          /* no 300ms delay, no double-tap zoom */
+    touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
   .tbtn { min-height: 36px; }
 }
 
-/* ── Desktop narrowing (≥1025px) ── */
-@media (max-width: 1050px) and (min-width: 1025px) {
-  #commands { width: 190px; }
-  #output   { width: 240px; }
-}
-@media (max-width: 1024px) and (min-width: 1025px) {
-  /* (intentionally empty — tablet block below handles ≤1024px) */
+/* ── Desktop narrowing ── */
+@media (max-width: 1050px) {
+  #sidebar { width: 260px; }
 }
 
-/* ─── TABLET (641px–1024px) — 2-col layout, touch-friendly ─── */
+/* ─── TABLET (641px–1024px) — sidebar stays visible, compact ─── */
 @media (min-width: 641px) and (max-width: 1024px) {
   body { height: 100dvh; overflow: hidden; }
 
-  /* Editor takes all remaining space */
-  #editor {
-    flex: 1 !important;
-    min-width: 0;
-    display: flex !important;
-    flex-direction: column;
-  }
+  #sidebar { width: 260px; }
 
-  /* Commands — right panel, visible by default */
-  #commands {
-    width: 300px !important;
-    min-width: 0 !important;
-    flex-shrink: 0;
-    display: flex !important;
-    flex-direction: column;
-    border-inline-start: 1px solid var(--border2);
-  }
-
-  /* Output — hidden by default, shown via tab */
-  #output {
-    display: none !important;
-    width: 300px !important;
-    min-width: 0 !important;
-    flex-shrink: 0;
-    border-inline-start: 1px solid var(--border2);
-  }
-
-  /* Tablet panel switching classes */
-  #commands.t-hide           { display: none !important; }
-  #output.t-show             { display: flex !important; flex-direction: column; }
-  #commands.t-solo, #output.t-solo { display: none !important; }
-
-  /* Bottom nav bar */
+  /* Bottom nav bar — for focus mode toggling sidebar */
   #mobile-nav { display: flex; }
 
   /* Keyboard button on touch tablets */
@@ -1734,10 +1741,9 @@ body {
   /* Comfortable touch targets */
   .mnav-btn  { min-height: 48px; padding: 8px 0 10px; font-size: 14px; }
   .cmd-tab   { min-height: 38px; }
-  .section-header { min-height: 44px; }
   .tbtn      { min-height: 36px; padding: 5px 10px; }
 
-  /* Top bar — scrollable for all buttons */
+  /* Top bar — scrollable */
   .top-bar {
     overflow-x: auto; overflow-y: hidden;
     height: auto !important; min-height: 48px;
@@ -1748,75 +1754,41 @@ body {
   }
   .top-bar::-webkit-scrollbar { display: none; }
   #song-title { font-size: 15px; }
-  /* user corner: keep icons, hide text label on tablet */
 
-  /* Spacing */
-  .editor-scroll { padding: 14px 14px 80px; }
+  .editor-scroll { padding: 14px 14px 20px; }
   .section-block { padding: 11px 12px 14px; }
   .lyrics-ta     { font-size: 14px; }
-  .panel-body    { padding: 14px; }
 }
 
-/* Small tablet / wide phone (641–768px) — narrower side panel */
+/* Small tablet (641–768px) — narrower sidebar */
 @media (min-width: 641px) and (max-width: 768px) {
-  #commands { width: 240px !important; }
-  #output   { width: 240px !important; }
+  #sidebar { width: 220px; }
 }
 
 /* ─── MOBILE (≤640px) ─── */
-#btn-keyboard { display: none; }   /* hidden on desktop */
+#btn-keyboard { display: none; }
 
 @media (max-width: 640px) {
-  body { height: 100dvh; overflow: hidden; }
+  body { height: 100dvh; }
+  /* Push editor content above fixed 58px mobile nav */
+  #editor { padding-bottom: 58px; }
 
-  /* Base panel reset — all hidden by default */
-  #commands, #editor, #output {
+  /* Sidebar hidden by default; slides up as overlay */
+  #sidebar {
     position: fixed !important;
     inset: 0 0 58px 0 !important;
     width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    height: auto !important;
-    display: none !important;
-    resize: none !important;
-    border: none !important;
-    z-index: 50;
-  }
-
-  /* Full-screen panel (editor tab) */
-  #editor.m-show   { display: flex !important; flex-direction: column; }
-  #output.m-show   { display: flex !important; flex-direction: column; }
-  #commands.m-show { display: flex !important; flex-direction: column; }
-
-  /* ── Split view: editor as top background, panel as bottom sheet ── */
-  #editor.m-bg {
-    display: flex !important;
-    flex-direction: column;
-    z-index: 40;
-  }
-  #editor.m-bg .editor-scroll {
-    max-height: calc(40dvh - 48px);
-    overflow-y: auto;
-  }
-
-  /* Bottom sheet for commands / output */
-  #commands.m-sheet, #output.m-sheet {
-    inset: auto 0 58px 0 !important;
-    height: 60dvh !important;
-    border-top: 2px solid var(--border2);
-    border-radius: 14px 14px 0 0;
-    box-shadow: 0 -8px 40px rgba(0,0,0,0.65);
     z-index: 100;
+    display: none !important;
+    border: none !important;
+    border-top: 2px solid var(--border2) !important;
+    border-radius: 14px 14px 0 0;
+  }
+  #sidebar.m-show {
+    display: flex !important;
     animation: sheetUp .22s ease-out;
   }
-  @keyframes sheetUp {
-    from { transform: translateY(25%); opacity: .6; }
-    to   { transform: translateY(0);   opacity: 1; }
-  }
-
-  /* Sheet drag handle */
-  #commands.m-sheet::before,
-  #output.m-sheet::before {
+  #sidebar.m-show::before {
     content: '';
     display: block;
     width: 36px; height: 4px;
@@ -1824,12 +1796,21 @@ body {
     border-radius: 2px;
     margin: 8px auto 4px;
     flex-shrink: 0;
+    order: -1;
   }
 
-  /* Show mobile nav */
+  @keyframes sheetUp {
+    from { transform: translateY(20%); opacity: .6; }
+    to   { transform: translateY(0);   opacity: 1; }
+  }
+
+  /* Status bar shifts up for mobile nav */
+  #status-bar { padding-bottom: 2px; }
+
+  /* Bottom nav */
   #mobile-nav { display: flex; }
 
-  /* Keyboard toggle button */
+  /* Keyboard toggle */
   #btn-keyboard { display: inline-flex !important; color: var(--txt1); }
   #btn-keyboard.kbd-on {
     color: var(--cyan);
@@ -1849,21 +1830,17 @@ body {
   .top-bar::-webkit-scrollbar { display: none; }
   #song-title { font-size: 15px; min-width: 90px; }
   .tbtn { padding: 5px 8px; font-size: 14px; gap: 3px; }
-  /* user corner: hide text badge on phone, show only icons */
   #user-badge-uc { display: none; }
   #user-corner { padding: 2px; gap: 1px; }
 
-  /* text tools bar — compact on phone */
-  #text-tools-bar { padding: 3px 10px; gap: 6px; }
+  /* Status bar compact */
+  #status-bar { gap: 5px; padding: 0 10px; }
   .ttbar-label { display: none; }
   .ttbtn { padding: 4px 9px; font-size: 14px; }
 
-  /* Editor / sections / output */
-  .editor-scroll { padding: 14px 12px 80px; }
+  .editor-scroll { padding: 14px 12px 20px; }
   .section-block { padding: 10px 11px 12px; }
   .lyrics-ta     { font-size: 14px; }
-  .panel-body    { padding: 14px; }
-  #output .pcard { margin-bottom: 12px; }
 }
 
 @media (max-width: 400px) {
@@ -1882,29 +1859,7 @@ body {
 })();
 </script>
 
-<!-- LEFT: SUNO COMMANDS PANEL -->
-<div id="commands">
-  <div class="sidebar-title">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-    Suno Commands
-  </div>
-  <div class="cmd-tabs">
-    <button class="cmd-tab active" id="tab-style"  data-tab="style"  onclick="switchCmdTab('style')">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77A5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-      Style
-    </button>
-    <button class="cmd-tab" id="tab-lyrics" data-tab="lyrics" onclick="switchCmdTab('lyrics')">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-      Lyrics
-    </button>
-  </div>
-  <div class="cmd-scroll">
-    <div id="cmd-style-panel"></div>
-    <div id="cmd-lyrics-panel" style="display:none"></div>
-  </div>
-</div>
-
-<!-- MAIN EDITOR -->
+<!-- SPLIT STUDIO: MAIN EDITOR (full-window column flex) -->
 <div id="editor">
   <div class="top-bar">
     <!-- Logo -->
@@ -1953,7 +1908,7 @@ body {
       מקלדת
     </button>
 
-    <!-- User corner (right side via order:-1) -->
+    <!-- User corner -->
     <div id="user-corner">
       <span id="user-badge-uc"></span>
       <button class="ucbtn ucbtn-admin" id="btn-admin" onclick="openAdminPanel()" title="ניהול משתמשים" style="display:none">
@@ -1965,81 +1920,107 @@ body {
     </div>
   </div>
 
-  <!-- Text tools bar: ניקוד · לטינזציה · פונטי -->
-  <div id="text-tools-bar">
-    <span class="ttbar-label">כלי טקסט</span>
+  <!-- Main row: section cards (left) + sidebar tools (right) -->
+  <div class="editor-main">
+
+    <div class="editor-scroll" id="editor-scroll">
+      <div id="sections-container"></div>
+      <div class="add-row" id="add-row"></div>
+    </div>
+
+    <!-- RIGHT SIDEBAR: Style Prompt + Commands + Tag Library -->
+    <div id="sidebar">
+
+      <!-- ── Style Prompt ── -->
+      <div class="sb-card" id="sb-style">
+        <div class="sb-card-hdr" onclick="toggleSbCard('style')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          <span class="sb-card-title">Style Prompt</span>
+          <div class="sb-card-actions">
+            <button class="copy-btn" id="copy-btn" onclick="copyOutput();event.stopPropagation()">COPY</button>
+            <button class="pcard-clear" onclick="clearStylePrompt();event.stopPropagation()" title="נקה">✕</button>
+            <span class="pcard-chevron open" id="sb-chevron-style">›</span>
+          </div>
+        </div>
+        <div class="sb-card-body" id="sb-body-style">
+          <textarea id="style-prompt" placeholder="לחץ על שבבים לימין..." oninput="updateStyleCounter()"></textarea>
+          <div class="char-counter" id="style-counter">0 / 120</div>
+        </div>
+      </div>
+
+      <!-- ── Suno Commands ── -->
+      <div class="sb-card sb-flex" id="sb-commands">
+        <div class="sb-card-hdr" onclick="toggleSbCard('commands')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span class="sb-card-title">Suno Commands</span>
+          <span class="pcard-chevron open" id="sb-chevron-commands" style="margin-inline-start:auto">›</span>
+        </div>
+        <div class="sb-card-body" id="sb-body-commands">
+          <div class="cmd-tabs">
+            <button class="cmd-tab active" id="tab-style" data-tab="style" onclick="switchCmdTab('style')">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77A5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              Style
+            </button>
+            <button class="cmd-tab" id="tab-lyrics" data-tab="lyrics" onclick="switchCmdTab('lyrics')">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              Lyrics
+            </button>
+          </div>
+          <div class="cmd-scroll">
+            <div id="cmd-style-panel"></div>
+            <div id="cmd-lyrics-panel" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Tag Library ── -->
+      <div class="sb-card sb-flex" id="sb-tags">
+        <div class="sb-card-hdr" onclick="toggleSbCard('tags')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <span class="sb-card-title">Tag Library</span>
+          <div class="sb-card-actions">
+            <button class="add-tag-btn" onclick="event.stopPropagation();openAddTagModal()" title="הוסף תג חדש">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+              תג חדש
+            </button>
+            <span class="pcard-chevron open" id="sb-chevron-tags">›</span>
+          </div>
+        </div>
+        <div class="sb-card-body" id="sb-body-tags">
+          <div class="tag-lib-search-wrap">
+            <input type="text" id="tag-search" placeholder="חיפוש תג..." oninput="filterTags(this.value)">
+          </div>
+          <div class="categories" id="categories"></div>
+        </div>
+      </div>
+
+    </div><!-- #sidebar -->
+  </div><!-- .editor-main -->
+
+  <!-- STATUS BAR: text tools (left) + lyrics counter + full preview (right) -->
+  <div id="status-bar">
     <div class="ttbar-pill">
-      <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudSelected()" title="ניקוד על הטקסט הנבחר (Ctrl+Shift+N)">
+      <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudSelected()" title="ניקוד (Ctrl+Shift+N)">
         <span>נ׳</span> ניקוד
       </button>
-      <button class="ttbtn tt-latin" id="btn-latin" onclick="latinizeSelected()" title="לטינזציה מדויקת (Ctrl+Shift+L)">
+      <button class="ttbtn tt-latin" id="btn-latin" onclick="latinizeSelected()" title="לטינזציה (Ctrl+Shift+L)">
         <span>Aa</span> לטינזציה
       </button>
-      <button class="ttbtn tt-phonetic" id="btn-phonetic" onclick="phoneticSelected()" title="פונטי מהיר — ללא API">
+      <button class="ttbtn tt-phonetic" id="btn-phonetic" onclick="phoneticSelected()" title="פונטי">
         <span>/ˈ/</span> פונטי
       </button>
     </div>
+    <div style="flex:1"></div>
+    <div class="lyrics-char-counter" id="lyrics-counter">0 / 3000 תווים</div>
+    <!-- Hidden output used by copy/preview -->
+    <div id="full-lyrics-out" style="display:none"></div>
+    <button class="full-preview-btn" onclick="openFullPreview()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12"/><circle cx="12" cy="12" r="3"/></svg>
+      Full Preview ↗
+    </button>
   </div>
 
-  <div class="editor-scroll" id="editor-scroll">
-    <div id="sections-container"></div>
-    <div class="add-row" id="add-row">
-      <!-- quick add buttons rendered by JS -->
-    </div>
-  </div>
-</div>
-
-<!-- RIGHT OUTPUT PANEL -->
-<div id="output">
-  <div class="panel-hdr">
-    <span class="panel-lbl">Style Studio</span>
-    <button class="copy-btn" id="copy-btn" onclick="copyOutput()">COPY</button>
-  </div>
-  <div class="panel-body">
-
-    <div class="pcard">
-      <div class="pcard-hdr">
-        <span>Style Prompt</span>
-        <button class="pcard-clear" onclick="clearStylePrompt()">נקה</button>
-      </div>
-      <textarea id="style-prompt" placeholder="לחץ על שבבים בצד שמאל..." oninput="updateStyleCounter()"></textarea>
-      <div class="char-counter" id="style-counter">0 / 120</div>
-    </div>
-
-    <div class="pcard">
-      <div class="pcard-hdr tag-lib-toggle" onclick="toggleTagLibCard()">
-        <span>Tag Library</span>
-        <div style="display:flex;align-items:center;gap:5px;margin-inline-start:auto">
-          <button class="add-tag-btn" onclick="event.stopPropagation();openAddTagModal()" title="הוסף תג חדש">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
-            תג חדש
-          </button>
-          <span class="pcard-chevron open" id="tag-lib-chevron">›</span>
-        </div>
-      </div>
-      <div class="tag-lib-body" id="tag-lib-body">
-        <div class="tag-lib-search-wrap">
-          <input type="text" id="tag-search" placeholder="חיפוש תג..." oninput="filterTags(this.value)">
-        </div>
-        <div class="categories" id="categories"></div>
-      </div>
-    </div>
-
-    <div class="pcard">
-      <div class="pcard-hdr" style="justify-content:space-between">
-        <span>תצוגה מלאה</span>
-        <button class="full-preview-btn" onclick="openFullPreview()">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12"/><circle cx="12" cy="12" r="3"/></svg>
-          Full Preview
-        </button>
-      </div>
-      <div class="lyrics-char-counter" id="lyrics-counter">0 / 3000 תווים</div>
-      <!-- Hidden output used by copy/preview -->
-      <div id="full-lyrics-out" style="display:none"></div>
-    </div>
-
-  </div>
-</div>
+</div><!-- #editor -->
 
 <!-- FULL PREVIEW MODAL -->
 <div id="full-preview-overlay" onclick="if(event.target===this)closeFullPreview()">
@@ -4199,11 +4180,17 @@ function insertCommandToLyrics(cmd) {
 }
 
 function toggleTagLibCard() {
-  const body = document.getElementById('tag-lib-body');
-  const chevron = document.getElementById('tag-lib-chevron');
+  toggleSbCard('tags'); // legacy alias
+}
+
+function toggleSbCard(name) {
+  const body    = document.getElementById('sb-body-' + name);
+  const chevron = document.getElementById('sb-chevron-' + name);
+  const card    = document.getElementById('sb-' + name);
   if (!body) return;
-  body.classList.toggle('collapsed');
-  if (chevron) chevron.classList.toggle('open', !body.classList.contains('collapsed'));
+  const collapsed = body.classList.toggle('collapsed');
+  if (chevron) chevron.classList.toggle('open', !collapsed);
+  if (card)    card.classList.toggle('sb-collapsed', collapsed);
 }
 
 // ════════════════════════════════════════════
@@ -4707,56 +4694,28 @@ async function setRegistration(open) {
 function isPhone()  { return window.matchMedia('(max-width: 640px)').matches; }
 function isTablet() { return window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches; }
 
-// ── Tablet panel switcher (2-col layout) ─────────────────────────────────────
+// ── Tablet: sidebar is always visible — just toggle focus if needed ───────────
 function tabletTab(panel) {
-  const commands = document.getElementById('commands');
-  const output   = document.getElementById('output');
-
-  // Reset tablet classes
-  commands.classList.remove('t-hide', 't-solo');
-  output.classList.remove('t-show', 't-solo');
-
+  const sidebar = document.getElementById('sidebar');
   if (panel === 'editor') {
-    // Solo editor: hide both side panels for focused writing
-    commands.classList.add('t-solo');
-    output.classList.add('t-solo');
-  } else if (panel === 'output') {
-    commands.classList.add('t-hide');
-    output.classList.add('t-show');
+    if (sidebar) sidebar.style.display = 'none';
+  } else {
+    if (sidebar) sidebar.style.display = '';
   }
-  // panel === 'commands': default CSS state — commands visible, output hidden
-
-  // Nav active state
-  ['commands','editor','output'].forEach(p => {
+  ['editor','sidebar'].forEach(p => {
     document.getElementById('mnav-' + p)?.classList.toggle('active', p === panel);
   });
 }
 
-// ── Mobile panel switcher (split-view bottom sheet) ──────────────────────────
+// ── Mobile panel switcher ─────────────────────────────────────────────────────
 function mobileTab(panel) {
   if (isTablet()) { tabletTab(panel); return; }
   if (!isPhone()) return;
 
-  const editor   = document.getElementById('editor');
-  const commands = document.getElementById('commands');
-  const output   = document.getElementById('output');
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) sidebar.classList.toggle('m-show', panel === 'sidebar');
 
-  [editor, commands, output].forEach(el => {
-    if (el) el.classList.remove('m-show', 'm-sheet', 'm-bg');
-  });
-
-  if (panel === 'editor') {
-    editor.classList.add('m-show');
-  } else {
-    editor.classList.add('m-bg');
-    const sheetEl = panel === 'commands' ? commands : output;
-    sheetEl.classList.add('m-show', 'm-sheet');
-    if (lastFocusedTa) {
-      setTimeout(() => lastFocusedTa.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
-    }
-  }
-
-  ['commands','editor','output'].forEach(p => {
+  ['editor','sidebar'].forEach(p => {
     document.getElementById('mnav-' + p)?.classList.toggle('active', p === panel);
   });
 }
@@ -4857,17 +4816,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Mobile bottom navigation -->
 <div id="mobile-nav">
-  <button class="mnav-btn" id="mnav-commands" onclick="mobileTab('commands')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M3 12h3m12 0h3M12 3v3m0 12v3"/></svg>
-    פקודות
-  </button>
   <button class="mnav-btn active" id="mnav-editor" onclick="mobileTab('editor')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
     עורך
   </button>
-  <button class="mnav-btn" id="mnav-output" onclick="mobileTab('output')">
+  <button class="mnav-btn" id="mnav-sidebar" onclick="mobileTab('sidebar')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-    פלט
+    כלים
   </button>
 </div>
 </body>
