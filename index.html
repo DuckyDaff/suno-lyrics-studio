@@ -62,7 +62,8 @@ body {
   display: flex;
   height: 100vh;
   overflow: hidden;
-  font-size: 13px;
+  font-size: 14px;
+  letter-spacing: -0.01em;
 }
 
 /* ─── SCROLLBARS ─── */
@@ -88,7 +89,7 @@ body {
 
 .sidebar-title {
   padding: 13px 14px 11px;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -112,7 +113,7 @@ body {
   border-radius: 8px;
   padding: 6px 10px 6px 28px;
   color: var(--txt0);
-  font-size: 12px;
+  font-size: 14px;
   outline: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2344447a' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -175,14 +176,14 @@ body {
 }
 .cat-name {
   flex: 1;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: .6px;
   text-transform: uppercase;
   color: var(--txt1);
 }
 .cat-count {
-  font-size: 10px;
+  font-size: 14px;
   color: var(--txt2);
   background: transparent;
   padding: 1px 5px;
@@ -191,7 +192,7 @@ body {
 .cat-chevron {
   color: var(--txt2);
   transition: transform .2s;
-  font-size: 9px;
+  font-size: 14px;
 }
 .cat.open .cat-chevron { transform: rotate(90deg); }
 
@@ -206,7 +207,7 @@ body {
 .tag {
   padding: 3px 9px;
   border-radius: 5px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all .1s;
@@ -283,7 +284,7 @@ body {
   background: transparent;
   color: var(--txt1);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   transition: all .1s;
   white-space: nowrap;
@@ -336,7 +337,7 @@ body {
   align-items: center;
   gap: 5px;
   padding: 5px 11px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   border: none;
   background: none;
@@ -375,7 +376,7 @@ body {
   flex-shrink: 0;
 }
 #user-badge-uc {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--txt1);
   white-space: nowrap;
   max-width: 110px;
@@ -428,7 +429,7 @@ body {
   padding: 7px 11px;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   transition: background .1s;
   display: flex;
   align-items: center;
@@ -475,7 +476,7 @@ body {
   gap: 5px;
   padding: 3px 10px;
   border-radius: 5px;
-  font-size: 10.5px;
+  font-size: 14px;
   font-weight: 600;
   cursor: default;
   flex-shrink: 0;
@@ -487,7 +488,7 @@ body {
   cursor: pointer;
   opacity: .65;
   transition: opacity .1s;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
 }
 .section-badge .x:hover { opacity: 1; }
@@ -507,14 +508,14 @@ body {
   background: transparent;
   color: var(--txt2);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 14px;
   transition: all .1s;
   font-family: inherit;
   letter-spacing: 0.05em;
 }
 .sact:hover { background: rgba(255,255,255,0.06); color: var(--txt1); border-color: rgba(255,255,255,0.1); }
 
-.sec-nikud, .sec-latin, .sec-phonetic, .sec-dir { font-size: 10px; padding: 3px 8px; }
+.sec-nikud, .sec-latin, .sec-phonetic, .sec-dir { font-size: 14px; padding: 3px 8px; }
 .sec-nikud { color: var(--txt2); border-color: rgba(255,255,255,0.07); background: transparent; }
 .sec-nikud:hover { color: var(--txt1); border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); box-shadow: none; }
 .sec-latin { color: var(--txt2); border-color: rgba(255,255,255,0.07); background: transparent; }
@@ -562,7 +563,7 @@ body {
   background: transparent;
   color: var(--txt2);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   transition: all .1s;
   font-family: inherit;
   letter-spacing: 0.05em;
@@ -595,7 +596,7 @@ body {
   flex-shrink: 0;
 }
 .panel-lbl {
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -609,7 +610,7 @@ body {
   background: rgba(0,212,255,0.08);
   color: var(--cyan);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.1em;
   transition: all .1s;
@@ -647,7 +648,7 @@ body {
   padding: 8px 12px;
   background: var(--bg1);
   border-bottom: 1px solid var(--border);
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -658,7 +659,7 @@ body {
 }
 .pcard-clear {
   cursor: pointer;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--txt2);
   background: none;
   border: none;
@@ -674,7 +675,7 @@ body {
   align-items: center;
   gap: 4px;
   padding: 2px 9px;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   font-family: inherit;
   border: 1px solid rgba(255,255,255,0.07);
@@ -729,7 +730,7 @@ body {
   letter-spacing: 0.05em;
 }
 #full-preview-modal .fpm-counter {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--txt2);
 }
 .fpm-counter.warn { color: var(--orange); }
@@ -750,7 +751,7 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 16px 20px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.9;
   white-space: pre-wrap;
   font-family: 'Consolas','Courier New',monospace;
@@ -760,7 +761,7 @@ body {
 #full-preview-body .sec-lbl-fp {
   color: var(--cyan);
   font-weight: 700;
-  font-size: 11px;
+  font-size: 14px;
   letter-spacing: 0.05em;
 }
 #full-preview-modal .fpm-actions {
@@ -781,7 +782,7 @@ body {
   background: var(--cyan);
   color: #090909;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   font-family: inherit;
   transition: all .1s;
@@ -796,7 +797,7 @@ body {
   background: transparent;
   color: var(--txt1);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   font-family: inherit;
   transition: all .1s;
 }
@@ -808,7 +809,7 @@ body {
   align-items: center;
   gap: 4px;
   padding: 2px 8px;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   font-family: inherit;
   border: 1px solid rgba(255,255,255,0.07);
@@ -856,7 +857,7 @@ body {
 }
 .atm-field { display: flex; flex-direction: column; gap: 5px; }
 .atm-label {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--txt2);
   letter-spacing: 0.3px;
@@ -867,7 +868,7 @@ body {
   border-radius: 6px;
   padding: 9px 12px;
   color: var(--txt0);
-  font-size: 13px;
+  font-size: 14px;
   font-family: inherit;
   outline: none;
   transition: border-color .1s, box-shadow .1s;
@@ -884,7 +885,7 @@ body {
   align-items: center;
   padding: 3px 11px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   border: 1px solid;
   transition: all .2s;
@@ -892,7 +893,7 @@ body {
   min-height: 24px;
 }
 .atm-error {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--red);
   background: rgba(201,64,64,0.08);
   border: 1px solid rgba(201,64,64,0.25);
@@ -914,7 +915,7 @@ body {
   background: transparent;
   color: var(--txt1);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   font-family: inherit;
   transition: all .1s;
 }
@@ -929,7 +930,7 @@ body {
   background: var(--cyan);
   color: #090909;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   font-family: inherit;
   transition: all .1s;
@@ -945,7 +946,7 @@ body {
   border: none;
   padding: 9px 11px;
   color: var(--txt0);
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.65;
   resize: none;
   outline: none;
@@ -953,7 +954,7 @@ body {
 }
 .char-counter {
   padding: 4px 11px;
-  font-size: 10px;
+  font-size: 14px;
   color: var(--txt2);
   border-top: 1px solid var(--border);
   text-align: right;
@@ -963,7 +964,7 @@ body {
 
 #full-lyrics-out {
   padding: 9px 11px;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.85;
   color: var(--txt1);
   direction: rtl;
@@ -984,7 +985,7 @@ body {
 
 .lyrics-char-counter {
   padding: 4px 11px;
-  font-size: 10px;
+  font-size: 14px;
   color: var(--txt2);
   border-top: 1px solid var(--border);
   text-align: right;
@@ -1002,7 +1003,7 @@ body {
   border: 1px solid var(--border2);
   border-radius: 6px;
   padding: 9px 18px;
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 500;
   z-index: 999;
   transition: transform .3s cubic-bezier(.34,1.56,.64,1);
@@ -1070,7 +1071,7 @@ body {
 .modal-tag {
   padding: 6px 13px;
   border-radius: 5px;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
   border: 1px solid rgba(255,255,255,0.07);
   background: transparent;
@@ -1158,7 +1159,7 @@ body {
   border-top-color: rgba(255,255,255,0.08);
 }
 .ap-title {
-  font-size: 10px;
+  font-size: 14px;
   color: var(--txt2);
   text-align: center;
   letter-spacing: 0.6px;
@@ -1169,7 +1170,7 @@ body {
 .ap-word-orig {
   font-family: 'David Libre', 'Frank Ruehl CLM', 'Noto Serif Hebrew', serif;
   color: var(--txt1);
-  font-size: 13px;
+  font-size: 14px;
   direction: rtl;
 }
 .ap-opts {
@@ -1197,7 +1198,7 @@ body {
   line-height: 1.4;
 }
 .ap-label {
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 0.2px;
   opacity: 0.8;
 }
@@ -1226,7 +1227,7 @@ body {
   border-bottom: 2px solid transparent;
   color: var(--txt1);
   cursor: pointer;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.05em;
   display: flex;
@@ -1255,7 +1256,7 @@ body {
   cursor: pointer;
   user-select: none;
   transition: background .1s;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
@@ -1265,7 +1266,7 @@ body {
 }
 .cmd-group-hdr:hover { background: rgba(0,212,255,0.04); }
 .cmd-group-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.cmd-group-chevron { color: var(--txt2); transition: transform .2s; margin-inline-start: auto; font-size: 9px; }
+.cmd-group-chevron { color: var(--txt2); transition: transform .2s; margin-inline-start: auto; font-size: 14px; }
 .cmd-group.open  .cmd-group-chevron { transform: rotate(90deg); }
 .cmd-chips { padding: 4px 8px 8px; display: flex; flex-wrap: wrap; gap: 4px; }
 .cmd-group.closed .cmd-chips { display: none; }
@@ -1274,7 +1275,7 @@ body {
 .cmd-chip {
   padding: 3px 9px;
   border-radius: 5px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all .1s;
@@ -1298,7 +1299,7 @@ body {
   border-color: rgba(255,255,255,0.07);
   color: var(--txt1);
   font-family: 'JetBrains Mono','Consolas','Courier New',monospace;
-  font-size: 10.5px;
+  font-size: 14px;
 }
 .cmd-chip.lyrics-chip:hover {
   background: rgba(0,212,255,0.08);
@@ -1327,7 +1328,7 @@ body {
   border-radius: 7px;
   padding: 5px 9px 5px 25px;
   color: var(--txt0);
-  font-size: 11px;
+  font-size: 14px;
   outline: none;
   font-family: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2344447a' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
@@ -1340,7 +1341,7 @@ body {
 
 .pcard-chevron {
   color: var(--txt2);
-  font-size: 13px;
+  font-size: 14px;
   transition: transform .2s;
   line-height: 1;
   cursor: pointer;
@@ -1383,7 +1384,7 @@ body {
   letter-spacing: 0.05em;
 }
 #import-modal .import-hint {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--txt2);
   line-height: 1.5;
 }
@@ -1392,7 +1393,7 @@ body {
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 4px;
   padding: 1px 5px;
-  font-size: 10.5px;
+  font-size: 14px;
   color: var(--cyan);
   font-family: 'JetBrains Mono','Consolas','Courier New',monospace;
 }
@@ -1405,7 +1406,7 @@ body {
   border-radius: 6px;
   padding: 13px 15px;
   color: var(--txt0);
-  font-size: 12.5px;
+  font-size: 14px;
   line-height: 1.75;
   resize: vertical;
   outline: none;
@@ -1432,7 +1433,7 @@ body {
   padding: 8px 10px;
 }
 #import-tag-bar .itb-label {
-  font-size: 10px;
+  font-size: 14px;
   color: var(--txt2);
   font-weight: 600;
   letter-spacing: 0.4px;
@@ -1444,7 +1445,7 @@ body {
 }
 .itag-btn {
   padding: 3px 10px;
-  font-size: 11px;
+  font-size: 14px;
   font-family: 'JetBrains Mono','Consolas','Courier New',monospace;
   font-weight: 600;
   border-radius: 5px;
@@ -1486,7 +1487,7 @@ body {
   margin-top: 2px;
 }
 .iprev-name {
-  font-size: 10.5px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--txt1);
   white-space: nowrap;
@@ -1494,7 +1495,7 @@ body {
   min-width: 70px;
 }
 .iprev-snip {
-  font-size: 10.5px;
+  font-size: 14px;
   color: var(--txt2);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1511,7 +1512,7 @@ body {
 }
 .import-parsed-count {
   flex: 1;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--txt2);
 }
 .import-cancel {
@@ -1521,7 +1522,7 @@ body {
   background: transparent;
   color: var(--txt1);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   font-family: inherit;
   transition: all .1s;
 }
@@ -1536,7 +1537,7 @@ body {
   background: var(--cyan);
   color: #090909;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   font-family: inherit;
   transition: all .1s;
@@ -1584,7 +1585,7 @@ body {
 .adm-close:hover { color: var(--txt0); }
 .adm-body { overflow-y: auto; padding: 16px 18px 20px; flex: 1; }
 .adm-section-title {
-  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  font-size: 14px; font-weight: 700; letter-spacing: 1px;
   text-transform: uppercase; color: var(--txt2); margin-bottom: 8px;
 }
 .adm-row {
@@ -1593,11 +1594,11 @@ body {
   border-radius: 6px; margin-bottom: 6px;
 }
 .adm-row-info { flex: 1; min-width: 0; }
-.adm-row-name { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-.adm-row-email { font-size: 11px; color: var(--txt1); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.adm-row-date  { font-size: 10px; color: var(--txt2); margin-top: 1px; }
+.adm-row-name { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.adm-row-email { font-size: 14px; color: var(--txt1); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm-row-date  { font-size: 14px; color: var(--txt2); margin-top: 1px; }
 .adm-badge {
-  font-size: 10px; padding: 1px 7px; border-radius: 10px;
+  font-size: 14px; padding: 1px 7px; border-radius: 10px;
   background: transparent; color: var(--txt1);
   border: 1px solid rgba(255,255,255,0.07);
 }
@@ -1605,14 +1606,14 @@ body {
 .adm-del-btn {
   padding: 4px 10px; background: rgba(201,64,64,0.08);
   border: 1px solid rgba(201,64,64,0.22); border-radius: 6px;
-  color: var(--red); cursor: pointer; font-size: 11px; font-family: inherit;
+  color: var(--red); cursor: pointer; font-size: 14px; font-family: inherit;
   white-space: nowrap; flex-shrink: 0; transition: background .1s;
 }
 .adm-del-btn:hover { background: rgba(201,64,64,0.2); }
 /* toggle switch */
 .tog-wrap { display: flex; align-items: center; gap: 10px; padding: 11px 13px; background: var(--bg2); border-radius: 6px; margin-bottom: 16px; }
-.tog-label { flex: 1; font-size: 13px; font-weight: 600; }
-.tog-sub { font-size: 11px; color: var(--txt1); margin-top: 1px; }
+.tog-label { flex: 1; font-size: 14px; font-weight: 600; }
+.tog-sub { font-size: 14px; color: var(--txt1); margin-top: 1px; }
 .toggle { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
 .toggle input { opacity: 0; width: 0; height: 0; }
 .toggle-sl {
@@ -1650,7 +1651,7 @@ body {
   border: none;
   color: var(--txt2);
   cursor: pointer;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 700;
   font-family: inherit;
   letter-spacing: 0.1em;
@@ -1731,7 +1732,7 @@ body {
   #btn-keyboard { display: inline-flex !important; }
 
   /* Comfortable touch targets */
-  .mnav-btn  { min-height: 48px; padding: 8px 0 10px; font-size: 11px; }
+  .mnav-btn  { min-height: 48px; padding: 8px 0 10px; font-size: 14px; }
   .cmd-tab   { min-height: 38px; }
   .section-header { min-height: 44px; }
   .tbtn      { min-height: 36px; padding: 5px 10px; }
@@ -1847,7 +1848,7 @@ body {
   }
   .top-bar::-webkit-scrollbar { display: none; }
   #song-title { font-size: 15px; min-width: 90px; }
-  .tbtn { padding: 5px 8px; font-size: 11px; gap: 3px; }
+  .tbtn { padding: 5px 8px; font-size: 14px; gap: 3px; }
   /* user corner: hide text badge on phone, show only icons */
   #user-badge-uc { display: none; }
   #user-corner { padding: 2px; gap: 1px; }
@@ -1855,7 +1856,7 @@ body {
   /* text tools bar — compact on phone */
   #text-tools-bar { padding: 3px 10px; gap: 6px; }
   .ttbar-label { display: none; }
-  .ttbtn { padding: 4px 9px; font-size: 10.5px; }
+  .ttbtn { padding: 4px 9px; font-size: 14px; }
 
   /* Editor / sections / output */
   .editor-scroll { padding: 14px 12px 80px; }
