@@ -3412,10 +3412,7 @@ function transliterateHebrew(text) {
     i = j;
   }
 
-  // Clean up (don't collapse aa/oo — they may be phonetically distinct)
-  return out
-    .replace(/\s+/g, ' ')
-    .trim();
+  return out;
 }
 
 // Rough phonetic latinization without nikud.
@@ -3502,6 +3499,23 @@ function roughLatinize(text) {
   return out.trim();
 }
 
+// ── doLatinize: process text preserving line structure ──────────────
+// Splits by newline, processes each line, re-joins. Handles both
+// nikud-bearing (uses transliterateHebrew) and bare Hebrew (roughLatinize).
+function doLatinize(text) {
+  return text.split('\n').map(line => {
+    if (!/[\u05D0-\u05EA]/.test(line)) return line; // no Hebrew → keep as-is
+    const hasNikud = /[\u05B0-\u05C7]/.test(line);
+    return hasNikud ? transliterateHebrew(line) : roughLatinize(line);
+  }).join('\n');
+}
+
+// ── applyPhonetic: phonetic respell, auto-latinizes Hebrew first ─────
+function applyPhonetic(text) {
+  const src = /[\u05D0-\u05EA]/.test(text) ? doLatinize(text) : text;
+  return phoneticRespell(src);
+}
+
 async function latinizeSelected() {
   const ta = getFocusedTextarea();
   if (!ta) { showToast('לחץ בתוך תיבת טקסט תחילה', 'error'); return; }
@@ -3522,8 +3536,7 @@ async function latinizeSelected() {
       source = await callDictaNakdan(text);
     } catch {}
 
-    const hasNikud = /[\u05B0-\u05C7]/.test(source);
-    const result = hasNikud ? transliterateHebrew(source) : roughLatinize(source);
+    const result = doLatinize(source);
 
     if (hasSelection) {
       ta.setRangeText(result, start, end, 'select');
@@ -3546,8 +3559,7 @@ async function latinizeSection(id) {
   showToast('ממיר...', '');
   let source = ta.value;
   try { source = await callDictaNakdan(ta.value); } catch {}
-  const hasNikud = /[\u05B0-\u05C7]/.test(source);
-  const result = hasNikud ? transliterateHebrew(source) : roughLatinize(source);
+  const result = doLatinize(source);
   ta.value = result;
   updateSectionText(id, result);
   showToast('לטינזציה בוצעה!', 'success');
@@ -3666,7 +3678,7 @@ function phoneticSelected() {
   const hasSelection = start !== end;
   const text = hasSelection ? ta.value.substring(start, end) : ta.value;
   if (!text.trim()) { showToast('אין טקסט להמרה', 'error'); return; }
-  const result = phoneticRespell(text);
+  const result = applyPhonetic(text);
   if (hasSelection) {
     ta.setRangeText(result, start, end, 'select');
   } else {
@@ -3680,7 +3692,7 @@ function phoneticSelected() {
 function phoneticSection(id) {
   const ta = document.getElementById('ta-' + id);
   if (!ta || !ta.value.trim()) { showToast('המקטע ריק', 'error'); return; }
-  const result = phoneticRespell(ta.value);
+  const result = applyPhonetic(ta.value);
   ta.value = result;
   updateSectionText(id, result);
   pushUndo();
@@ -3724,8 +3736,7 @@ async function latinizeAll() {
     try {
       let source = sec.text;
       try { source = await callDictaNakdan(sec.text); } catch (e) {}
-      const hasNikud = /[\u05B0-\u05C7]/.test(source);
-      const result = hasNikud ? transliterateHebrew(source) : roughLatinize(source);
+      const result = doLatinize(source);
       sec.text = result;
       const ta = document.getElementById('ta-' + sec.id);
       if (ta) { ta.value = result; ta.dispatchEvent(new Event('input')); }
@@ -3740,7 +3751,7 @@ function phoneticAll() {
   const toProcess = sections.filter(s => s.text && s.text.trim());
   if (!toProcess.length) { showToast('אין תיבות עם טקסט', 'error'); return; }
   for (const sec of toProcess) {
-    const result = phoneticRespell(sec.text);
+    const result = applyPhonetic(sec.text);
     sec.text = result;
     const ta = document.getElementById('ta-' + sec.id);
     if (ta) { ta.value = result; ta.dispatchEvent(new Event('input')); }
