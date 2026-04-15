@@ -671,6 +671,143 @@ body {
 }
 .pcard-clear:hover { color: var(--txt1); }
 
+/* ── Add-tag button ── */
+.add-tag-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: inherit;
+  border: 1px solid rgba(130,80,255,0.35);
+  border-radius: 5px;
+  background: rgba(130,80,255,0.08);
+  color: var(--purple);
+  cursor: pointer;
+  transition: all .15s;
+  touch-action: manipulation;
+  white-space: nowrap;
+}
+.add-tag-btn:hover { background: rgba(130,80,255,0.2); border-color: var(--purple); }
+
+/* ── Add-tag modal ── */
+#add-tag-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(8px);
+  z-index: 250;
+  justify-content: center;
+  align-items: center;
+}
+#add-tag-overlay.open { display: flex; }
+#add-tag-modal {
+  background: rgba(14,12,40,0.97);
+  border: 1px solid rgba(130,90,255,0.35);
+  border-radius: 16px;
+  padding: 24px;
+  width: 420px;
+  max-width: 95vw;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.8), inset 0 1px 0 rgba(150,120,255,0.08);
+}
+#add-tag-modal h3 {
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--grad-main);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0;
+}
+.atm-field { display: flex; flex-direction: column; gap: 5px; }
+.atm-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--txt2);
+  letter-spacing: 0.3px;
+}
+.atm-input, .atm-select {
+  background: rgba(8,8,25,0.85);
+  border: 1px solid rgba(100,75,200,0.3);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--txt0);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  direction: ltr;
+}
+.atm-input:focus, .atm-select:focus {
+  border-color: rgba(130,80,255,0.5);
+  box-shadow: 0 0 0 2px rgba(130,80,255,0.08);
+}
+.atm-input::placeholder { color: var(--txt2); }
+.atm-select option { background: #1c1c2e; color: var(--txt0); }
+.atm-preview-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 11px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid;
+  transition: all .2s;
+  align-self: flex-start;
+  min-height: 24px;
+}
+.atm-error {
+  font-size: 11px;
+  color: var(--red);
+  background: rgba(224,85,85,0.08);
+  border: 1px solid rgba(224,85,85,0.25);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: none;
+}
+.atm-error.visible { display: block; }
+.atm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 2px;
+}
+.atm-cancel {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(100,75,200,0.3);
+  background: transparent;
+  color: var(--txt1);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: all .15s;
+}
+.atm-cancel:hover { background: rgba(30,22,65,0.8); color: var(--txt0); }
+.atm-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--grad-purple);
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  transition: all .15s;
+  box-shadow: 0 2px 10px rgba(130,80,255,0.35);
+}
+.atm-confirm:hover { filter: brightness(1.15); transform: translateY(-1px); }
+.atm-confirm:active { transform: scale(.97); }
+
 #style-prompt {
   width: 100%;
   min-height: 70px;
@@ -1739,7 +1876,13 @@ body {
     <div class="pcard">
       <div class="pcard-hdr tag-lib-toggle" onclick="toggleTagLibCard()">
         <span>Tag Library</span>
-        <span class="pcard-chevron open" id="tag-lib-chevron">›</span>
+        <div style="display:flex;align-items:center;gap:5px;margin-inline-start:auto">
+          <button class="add-tag-btn" onclick="event.stopPropagation();openAddTagModal()" title="הוסף תג חדש">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+            תג חדש
+          </button>
+          <span class="pcard-chevron open" id="tag-lib-chevron">›</span>
+        </div>
       </div>
       <div class="tag-lib-body" id="tag-lib-body">
         <div class="tag-lib-search-wrap">
@@ -1757,6 +1900,47 @@ body {
       <div class="lyrics-char-counter" id="lyrics-counter">0 / 3000 תווים</div>
     </div>
 
+  </div>
+</div>
+
+<!-- ADD TAG MODAL -->
+<div id="add-tag-overlay" onclick="if(event.target===this)closeAddTagModal()">
+  <div id="add-tag-modal">
+    <h3>הוסף תג חדש לספרייה</h3>
+
+    <div class="atm-field">
+      <div class="atm-label">שם התג</div>
+      <input class="atm-input" id="atm-tag-input" placeholder="למשל: Dreamy, Aggressive..." oninput="atmUpdatePreview()">
+    </div>
+
+    <div class="atm-field">
+      <div class="atm-label">ספרייה</div>
+      <select class="atm-select" id="atm-lib-select" onchange="atmLibChanged()">
+        <option value="tags">Tag Library</option>
+        <option value="style">Suno Commands — Style</option>
+        <option value="lyrics">Suno Commands — Lyrics</option>
+      </select>
+    </div>
+
+    <div class="atm-field">
+      <div class="atm-label">קטגוריה</div>
+      <select class="atm-select" id="atm-cat-select" onchange="atmUpdatePreview()"></select>
+    </div>
+
+    <div class="atm-field">
+      <div class="atm-label">תצוגה מקדימה</div>
+      <span class="atm-preview-pill" id="atm-preview">—</span>
+    </div>
+
+    <div class="atm-error" id="atm-error"></div>
+
+    <div class="atm-actions">
+      <button class="atm-cancel" onclick="closeAddTagModal()">ביטול</button>
+      <button class="atm-confirm" onclick="doAddTag()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
+        הוסף תג
+      </button>
+    </div>
   </div>
 </div>
 
@@ -2015,7 +2199,8 @@ let sectionIdCounter = 0;
 //  INIT
 // ════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-  // Apply saved reorder before rendering
+  // Load user-added custom tags, then apply saved order
+  loadCustomTags();
   applyTagLibraryOrder();
   applyCmdOrder('style');
   applyCmdOrder('lyrics');
@@ -2047,6 +2232,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && activeAmbigPopup) hideAmbigPopup();
     if (e.key === 'Escape' && document.getElementById('import-overlay').classList.contains('open')) closeImportModal();
+    if (e.key === 'Escape' && document.getElementById('add-tag-overlay').classList.contains('open')) closeAddTagModal();
   });
 });
 
@@ -3968,6 +4154,160 @@ function initAuth() {
 }
 
 // ── Admin panel ──────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════
+//  ADD TAG MODAL
+// ════════════════════════════════════════════
+const CUSTOM_TAGS_KEY = 'melodraft_custom_tags';
+
+function openAddTagModal() {
+  document.getElementById('add-tag-overlay').classList.add('open');
+  document.getElementById('atm-tag-input').value = '';
+  document.getElementById('atm-error').classList.remove('visible');
+  atmLibChanged();   // populate categories for default lib
+  setTimeout(() => document.getElementById('atm-tag-input').focus(), 50);
+}
+
+function closeAddTagModal() {
+  document.getElementById('add-tag-overlay').classList.remove('open');
+}
+
+// Rebuild category select when library changes
+function atmLibChanged() {
+  const lib    = document.getElementById('atm-lib-select').value;
+  const catSel = document.getElementById('atm-cat-select');
+  catSel.innerHTML = '';
+
+  const cats = lib === 'tags'
+    ? TAG_LIBRARY.map(c => ({ name: c.name, color: c.color }))
+    : SUNO_COMMANDS[lib].map(g => ({ name: g.name, color: g.color }));
+
+  cats.forEach((c, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = c.name;
+    catSel.appendChild(opt);
+  });
+  atmUpdatePreview();
+}
+
+// Live color preview pill
+function atmUpdatePreview() {
+  const lib     = document.getElementById('atm-lib-select').value;
+  const catIdx  = parseInt(document.getElementById('atm-cat-select').value);
+  const tagText = document.getElementById('atm-tag-input').value.trim();
+  const pill    = document.getElementById('atm-preview');
+
+  const cats = lib === 'tags'
+    ? TAG_LIBRARY
+    : SUNO_COMMANDS[lib];
+  const color = cats[catIdx]?.color || '#9b72ef';
+
+  pill.style.cssText = `background:${color}28;border-color:${color}60;color:${color}`;
+  pill.textContent   = tagText || '—';
+}
+
+// Collect every tag currently in all libraries (lowercase, trimmed)
+function getAllExistingTags() {
+  const set = new Set();
+  TAG_LIBRARY.forEach(c => c.tags.forEach(t => set.add(t.toLowerCase().trim())));
+  ['style','lyrics'].forEach(tab =>
+    SUNO_COMMANDS[tab].forEach(g => g.chips.forEach(ch => set.add(ch.toLowerCase().trim())))
+  );
+  return set;
+}
+
+function doAddTag() {
+  const lib     = document.getElementById('atm-lib-select').value;
+  const catIdx  = parseInt(document.getElementById('atm-cat-select').value);
+  const rawTag  = document.getElementById('atm-tag-input').value.trim();
+  const errEl   = document.getElementById('atm-error');
+
+  errEl.classList.remove('visible');
+
+  if (!rawTag) {
+    errEl.textContent = 'יש להזין שם תג';
+    errEl.classList.add('visible');
+    return;
+  }
+
+  // Duplicate check across all libraries
+  const existing = getAllExistingTags();
+  if (existing.has(rawTag.toLowerCase())) {
+    errEl.textContent = `התג "${rawTag}" כבר קיים בספרייה`;
+    errEl.classList.add('visible');
+    return;
+  }
+
+  // Add to the right data structure
+  if (lib === 'tags') {
+    TAG_LIBRARY[catIdx].tags.push(rawTag);
+  } else {
+    SUNO_COMMANDS[lib][catIdx].chips.push(rawTag);
+  }
+
+  // Persist custom tags to localStorage
+  saveCustomTag({ lib, catIdx, tag: rawTag });
+
+  // Re-render the relevant panel
+  if (lib === 'tags') {
+    renderTagLibrary();
+    initDragReorder(
+      document.getElementById('categories'), '.cat', onTagLibraryReorder
+    );
+  } else {
+    renderCommandPanel(lib);
+    initDragReorder(
+      document.getElementById(`cmd-${lib}-panel`), '.cmd-group',
+      els => onCmdGroupReorder(lib, els)
+    );
+    // Make sure the right panel is visible
+    switchCmdTab(lib === 'style' ? 'style' : 'lyrics');
+  }
+
+  // Open the category so the user can see the new tag
+  if (lib === 'tags') {
+    const cats = document.querySelectorAll('#categories .cat');
+    if (cats[catIdx]) {
+      cats[catIdx].classList.add('open');
+      cats[catIdx].classList.remove('closed');
+      cats[catIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  } else {
+    const panel = document.getElementById(`cmd-${lib}-panel`);
+    const groups = panel?.querySelectorAll('.cmd-group');
+    if (groups?.[catIdx]) {
+      groups[catIdx].classList.add('open');
+      groups[catIdx].classList.remove('closed');
+      groups[catIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  closeAddTagModal();
+  showToast(`התג "${rawTag}" נוסף בהצלחה`, 'success');
+}
+
+// ── Custom tag persistence ────────────────────────────────────
+function saveCustomTag(entry) {
+  const list = getCustomTags();
+  list.push(entry);
+  localStorage.setItem(CUSTOM_TAGS_KEY, JSON.stringify(list));
+}
+
+function getCustomTags() {
+  try { return JSON.parse(localStorage.getItem(CUSTOM_TAGS_KEY)) || []; } catch { return []; }
+}
+
+function loadCustomTags() {
+  getCustomTags().forEach(({ lib, catIdx, tag }) => {
+    try {
+      if (lib === 'tags' && TAG_LIBRARY[catIdx] && !TAG_LIBRARY[catIdx].tags.includes(tag))
+        TAG_LIBRARY[catIdx].tags.push(tag);
+      else if ((lib === 'style' || lib === 'lyrics') && SUNO_COMMANDS[lib][catIdx] && !SUNO_COMMANDS[lib][catIdx].chips.includes(tag))
+        SUNO_COMMANDS[lib][catIdx].chips.push(tag);
+    } catch {}
+  });
+}
+
 function openAdminPanel() {
   document.getElementById('adm-overlay').classList.add('open');
   loadAdminPanel();
