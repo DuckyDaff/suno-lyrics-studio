@@ -591,10 +591,21 @@ body {
   border-radius: 8px;
   padding: 5px;
   z-index: 99;
-  min-width: 200px;
+  min-width: 210px;
+  max-height: 70vh;
+  overflow-y: auto;
   box-shadow: 0 8px 30px rgba(0,0,0,.6);
 }
 .templates-dd.open { display: block; }
+.tpl-sep {
+  padding: 7px 10px 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--txt2);
+  margin-top: 3px;
+}
 .tpl-item {
   padding: 7px 11px;
   border-radius: 5px;
@@ -1986,11 +1997,30 @@ body {
         תבניות
       </button>
       <div class="templates-dd" id="tpl-dd">
-        <div class="tpl-item" onclick="loadTemplate('pop')"><span class="tpl-dot" style="background:var(--pink)"></span>Pop Song</div>
-        <div class="tpl-item" onclick="loadTemplate('rock')"><span class="tpl-dot" style="background:var(--red)"></span>Rock Song</div>
-        <div class="tpl-item" onclick="loadTemplate('hiphop')"><span class="tpl-dot" style="background:var(--orange)"></span>Hip-Hop</div>
-        <div class="tpl-item" onclick="loadTemplate('mizrahi')"><span class="tpl-dot" style="background:var(--yellow)"></span>מזרחי</div>
-        <div class="tpl-item" onclick="loadTemplate('ballad')"><span class="tpl-dot" style="background:var(--teal)"></span>Ballad</div>
+        <div class="tpl-sep">🎤 פופ ומיינסטרים</div>
+        <div class="tpl-item" onclick="loadTemplate('pop')"><span class="tpl-dot" style="background:#e070a0"></span>Pop</div>
+        <div class="tpl-item" onclick="loadTemplate('rnb')"><span class="tpl-dot" style="background:#d070c0"></span>R&B / Neo-Soul</div>
+        <div class="tpl-item" onclick="loadTemplate('dancepop')"><span class="tpl-dot" style="background:#00d4ff"></span>Dance Pop</div>
+        <div class="tpl-sep">⚡ ריתמי ועוצמה</div>
+        <div class="tpl-item" onclick="loadTemplate('rock')"><span class="tpl-dot" style="background:#c84040"></span>Rock</div>
+        <div class="tpl-item" onclick="loadTemplate('metal')"><span class="tpl-dot" style="background:#8a1010"></span>Heavy Metal</div>
+        <div class="tpl-item" onclick="loadTemplate('hiphop')"><span class="tpl-dot" style="background:#e8922a"></span>Hip-Hop</div>
+        <div class="tpl-item" onclick="loadTemplate('trap')"><span class="tpl-dot" style="background:#c04080"></span>Trap</div>
+        <div class="tpl-item" onclick="loadTemplate('funk')"><span class="tpl-dot" style="background:#ff9f43"></span>Funk</div>
+        <div class="tpl-sep">🎛️ אלקטרוני</div>
+        <div class="tpl-item" onclick="loadTemplate('edm')"><span class="tpl-dot" style="background:#9b72ef"></span>EDM / Electronic</div>
+        <div class="tpl-item" onclick="loadTemplate('lofi')"><span class="tpl-dot" style="background:#5b9cf6"></span>Lo-Fi Hip-Hop</div>
+        <div class="tpl-sep">🪘 ים-תיכוני ואתני</div>
+        <div class="tpl-item" onclick="loadTemplate('mizrahi')"><span class="tpl-dot" style="background:#b88a1e"></span>מזרחי</div>
+        <div class="tpl-item" onclick="loadTemplate('greek')"><span class="tpl-dot" style="background:#1aaa96"></span>יווני / מדיטרני</div>
+        <div class="tpl-item" onclick="loadTemplate('reggae')"><span class="tpl-dot" style="background:#1aad7a"></span>Reggae</div>
+        <div class="tpl-sep">🎸 אורגני ואקוסטי</div>
+        <div class="tpl-item" onclick="loadTemplate('ballad')"><span class="tpl-dot" style="background:#28c4af"></span>Ballad</div>
+        <div class="tpl-item" onclick="loadTemplate('folk')"><span class="tpl-dot" style="background:#7bc8f0"></span>Folk Acoustic</div>
+        <div class="tpl-item" onclick="loadTemplate('country')"><span class="tpl-dot" style="background:#c4762e"></span>Country</div>
+        <div class="tpl-item" onclick="loadTemplate('jazz')"><span class="tpl-dot" style="background:#b88a1e"></span>Jazz</div>
+        <div class="tpl-sep">🎬 סינמטי</div>
+        <div class="tpl-item" onclick="loadTemplate('cinematic')"><span class="tpl-dot" style="background:#7c5cbf"></span>Cinematic / Epic</div>
       </div>
     </div>
 
@@ -3807,8 +3837,9 @@ function toggleTemplates() {
 
 const TEMPLATES = {
   pop: {
-    style: 'Pop, Upbeat, Female vocals, Piano, Synthesizer, 120 BPM',
+    style: 'Pop, Catchy, Upbeat, Female vocals, Vocal harmonies, Grand piano, Synthesizer, Clapping, Shimmering hi-hats, 118 BPM',
     sections: [
+      { name: 'Intro', text: '' },
       { name: 'Verse 1', text: '' },
       { name: 'Pre-Chorus', text: '' },
       { name: 'Chorus', text: '' },
@@ -3820,21 +3851,79 @@ const TEMPLATES = {
       { name: 'Outro', text: '' },
     ]
   },
+  rnb: {
+    style: 'Neo-Soul, R&B, Smooth, Soulful female vocals, Vocal runs, Rhodes piano, Warm bass guitar, Drum groove, Background vocals, 85 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Pre-Chorus', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Pre-Chorus', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Bridge', text: '' },
+      { name: 'Final Chorus', text: '' },
+      { name: 'Outro (Fade)', text: '' },
+    ]
+  },
+  dancepop: {
+    style: 'Dance Pop, Electronic, High energy, Female vocals, Synth lead, Four-on-the-floor kick, Sidechain compression, Clapping, Wide stereo, 128 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Pre-Chorus', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Pre-Chorus', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Drop', text: '' },
+      { name: 'Final Chorus', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
   rock: {
-    style: 'Rock, Energetic, Male vocals, Electric guitar, Drums, 140 BPM',
+    style: 'Rock, Energetic, Powerful male vocals, Electric guitar, Distorted guitar, Bass guitar, Live drums, 140 BPM',
     sections: [
       { name: 'Intro', text: '' },
       { name: 'Verse 1', text: '' },
       { name: 'Chorus', text: '' },
       { name: 'Verse 2', text: '' },
       { name: 'Chorus', text: '' },
-      { name: 'Solo', text: '' },
+      { name: 'Guitar Solo', text: '' },
+      { name: 'Bridge', text: '' },
+      { name: 'Final Chorus', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
+  metal: {
+    style: 'Heavy Metal, Aggressive male vocals, Power chords, Distorted guitar, Shredding solo, Double kick drums, Palm muting, Drop D tuning, Wall of sound, 160 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
       { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Breakdown', text: '' },
+      { name: 'Guitar Solo', text: '' },
+      { name: 'Final Chorus', text: '' },
       { name: 'Outro', text: '' },
     ]
   },
   hiphop: {
-    style: 'Hip-hop, Trap, Male vocals, Rap, 808 bass, 90 BPM',
+    style: 'Hip-Hop, Boom bap, Male rap vocals, Melodic hook, Vinyl crackle, Soul sample, Rhodes keys, 808 bass, Snare crack, 92 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Hook', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Hook', text: '' },
+      { name: 'Bridge', text: '' },
+      { name: 'Verse 3', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
+  trap: {
+    style: 'Trap, Dark atmosphere, Male rap vocals, 808 bass, Aggressive 808 bass syncopation, Hi-hats, Snare crack, Synth pad, Vocal ad-libs, 140 BPM',
     sections: [
       { name: 'Intro', text: '' },
       { name: 'Verse 1', text: '' },
@@ -3846,30 +3935,146 @@ const TEMPLATES = {
       { name: 'Outro', text: '' },
     ]
   },
-  mizrahi: {
-    style: 'Mizrahi, Oriental, Oud, Darbuka, Maqam Hijaz, Male vocals, 100 BPM',
+  funk: {
+    style: 'Funk, Groovy, Male vocals, Slap bass, Wah guitar, Clavinet, Brass section, Trumpet, Saxophone, Tight drums, 102 BPM',
     sections: [
       { name: 'Intro', text: '' },
       { name: 'Verse 1', text: '' },
       { name: 'Chorus', text: '' },
       { name: 'Verse 2', text: '' },
       { name: 'Chorus', text: '' },
-      { name: 'Bridge', text: '' },
+      { name: 'Instrumental Break', text: '' },
+      { name: 'Final Chorus', text: '' },
+      { name: 'Outro (Fade)', text: '' },
+    ]
+  },
+  edm: {
+    style: 'Electronic Dance Music, Progressive, Synth lead, Arpeggiator, Four-on-the-floor, Sidechain compression, Drop, Build up, Drum machine, 128 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Build Up', text: '' },
+      { name: 'Drop', text: '' },
+      { name: 'Break', text: '' },
+      { name: 'Build Up', text: '' },
+      { name: 'Drop', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
+  lofi: {
+    style: 'Lo-Fi Hip-Hop, Chill, Nostalgic, Vinyl crackle, Rhodes piano, Lazy drums, Smooth jazz sample, Warm bass, Mellow atmosphere, 75 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Hook', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Hook', text: '' },
+      { name: 'Outro (Fade)', text: '' },
+    ]
+  },
+  mizrahi: {
+    style: 'Mizrahi, Oriental, Soulful male vocals, Melismatic and Soulful, Oud, Darbuka, Buzuqi, Violin, Maqam Hijaz, Ethnic percussion, 100 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
       { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Taksim', text: '' },
+      { name: 'Final Chorus', text: '' },
+      { name: 'Outro (Fade)', text: '' },
+    ]
+  },
+  greek: {
+    style: 'Greek, Mediterranean, Bouzouki, Oud, Darbuka, Atmospheric strings, Emotional male vocals, Mawwal, Laïká style, 108 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Solo: Oud', text: '' },
+      { name: 'Final Chorus', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
+  reggae: {
+    style: 'Reggae, Relaxed, Positive vibes, Male vocals, Offbeat guitar, Bass guitar, Organ, Drum and bass, Dub echo, 80 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Dub Break', text: '' },
+      { name: 'Final Chorus', text: '' },
       { name: 'Outro (Fade)', text: '' },
     ]
   },
   ballad: {
-    style: 'Ballad, Melancholic, Emotional, Female vocals, Piano, Strings, 70 BPM',
+    style: 'Ballad, Emotional, Melancholic, Powerful female vocals, Grand piano, String quartet, Cello, Slow build, Reverb, 66 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Pre-Chorus', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Pre-Chorus', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Bridge', text: '' },
+      { name: 'Final Chorus', text: '' },
+      { name: 'Outro (Fade)', text: '' },
+    ]
+  },
+  folk: {
+    style: 'Folk, Acoustic, Storytelling, Warm male vocals, Acoustic guitar, Fingerpicking, Harmonica, Upright bass, Light percussion, 85 BPM',
     sections: [
       { name: 'Intro', text: '' },
       { name: 'Verse 1', text: '' },
       { name: 'Chorus', text: '' },
       { name: 'Verse 2', text: '' },
       { name: 'Chorus', text: '' },
-      { name: 'Bridge', text: '' },
+      { name: 'Instrumental Break', text: '' },
+      { name: 'Verse 3', text: '' },
       { name: 'Final Chorus', text: '' },
-      { name: 'Outro (Fade)', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
+  country: {
+    style: 'Country, Americana, Male vocals, Country twang, Acoustic guitar, Pedal steel guitar, Fiddle, Bass guitar, Tambourine, 100 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Verse 1', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Verse 2', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Guitar Solo', text: '' },
+      { name: 'Final Chorus', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
+  jazz: {
+    style: 'Jazz, Swing, Live performance, Muted Trumpet Solo, Double Bass, Grand piano, Brushed drums, Saxophone, Warm brass, 120 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Head (Verse)', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Piano Solo', text: '' },
+      { name: 'Head (Verse)', text: '' },
+      { name: 'Chorus', text: '' },
+      { name: 'Trumpet Solo', text: '' },
+      { name: 'Outro', text: '' },
+    ]
+  },
+  cinematic: {
+    style: 'Cinematic, Epic, Orchestral, Dramatic, Film score, Strings, Brass section, Choir, Powerful, Building Energy, Triumphant, 78 BPM',
+    sections: [
+      { name: 'Intro', text: '' },
+      { name: 'Rising Action', text: '' },
+      { name: 'Climax', text: '' },
+      { name: 'Interlude', text: '' },
+      { name: 'Crescendo', text: '' },
+      { name: 'Finale', text: '' },
+      { name: 'Epilogue', text: '' },
     ]
   }
 };
