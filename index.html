@@ -359,9 +359,9 @@ body {
   gap: 5px;
   padding: 6px 12px;
   border-radius: 7px;
-  border: 1px solid rgba(255,255,255,0.07);
-  background: transparent;
-  color: var(--txt1);
+  border: 1px solid rgba(255,255,255,0.13);
+  background: rgba(255,255,255,0.04);
+  color: var(--txt0);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -372,16 +372,31 @@ body {
   font-family: inherit;
 }
 .tbtn:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.12);
-  color: var(--txt0);
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(255,255,255,0.22);
+  color: #fff;
 }
 .tbtn:active { transform: scale(.97); }
 
-.tbtn.undo-btn { color: var(--txt2); border-color: var(--border); background: transparent; }
-.tbtn.undo-btn:hover { color: var(--txt1); background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); }
+/* Specific top-bar button accent colors */
+.tbtn.add-line {
+  color: var(--cyan);
+  border-color: rgba(0,212,255,0.3);
+  background: rgba(0,212,255,0.06);
+}
+.tbtn.add-line:hover { background: rgba(0,212,255,0.13); border-color: rgba(0,212,255,0.5); color: var(--cyan); }
+
+#btn-global-dir {
+  color: var(--orange);
+  border-color: rgba(196,118,46,0.35);
+  background: rgba(196,118,46,0.07);
+}
+#btn-global-dir:hover { background: rgba(196,118,46,0.15); border-color: rgba(196,118,46,0.55); color: var(--orange); }
+
+.tbtn.undo-btn { color: var(--txt1); border-color: var(--border); background: transparent; }
+.tbtn.undo-btn:hover { color: var(--txt0); background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); }
 .tbtn.undo-btn:disabled { opacity: .3; cursor: not-allowed; }
-.tbtn.undo-btn:disabled:hover { background: transparent; border-color: var(--border); transform: none; box-shadow: none; color: var(--txt2); }
+.tbtn.undo-btn:disabled:hover { background: transparent; border-color: var(--border); transform: none; box-shadow: none; color: var(--txt1); }
 /* ── Text tools bar ──────────────────────────────────── */
 #text-tools-bar {
   display: flex;
@@ -435,12 +450,12 @@ body {
 .ttbtn:active { transform: scale(.97); }
 .ttbtn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 .ttbtn .spin { display: inline-block; width: 10px; height: 10px; border: 1.5px solid; border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; }
-.ttbtn.tt-nikud    { color: var(--txt1); }
-.ttbtn.tt-nikud:hover    { background: rgba(255,255,255,0.05); color: var(--txt0); }
-.ttbtn.tt-latin    { color: var(--txt1); }
-.ttbtn.tt-latin:hover    { background: rgba(255,255,255,0.05); color: var(--txt0); }
-.ttbtn.tt-phonetic { color: var(--txt1); }
-.ttbtn.tt-phonetic:hover { background: rgba(255,255,255,0.05); color: var(--txt0); }
+.ttbtn.tt-nikud    { color: var(--purple); }
+.ttbtn.tt-nikud:hover    { background: rgba(124,92,191,0.12); color: var(--purple); }
+.ttbtn.tt-latin    { color: var(--cyan); }
+.ttbtn.tt-latin:hover    { background: rgba(0,212,255,0.1); color: var(--cyan); }
+.ttbtn.tt-phonetic { color: var(--green); }
+.ttbtn.tt-phonetic:hover { background: rgba(26,173,122,0.1); color: var(--green); }
 
 /* ── User corner ─────────────────────────────────────── */
 #user-corner {
