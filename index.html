@@ -1230,37 +1230,107 @@ body {
 }
 
 /* ─── RESPONSIVE ─── */
-@media (max-width: 900px) {
+
+/* Prevent flex children from overflowing their container */
+#editor, #commands, #output { min-width: 0; }
+.section-block { min-width: 0; }
+
+@media (max-width: 1050px) {
   #commands { width: 190px; }
   #output   { width: 240px; }
 }
+@media (max-width: 860px) {
+  #commands { width: 170px; min-width: 150px; }
+  #output   { width: 210px; min-width: 180px; }
+  .top-bar  { overflow-x: auto; scrollbar-width: none; }
+  .top-bar::-webkit-scrollbar { display: none; }
+}
+@media (max-width: 720px) {
+  /* Hide output — too cramped for 3 panels */
+  #output { display: none; }
+  #commands { width: 170px; }
+}
+
+/* ─── MOBILE (≤640px) ─── */
+#btn-keyboard { display: none; }   /* hidden on desktop */
 
 @media (max-width: 640px) {
   body { height: 100dvh; overflow: hidden; }
 
-  /* all three panels become full-screen layers */
+  /* Base panel reset — all hidden by default */
   #commands, #editor, #output {
     position: fixed !important;
-    inset: 0 0 58px 0 !important;   /* leave room for nav bar */
+    inset: 0 0 58px 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
     height: auto !important;
     display: none !important;
     resize: none !important;
-    z-index: 50;
     border: none !important;
+    z-index: 50;
   }
-  #commands.m-show, #editor.m-show, #output.m-show {
-    display: flex !important;
-  }
-  #editor { flex-direction: column; }
-  #output { flex-direction: column; }
 
-  /* show mobile nav */
+  /* Full-screen panel (editor tab) */
+  #editor.m-show   { display: flex !important; flex-direction: column; }
+  #output.m-show   { display: flex !important; flex-direction: column; }
+  #commands.m-show { display: flex !important; flex-direction: column; }
+
+  /* ── Split view: editor as top background, panel as bottom sheet ── */
+  /* Editor visible behind the sheet */
+  #editor.m-bg {
+    display: flex !important;
+    flex-direction: column;
+    z-index: 40;
+    /* top 40% — clamp the scroll area so the section is visible */
+  }
+  #editor.m-bg .editor-scroll {
+    max-height: calc(40dvh - 48px);
+    overflow-y: auto;
+  }
+
+  /* Bottom sheet for commands / output */
+  #commands.m-sheet, #output.m-sheet {
+    inset: auto 0 58px 0 !important;
+    height: 60dvh !important;
+    border-top: 2px solid var(--border2);
+    border-radius: 14px 14px 0 0;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.65);
+    z-index: 100;
+    animation: sheetUp .22s ease-out;
+  }
+  @keyframes sheetUp {
+    from { transform: translateY(25%); opacity: .6; }
+    to   { transform: translateY(0);   opacity: 1; }
+  }
+
+  /* Sheet drag handle */
+  #commands.m-sheet::before,
+  #output.m-sheet::before {
+    content: '';
+    display: block;
+    width: 36px; height: 4px;
+    background: var(--border2);
+    border-radius: 2px;
+    margin: 8px auto 4px;
+    flex-shrink: 0;
+  }
+
+  /* Show mobile nav */
   #mobile-nav { display: flex; }
 
-  /* top bar: scrollable strip */
+  /* Keyboard toggle button — mobile only */
+  #btn-keyboard {
+    display: inline-flex !important;
+    color: var(--txt1);
+  }
+  #btn-keyboard.kbd-on {
+    color: var(--blue);
+    border-color: rgba(91,156,246,0.4);
+    background: rgba(91,156,246,0.1);
+  }
+
+  /* Top bar */
   .top-bar {
     overflow-x: auto;
     overflow-y: hidden;
@@ -1275,22 +1345,22 @@ body {
   .top-bar::-webkit-scrollbar { display: none; }
   #song-title { font-size: 15px; min-width: 90px; }
   .tbtn { padding: 5px 8px; font-size: 11px; gap: 3px; }
-  #user-badge { display: none; }   /* save space on mobile */
+  #user-badge { display: none; }
 
-  /* editor scroll: add bottom padding for nav bar */
+  /* Editor scroll */
   .editor-scroll { padding: 14px 12px 80px; }
 
-  /* section cards */
+  /* Section cards */
   .section-block { padding: 10px 11px 12px; }
   .lyrics-ta     { font-size: 14px; }
 
-  /* output panel */
+  /* Output panel */
   .panel-body { padding: 14px; }
   #output .pcard { margin-bottom: 12px; }
 }
 
 @media (max-width: 400px) {
-  .tbtn span, .tbtn > svg + * { display: none; }   /* icon-only on very small */
+  .tbtn span, .tbtn > svg + * { display: none; }
   .tbtn { padding: 6px 7px; }
 }
 </style>
@@ -1375,6 +1445,12 @@ body {
         <div class="tpl-item" onclick="loadTemplate('ballad')"><span class="tpl-dot" style="background:var(--teal)"></span>Ballad</div>
       </div>
     </div>
+
+    <!-- Keyboard toggle (mobile only) -->
+    <button class="tbtn" id="btn-keyboard" onclick="toggleMobileKeyboard()" title="פתח/סגור מקלדת">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M8 17h8"/></svg>
+      מקלדת
+    </button>
 
     <!-- Admin button (shown only to admin role) -->
     <button class="tbtn" id="btn-admin" onclick="openAdminPanel()" title="ניהול משתמשים" style="display:none;color:var(--yellow);border-color:rgba(217,167,58,0.25);">
@@ -1877,7 +1953,7 @@ function renderSections() {
   restoreAmbigListeners();
 
   // Auto-size all textareas to fit their content
-  setTimeout(autoResizeAll, 0);
+  setTimeout(() => { autoResizeAll(); initMobileKeyboard(); }, 0);
 
   // Sync global dir button label to majority direction
   const dirs = sections.map(s => s.dir || 'rtl');
@@ -3176,45 +3252,53 @@ function closeImportModal(e) {
 }
 
 // Parse a full Suno-format song text into sections.
-// Lines that are ONLY "[Tag]" or "[Tag: description]" are treated as section headers.
-// The section name is the part before the colon. "[End]" is skipped.
+// If the text has [Tag] bracket headers → split by those.
+// Otherwise → split by blank lines and assign generic section names.
 function parseImportedSong(text) {
-  const result = [];
-  let currentName = null;
-  let currentTag  = null;
-  let currentLines = [];
+  // ── Bracket-based parse ──────────────────────────────────────
+  const hasBrackets = /^\[([^\]]+)\]$/m.test(text);
 
-  for (const line of text.split('\n')) {
-    // A section header is a line whose entire content is [something]
-    const m = line.trim().match(/^\[([^\]]+)\]$/);
-    if (m) {
-      if (currentName !== null) {
-        // Prepend the full tag line as first line of textarea content
-        const tagLine = currentTag !== currentName ? `[${currentTag}]\n` : '';
-        result.push({ name: currentName, text: (tagLine + currentLines.join('\n')).trim() });
+  if (hasBrackets) {
+    const result = [];
+    let currentName = null, currentTag = null, currentLines = [];
+    for (const line of text.split('\n')) {
+      const m = line.trim().match(/^\[([^\]]+)\]$/);
+      if (m) {
+        if (currentName !== null) {
+          const tagLine = currentTag !== currentName ? `[${currentTag}]\n` : '';
+          result.push({ name: currentName, text: (tagLine + currentLines.join('\n')).trim() });
+        }
+        const tag = m[1].trim();
+        const baseName = (tag.indexOf(':') >= 0 ? tag.substring(0, tag.indexOf(':')) : tag).trim();
+        if (baseName.toLowerCase() === 'end') { currentName = null; currentLines = []; continue; }
+        currentName = baseName;
+        currentTag  = tag;
+        currentLines = [];
+      } else {
+        if (currentName !== null) currentLines.push(line);
       }
-      const tag = m[1].trim();
-      const baseName = (tag.indexOf(':') >= 0 ? tag.substring(0, tag.indexOf(':')) : tag).trim();
-      if (baseName.toLowerCase() === 'end') { currentName = null; currentLines = []; continue; }
-      currentName = baseName;   // badge/colors use only "Verse 1"
-      currentTag  = tag;        // full tag preserved for first line of textarea
-      currentLines = [];
-    } else {
-      if (currentName !== null) currentLines.push(line);
     }
-  }
-  if (currentName !== null) {
-    const tagLine = currentTag !== currentName ? `[${currentTag}]\n` : '';
-    result.push({ name: currentName, text: (tagLine + currentLines.join('\n')).trim() });
+    if (currentName !== null) {
+      const tagLine = currentTag !== currentName ? `[${currentTag}]\n` : '';
+      result.push({ name: currentName, text: (tagLine + currentLines.join('\n')).trim() });
+    }
+    const knownNames = new Set(TAG_LIBRARY.find(c => c.en === 'Structure')?.tags ?? []);
+    return result.filter(s => {
+      const base = s.name.includes(':') ? s.name.split(':')[0].trim() : s.name;
+      return s.text.trim().length > 0 || knownNames.has(s.name) || knownNames.has(base);
+    });
   }
 
-  // Drop sections that have no lyrics AND whose name looks like a production note
-  // (not in our known section list). E.g. [Final Electronic Distortion] with no text.
-  const knownNames = new Set(TAG_LIBRARY.find(c => c.en === 'Structure')?.tags ?? []);
-  return result.filter(s => {
-    const base = s.name.includes(':') ? s.name.split(':')[0].trim() : s.name;
-    return s.text.trim().length > 0 || knownNames.has(s.name) || knownNames.has(base);
-  });
+  // ── Blank-line fallback ──────────────────────────────────────
+  // Split on one or more blank lines; name blocks sequentially.
+  const defaultNames = ['Verse 1','Chorus','Verse 2','Chorus','Bridge','Verse 3','Outro'];
+  let nameIdx = 0;
+  return text
+    .split(/\n[ \t]*\n+/)
+    .map(block => block.trim())
+    .filter(block => block.length > 0)
+    .map(block => ({ name: defaultNames[nameIdx] ?? `Part ${++nameIdx}`, text: block, _inc: nameIdx++ }))
+    .map(({ name, text }) => ({ name, text }));
 }
 
 function doImport() {
@@ -3224,7 +3308,7 @@ function doImport() {
 
   const parsed = parseImportedSong(text);
   if (parsed.length === 0) {
-    showToast('לא נמצאו מקטעים — ודא שהטקסט מכיל תגיות כמו [Verse 1]', 'error');
+    showToast('לא נמצאו מקטעים — ודא שהטקסט מכיל תוכן', 'error');
     return;
   }
 
@@ -3413,19 +3497,91 @@ async function setRegistration(open) {
   await adminAPI('set_registration', { open });
 }
 
-// ── Mobile panel switcher ───────────────────────────────────────────────────
+// ── Mobile panel switcher (split-view) ──────────────────────────────────────
 function mobileTab(panel) {
+  if (!window.matchMedia('(max-width: 640px)').matches) return;
+
+  const editor   = document.getElementById('editor');
+  const commands = document.getElementById('commands');
+  const output   = document.getElementById('output');
+
+  // Reset all states
+  [editor, commands, output].forEach(el => {
+    if (el) el.classList.remove('m-show', 'm-sheet', 'm-bg');
+  });
+
+  if (panel === 'editor') {
+    editor.classList.add('m-show');
+  } else {
+    // Editor visible as top-40% backdrop
+    editor.classList.add('m-bg');
+    // Selected panel slides up as bottom sheet
+    const sheetEl = panel === 'commands' ? commands : output;
+    sheetEl.classList.add('m-show', 'm-sheet');
+    // Scroll last-focused section into view in the background editor
+    if (lastFocusedTa) {
+      setTimeout(() => lastFocusedTa.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+  }
+
+  // Nav button active states
   ['commands','editor','output'].forEach(p => {
-    const el  = document.getElementById(p);
     const btn = document.getElementById('mnav-' + p);
-    if (el)  el.classList.toggle('m-show', p === panel);
     if (btn) btn.classList.toggle('active', p === panel);
   });
 }
 
+// ── Mobile keyboard toggle ───────────────────────────────────────────────────
+let mobileKbdOpen = false;
+
+function setAllTextareasInputMode(mode) {
+  document.querySelectorAll('.lyrics-ta').forEach(ta => ta.setAttribute('inputmode', mode));
+}
+
+function initMobileKeyboard() {
+  if (!window.matchMedia('(max-width: 640px)').matches) return;
+  setAllTextareasInputMode('none');   // no auto-keyboard on tap
+  mobileKbdOpen = false;
+}
+
+function toggleMobileKeyboard() {
+  if (!window.matchMedia('(max-width: 640px)').matches) return;
+  mobileKbdOpen = !mobileKbdOpen;
+  const btn = document.getElementById('btn-keyboard');
+  if (mobileKbdOpen) {
+    // Open keyboard on the last focused (or first) textarea
+    const ta = lastFocusedTa || document.querySelector('.lyrics-ta');
+    if (ta) {
+      ta.setAttribute('inputmode', 'text');
+      ta.focus();
+      // Switch to editor panel so the textarea is visible
+      mobileTab('editor');
+    }
+    if (btn) btn.classList.add('kbd-on');
+  } else {
+    setAllTextareasInputMode('none');
+    if (document.activeElement?.classList.contains('lyrics-ta')) document.activeElement.blur();
+    if (btn) btn.classList.remove('kbd-on');
+    mobileKbdOpen = false;
+  }
+}
+
+// When user manually focuses a textarea (e.g. after switching inputmode), keep btn state in sync
+document.addEventListener('blur', e => {
+  if (!window.matchMedia('(max-width: 640px)').matches) return;
+  if (e.target.classList?.contains('lyrics-ta')) {
+    // Only close if it wasn't intentional (inputmode='none' taps don't trigger keyboard)
+    const btn = document.getElementById('btn-keyboard');
+    if (btn) btn.classList.remove('kbd-on');
+    mobileKbdOpen = false;
+    setAllTextareasInputMode('none');
+  }
+}, true);
+
 function initMobile() {
   if (window.matchMedia('(max-width: 640px)').matches) {
     mobileTab('editor');
+    initMobileKeyboard();
   }
 }
 
