@@ -217,13 +217,13 @@ body {
 
 /* ─── STATUS BAR ─── */
 #status-bar {
-  height: 42px;
+  height: 36px;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 0 14px;
   background: var(--bg0);
-  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   direction: ltr;
 }
@@ -2048,6 +2048,29 @@ body {
     </div>
   </div>
 
+  <!-- TEXT TOOLS BAR (below top-bar) -->
+  <div id="status-bar">
+    <span class="ttbar-label">כל התיבות ▾</span>
+    <div class="ttbar-pill">
+      <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudAll()" title="ניקוד לכל התיבות (Ctrl+Shift+N)">
+        <span>נ׳</span> ניקוד
+      </button>
+      <button class="ttbtn tt-latin" id="btn-latin" onclick="latinizeAll()" title="לטינזציה לכל התיבות (Ctrl+Shift+L)">
+        <span>Aa</span> לטינזציה
+      </button>
+      <button class="ttbtn tt-phonetic" id="btn-phonetic" onclick="phoneticAll()" title="פונטי לכל התיבות">
+        <span>/ˈ/</span> פונטי
+      </button>
+    </div>
+    <div style="flex:1"></div>
+    <div class="lyrics-char-counter" id="lyrics-counter">0 / 3000 תווים</div>
+    <div id="full-lyrics-out" style="display:none"></div>
+    <button class="full-preview-btn" onclick="openFullPreview()">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12"/><circle cx="12" cy="12" r="3"/></svg>
+      Full Preview ↗
+    </button>
+  </div>
+
   <!-- Main row: section cards (left) + sidebar tools (right) -->
   <div class="editor-main">
 
@@ -2125,28 +2148,6 @@ body {
     </div><!-- #sidebar -->
   </div><!-- .editor-main -->
 
-  <!-- STATUS BAR: text tools (left) + lyrics counter + full preview (right) -->
-  <div id="status-bar">
-    <div class="ttbar-pill">
-      <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudSelected()" title="ניקוד (Ctrl+Shift+N)">
-        <span>נ׳</span> ניקוד
-      </button>
-      <button class="ttbtn tt-latin" id="btn-latin" onclick="latinizeSelected()" title="לטינזציה (Ctrl+Shift+L)">
-        <span>Aa</span> לטינזציה
-      </button>
-      <button class="ttbtn tt-phonetic" id="btn-phonetic" onclick="phoneticSelected()" title="פונטי">
-        <span>/ˈ/</span> פונטי
-      </button>
-    </div>
-    <div style="flex:1"></div>
-    <div class="lyrics-char-counter" id="lyrics-counter">0 / 3000 תווים</div>
-    <!-- Hidden output used by copy/preview -->
-    <div id="full-lyrics-out" style="display:none"></div>
-    <button class="full-preview-btn" onclick="openFullPreview()">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12"/><circle cx="12" cy="12" r="3"/></svg>
-      Full Preview ↗
-    </button>
-  </div>
 
 </div><!-- #editor -->
 
@@ -3684,6 +3685,68 @@ function phoneticSection(id) {
   updateSectionText(id, result);
   pushUndo();
   showToast('Phonetic respelling בוצע!', 'success');
+}
+
+// ════════════════════════════════════════════
+//  APPLY-ALL: run tools on every section with text
+// ════════════════════════════════════════════
+async function nikudAll() {
+  const toProcess = sections.filter(s => s.text && s.text.trim());
+  if (!toProcess.length) { showToast('אין תיבות עם טקסט', 'error'); return; }
+  const btn = document.getElementById('btn-nikud');
+  if (btn) btn.disabled = true;
+  let i = 0;
+  for (const sec of toProcess) {
+    i++;
+    if (btn) btn.innerHTML = `<span class="spin"></span> ${i}/${toProcess.length}`;
+    try {
+      const rawData = await callDictaNakdanRaw(sec.text);
+      const nikudded = buildNikudText(rawData, null);
+      sec.text = nikudded;
+      const ta = document.getElementById('ta-' + sec.id);
+      if (ta) { ta.value = nikudded; ta.dispatchEvent(new Event('input')); }
+    } catch (e) {}
+  }
+  updateOutput(); pushUndo();
+  if (btn) { btn.innerHTML = '<span>נ׳</span> ניקוד'; btn.disabled = false; }
+  showToast(`ניקוד בוצע על ${toProcess.length} תיבות!`, 'success');
+}
+
+async function latinizeAll() {
+  const toProcess = sections.filter(s => s.text && s.text.trim());
+  if (!toProcess.length) { showToast('אין תיבות עם טקסט', 'error'); return; }
+  const btn = document.getElementById('btn-latin');
+  if (btn) btn.disabled = true;
+  let i = 0;
+  for (const sec of toProcess) {
+    i++;
+    if (btn) btn.innerHTML = `<span class="spin"></span> ${i}/${toProcess.length}`;
+    try {
+      let source = sec.text;
+      try { source = await callDictaNakdan(sec.text); } catch (e) {}
+      const hasNikud = /[\u05B0-\u05C7]/.test(source);
+      const result = hasNikud ? transliterateHebrew(source) : roughLatinize(source);
+      sec.text = result;
+      const ta = document.getElementById('ta-' + sec.id);
+      if (ta) { ta.value = result; ta.dispatchEvent(new Event('input')); }
+    } catch (e) {}
+  }
+  updateOutput(); pushUndo();
+  if (btn) { btn.innerHTML = '<span>Aa</span> לטינזציה'; btn.disabled = false; }
+  showToast(`לטינזציה בוצעה על ${toProcess.length} תיבות!`, 'success');
+}
+
+function phoneticAll() {
+  const toProcess = sections.filter(s => s.text && s.text.trim());
+  if (!toProcess.length) { showToast('אין תיבות עם טקסט', 'error'); return; }
+  for (const sec of toProcess) {
+    const result = phoneticRespell(sec.text);
+    sec.text = result;
+    const ta = document.getElementById('ta-' + sec.id);
+    if (ta) { ta.value = result; ta.dispatchEvent(new Event('input')); }
+  }
+  updateOutput(); pushUndo();
+  showToast(`Phonetic בוצע על ${toProcess.length} תיבות!`, 'success');
 }
 
 // ════════════════════════════════════════════
