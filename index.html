@@ -280,27 +280,100 @@ body {
 .tbtn.undo-btn:hover { color: var(--txt1); box-shadow: none; background: var(--bg2); }
 .tbtn.undo-btn:disabled { opacity: .3; cursor: not-allowed; }
 .tbtn.undo-btn:disabled:hover { background: transparent; border-color: var(--border); transform: none; box-shadow: none; color: var(--txt2); }
-.tbtn.nikud {
-  background: rgba(20,44,36,0.9);
-  border-color: rgba(46,196,145,0.35);
-  color: var(--green);
+/* ── Text tools bar ──────────────────────────────────── */
+#text-tools-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px;
+  background: linear-gradient(to bottom, var(--bg1), var(--bg2));
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.tbtn.nikud:hover {
-  background: rgba(24,56,44,0.95);
-  border-color: var(--green);
-  box-shadow: var(--glow-green);
+.ttbar-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--txt2);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-.tbtn.latinize {
-  background: rgba(28,20,46,0.9);
-  border-color: rgba(155,114,239,0.35);
-  color: var(--purple);
-  text-shadow: 0 0 8px rgba(170,85,255,0.5);
+.ttbar-pill {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 2px;
 }
-.tbtn.latinize:hover {
-  background: rgba(36,24,58,0.95);
-  border-color: var(--purple);
-  box-shadow: var(--glow-purple);
+.ttbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  font-family: inherit;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
 }
+.ttbtn:active { transform: scale(.97); }
+.ttbtn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.ttbtn .spin { display: inline-block; width: 10px; height: 10px; border: 1.5px solid; border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; }
+.ttbtn.tt-nikud    { color: var(--green); }
+.ttbtn.tt-nikud:hover    { background: rgba(46,196,145,.13); }
+.ttbtn.tt-latin    { color: var(--purple); }
+.ttbtn.tt-latin:hover    { background: rgba(155,114,239,.13); }
+.ttbtn.tt-phonetic { color: var(--blue); }
+.ttbtn.tt-phonetic:hover { background: rgba(91,156,246,.13); }
+
+/* ── User corner ─────────────────────────────────────── */
+#user-corner {
+  order: -1;           /* RTL flex: renders on the physical-right side */
+  display: none;       /* shown by initAuth() */
+  align-items: center;
+  gap: 2px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 9px;
+  padding: 2px 2px 2px 8px;
+  flex-shrink: 0;
+}
+#user-corner.visible { display: flex; }
+#user-badge-uc {
+  font-size: 11px;
+  color: var(--txt1);
+  white-space: nowrap;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ucbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.ucbtn:hover { background: var(--bg4); }
+.ucbtn.ucbtn-admin { color: var(--yellow); }
+.ucbtn.ucbtn-logout { color: var(--txt2); }
+.ucbtn.ucbtn-logout:hover { color: var(--red); background: rgba(224,85,85,.1); }
 .tbtn.add-line {
   border-style: dashed;
   border-color: rgba(255,255,255,0.12);
@@ -411,13 +484,15 @@ body {
 }
 .sact:hover { background: var(--bg4); color: var(--txt0); border-color: var(--border2); }
 
-.sec-nikud, .sec-latin, .sec-dir { font-size: 10px; padding: 3px 8px; }
+.sec-nikud, .sec-latin, .sec-phonetic, .sec-dir { font-size: 10px; padding: 3px 8px; }
 .sec-nikud { color: var(--green); border-color: rgba(0,200,120,0.3); background: rgba(0,30,18,0.7); }
 .sec-nikud:hover { color: var(--green); border-color: var(--green); box-shadow: 0 0 8px rgba(0,255,180,0.2); }
 .sec-latin { color: var(--purple); border-color: rgba(130,80,255,0.3); background: rgba(20,10,45,0.7); }
 .sec-latin:hover { color: var(--purple); border-color: var(--purple); box-shadow: 0 0 8px rgba(150,80,255,0.2); }
-.sec-dir { color: var(--blue); border-color: rgba(0,180,255,0.3); background: rgba(0,20,40,0.7); font-family: 'Consolas','Courier New',monospace; letter-spacing: 0.5px; }
-.sec-dir:hover { color: var(--blue); border-color: var(--blue); box-shadow: 0 0 8px rgba(0,180,255,0.2); }
+.sec-phonetic { color: var(--blue); border-color: rgba(91,156,246,0.3); background: rgba(0,18,40,0.7); }
+.sec-phonetic:hover { color: var(--blue); border-color: var(--blue); box-shadow: 0 0 8px rgba(91,156,246,0.2); }
+.sec-dir { color: var(--txt1); border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); font-family: 'Consolas','Courier New',monospace; letter-spacing: 0.5px; }
+.sec-dir:hover { color: var(--txt0); border-color: rgba(255,255,255,0.25); box-shadow: none; }
 
 .lyrics-ta {
   width: 100%;
@@ -1199,35 +1274,7 @@ body {
 .mnav-btn.active { color: var(--purple); }
 .mnav-btn svg { flex-shrink: 0; }
 
-/* ─── USER BADGE (top bar) ─── */
-#user-info {
-  margin-inline-start: auto;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  flex-shrink: 0;
-}
-#user-badge {
-  font-size: 11px;
-  color: var(--txt1);
-  padding: 3px 9px;
-  background: var(--bg3);
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  white-space: nowrap;
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.tbtn.logout-btn {
-  color: var(--red);
-  border-color: rgba(232,85,85,0.25);
-}
-.tbtn.logout-btn:hover {
-  background: rgba(232,85,85,0.12);
-  border-color: var(--red);
-  box-shadow: none;
-}
+/* (user corner styles are in the text-tools / user-corner block above) */
 
 /* ─── RESPONSIVE ─── */
 
@@ -1312,7 +1359,7 @@ body {
   }
   .top-bar::-webkit-scrollbar { display: none; }
   #song-title { font-size: 15px; }
-  #user-badge { display: none; }
+  /* user corner: keep icons, hide text label on tablet */
 
   /* Spacing */
   .editor-scroll { padding: 14px 14px 80px; }
@@ -1413,7 +1460,14 @@ body {
   .top-bar::-webkit-scrollbar { display: none; }
   #song-title { font-size: 15px; min-width: 90px; }
   .tbtn { padding: 5px 8px; font-size: 11px; gap: 3px; }
-  #user-badge { display: none; }
+  /* user corner: hide text badge on phone, show only icons */
+  #user-badge-uc { display: none; }
+  #user-corner { padding: 2px; gap: 1px; }
+
+  /* text tools bar — compact on phone */
+  #text-tools-bar { padding: 3px 10px; gap: 6px; }
+  .ttbar-label { display: none; }
+  .ttbtn { padding: 4px 9px; font-size: 10.5px; }
 
   /* Editor / sections / output */
   .editor-scroll { padding: 14px 12px 80px; }
@@ -1478,18 +1532,12 @@ body {
     <button class="tbtn undo-btn" id="btn-redo" onclick="redo()" title="שחזר (Ctrl+Y)" disabled>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 7v6h-6"/><path d="M21 13c-2 5-6.5 8-12 8a9 9 0 0 1 0-18c3.4 0 6.4 1.5 8.5 4"/></svg>
     </button>
-    <button class="tbtn nikud" id="btn-nikud" onclick="nikudSelected()">
-      <span id="nikud-icon">נ׳</span> ניקוד
-    </button>
-    <button class="tbtn latinize" id="btn-latin" onclick="latinizeSelected()">
-      <span>Aa</span> לטינזציה
-    </button>
     <button class="tbtn add-line" onclick="openModal()">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
       + שורת תג
     </button>
     <button class="tbtn" id="btn-global-dir" onclick="toggleAllDir()" title="שנה כיוון לכל התיבות">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10H7M21 6H7M21 14H7M21 18H7"/><path d="M3 6l3-3-3-3M3 18l3 3-3 3" stroke-width="0"/><polyline points="3 3 3 21"/></svg>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10H7M21 6H7M21 14H7M21 18H7"/><polyline points="3 3 3 21"/></svg>
       <span id="global-dir-lbl">RTL</span>
     </button>
     <button class="tbtn" onclick="openImportModal()" title="ייבוא שיר שלם">
@@ -1510,24 +1558,36 @@ body {
       </div>
     </div>
 
-    <!-- Keyboard toggle (mobile only) -->
+    <!-- Keyboard toggle (mobile/tablet) -->
     <button class="tbtn" id="btn-keyboard" onclick="toggleMobileKeyboard()" title="פתח/סגור מקלדת">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M8 17h8"/></svg>
       מקלדת
     </button>
 
-    <!-- Admin button (shown only to admin role) -->
-    <button class="tbtn" id="btn-admin" onclick="openAdminPanel()" title="ניהול משתמשים" style="display:none;color:var(--yellow);border-color:rgba(217,167,58,0.25);">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      ניהול
-    </button>
+    <!-- User corner (right side via order:-1) -->
+    <div id="user-corner">
+      <span id="user-badge-uc"></span>
+      <button class="ucbtn ucbtn-admin" id="btn-admin" onclick="openAdminPanel()" title="ניהול משתמשים" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
+      <button class="ucbtn ucbtn-logout" onclick="logout()" title="יציאה">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
 
-    <!-- User info + logout -->
-    <div id="user-info">
-      <span id="user-badge"></span>
-      <button class="tbtn logout-btn" onclick="logout()" title="התנתק">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        יציאה
+  <!-- Text tools bar: ניקוד · לטינזציה · פונטי -->
+  <div id="text-tools-bar">
+    <span class="ttbar-label">כלי טקסט</span>
+    <div class="ttbar-pill">
+      <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudSelected()" title="ניקוד על הטקסט הנבחר (Ctrl+Shift+N)">
+        <span>נ׳</span> ניקוד
+      </button>
+      <button class="ttbtn tt-latin" id="btn-latin" onclick="latinizeSelected()" title="לטינזציה מדויקת (Ctrl+Shift+L)">
+        <span>Aa</span> לטינזציה
+      </button>
+      <button class="ttbtn tt-phonetic" id="btn-phonetic" onclick="phoneticSelected()" title="פונטי מהיר — ללא API">
+        <span>/ˈ/</span> פונטי
       </button>
     </div>
   </div>
@@ -1869,7 +1929,7 @@ function renderTagLibrary(filter = '') {
     if (filteredTags.length === 0) return;
 
     const catEl = document.createElement('div');
-    catEl.className = 'cat ' + (f ? 'open' : (ci < 3 ? 'open' : 'closed'));
+    catEl.className = 'cat ' + (f ? 'open' : 'closed');
     catEl.innerHTML = `
       <div class="cat-header" onclick="this.parentElement.classList.toggle('open'); this.parentElement.classList.toggle('closed')">
         <span class="cat-dot" style="background:${cat.color}"></span>
@@ -1985,7 +2045,8 @@ function renderSections() {
         </span>
         <div class="section-actions">
           <button class="sact sec-nikud" onclick="nikudSection(${sec.id})" title="ניקוד המקטע">נ׳ ניקוד</button>
-          <button class="sact sec-latin" onclick="latinizeSection(${sec.id})" title="לטינזציה למקטע">Aa לטין</button>
+          <button class="sact sec-latin" onclick="latinizeSection(${sec.id})" title="לטינזציה מדויקת">Aa לטין</button>
+          <button class="sact sec-phonetic" onclick="phoneticSection(${sec.id})" title="פונטי מהיר">/ˈ/ פונטי</button>
           <button class="sact sec-dir" id="dir-btn-${sec.id}" onclick="toggleDir(${sec.id})" title="שנה כיוון טקסט">${(sec.dir||'rtl').toUpperCase()}</button>
           <button class="sact" onclick="moveSectionUp(${sec.id})" title="העבר למעלה">↑</button>
           <button class="sact" onclick="moveSectionDown(${sec.id})" title="העבר למטה">↓</button>
@@ -2901,6 +2962,37 @@ async function latinizeSection(id) {
 }
 
 // ════════════════════════════════════════════
+//  PHONETIC (instant, offline roughLatinize)
+// ════════════════════════════════════════════
+function phoneticSelected() {
+  const ta = getFocusedTextarea();
+  if (!ta) { showToast('לחץ בתוך תיבת טקסט תחילה', 'error'); return; }
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const hasSelection = start !== end;
+  const text = hasSelection ? ta.value.substring(start, end) : ta.value;
+  if (!text.trim()) { showToast('אין טקסט להמרה', 'error'); return; }
+  const result = roughLatinize(text);
+  if (hasSelection) {
+    ta.setRangeText(result, start, end, 'select');
+  } else {
+    ta.value = result;
+  }
+  ta.dispatchEvent(new Event('input'));
+  pushUndo();
+  showToast('המרה פונטית בוצעה!', 'success');
+}
+
+function phoneticSection(id) {
+  const ta = document.getElementById('ta-' + id);
+  if (!ta || !ta.value.trim()) { showToast('המקטע ריק', 'error'); return; }
+  const result = roughLatinize(ta.value);
+  ta.value = result;
+  updateSectionText(id, result);
+  pushUndo();
+  showToast('המרה פונטית בוצעה!', 'success');
+}
+
+// ════════════════════════════════════════════
 //  HELPER: focused textarea
 // ════════════════════════════════════════════
 let lastFocusedTa = null;
@@ -3080,7 +3172,7 @@ function loadTemplate(key) {
 const SUNO_COMMANDS = {
   style: [
     {
-      name: 'קולות וביצוע', color: '#b66dff', open: true,
+      name: 'קולות וביצוע', color: '#b66dff', open: false,
       chips: ['Deep voice','Bass vocals','Baritone','Low register',
               'High tenor','Falsetto','Soprano','High register',
               'Choir','Duet','Mixed duet','Harmony','Background vocals',
@@ -3193,7 +3285,7 @@ const SUNO_COMMANDS = {
   ],
   lyrics: [
     {
-      name: 'פתיחות', color: '#4a9eff', open: true,
+      name: 'פתיחות', color: '#4a9eff', open: false,
       chips: ['[Intro]','[Verse]','[Verse 1]','[Spoken Intro]','[Inst. Intro]','[Build Up]','[Overture]']
     },
     {
@@ -3478,12 +3570,17 @@ function initAuth() {
   const username = localStorage.getItem('suno_username');
   const role     = localStorage.getItem('suno_role');
   if (!token) { window.location.replace('/login.html'); return; }
-  const badge = document.getElementById('user-badge');
+
+  // Populate user corner
+  const corner = document.getElementById('user-corner');
+  const badge  = document.getElementById('user-badge-uc');
   if (badge && username) badge.textContent = (role === 'admin' ? '★ ' : '') + username;
+  if (corner) corner.classList.add('visible');
   if (role === 'admin') {
     const btn = document.getElementById('btn-admin');
     if (btn) btn.style.display = '';
   }
+
   fetch('/api/auth?action=verify&token=' + encodeURIComponent(token))
     .then(r => r.json())
     .then(d => { if (!d.ok) logout(); })
