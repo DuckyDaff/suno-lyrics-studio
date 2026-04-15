@@ -65,18 +65,19 @@ body {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-/* ─── LEFT COMMANDS PANEL ─── */
+/* ─── RIGHT COMMANDS PANEL ─── */
 #commands {
   width: 235px;
   min-width: 190px;
   max-width: 320px;
   background: var(--bg1);
-  border-right: 1px solid var(--border);
+  border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   resize: horizontal;
   flex-shrink: 0;
+  order: 1;
 }
 
 .sidebar-title {
@@ -90,6 +91,7 @@ body {
   display: flex;
   align-items: center;
   gap: 7px;
+  direction: rtl;
 }
 .sidebar-title svg { opacity: 0.4; }
 
@@ -128,6 +130,7 @@ body {
   cursor: pointer;
   user-select: none;
   transition: background .15s;
+  direction: rtl;
 }
 .cat-header:hover { background: rgba(110,80,255,0.08); }
 .cat-dot {
@@ -289,6 +292,7 @@ body {
   background: linear-gradient(to bottom, var(--bg1), var(--bg2));
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  direction: rtl;
 }
 .ttbar-label {
   font-size: 9.5px;
@@ -339,7 +343,7 @@ body {
 /* ── User corner ─────────────────────────────────────── */
 #user-corner {
   order: -1;           /* RTL flex: renders on the physical-right side */
-  display: none;       /* shown by initAuth() */
+  display: flex;
   align-items: center;
   gap: 2px;
   background: var(--bg3);
@@ -348,7 +352,6 @@ body {
   padding: 2px 2px 2px 8px;
   flex-shrink: 0;
 }
-#user-corner.visible { display: flex; }
 #user-badge-uc {
   font-size: 11px;
   color: var(--txt1);
@@ -548,11 +551,12 @@ body {
   width: 300px;
   min-width: 240px;
   background: var(--bg1);
-  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
+  order: -1;
 }
 
 .panel-hdr {
@@ -959,10 +963,11 @@ body {
   letter-spacing: 0.6px;
   text-transform: uppercase;
   color: var(--txt1);
+  direction: rtl;
 }
 .cmd-group-hdr:hover { background: var(--bg3); }
 .cmd-group-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.cmd-group-chevron { color: var(--txt2); transition: transform .2s; margin-left: auto; font-size: 9px; }
+.cmd-group-chevron { color: var(--txt2); transition: transform .2s; margin-inline-start: auto; font-size: 9px; }
 .cmd-group.open  .cmd-group-chevron { transform: rotate(90deg); }
 .cmd-chips { padding: 4px 8px 8px; display: flex; flex-wrap: wrap; gap: 4px; }
 .cmd-group.closed .cmd-chips { display: none; }
@@ -3572,10 +3577,8 @@ function initAuth() {
   if (!token) { window.location.replace('/login.html'); return; }
 
   // Populate user corner
-  const corner = document.getElementById('user-corner');
-  const badge  = document.getElementById('user-badge-uc');
+  const badge = document.getElementById('user-badge-uc');
   if (badge && username) badge.textContent = (role === 'admin' ? '★ ' : '') + username;
-  if (corner) corner.classList.add('visible');
   if (role === 'admin') {
     const btn = document.getElementById('btn-admin');
     if (btn) btn.style.display = '';
