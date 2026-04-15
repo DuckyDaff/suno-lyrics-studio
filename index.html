@@ -1235,20 +1235,96 @@ body {
 #editor, #commands, #output { min-width: 0; }
 .section-block { min-width: 0; }
 
-@media (max-width: 1050px) {
+/* Touch-device global improvements (phones + tablets) */
+@media (pointer: coarse) {
+  .tbtn, .cmd-tab, .mnav-btn, button, [role="button"] {
+    touch-action: manipulation;          /* no 300ms delay, no double-tap zoom */
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tbtn { min-height: 36px; }
+}
+
+/* ── Desktop narrowing (≥1025px) ── */
+@media (max-width: 1050px) and (min-width: 1025px) {
   #commands { width: 190px; }
   #output   { width: 240px; }
 }
-@media (max-width: 860px) {
-  #commands { width: 170px; min-width: 150px; }
-  #output   { width: 210px; min-width: 180px; }
-  .top-bar  { overflow-x: auto; scrollbar-width: none; }
-  .top-bar::-webkit-scrollbar { display: none; }
+@media (max-width: 1024px) and (min-width: 1025px) {
+  /* (intentionally empty — tablet block below handles ≤1024px) */
 }
-@media (max-width: 720px) {
-  /* Hide output — too cramped for 3 panels */
-  #output { display: none; }
-  #commands { width: 170px; }
+
+/* ─── TABLET (641px–1024px) — 2-col layout, touch-friendly ─── */
+@media (min-width: 641px) and (max-width: 1024px) {
+  body { height: 100dvh; overflow: hidden; }
+
+  /* Editor takes all remaining space */
+  #editor {
+    flex: 1 !important;
+    min-width: 0;
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  /* Commands — right panel, visible by default */
+  #commands {
+    width: 300px !important;
+    min-width: 0 !important;
+    flex-shrink: 0;
+    display: flex !important;
+    flex-direction: column;
+    border-inline-start: 1px solid var(--border2);
+  }
+
+  /* Output — hidden by default, shown via tab */
+  #output {
+    display: none !important;
+    width: 300px !important;
+    min-width: 0 !important;
+    flex-shrink: 0;
+    border-inline-start: 1px solid var(--border2);
+  }
+
+  /* Tablet panel switching classes */
+  #commands.t-hide           { display: none !important; }
+  #output.t-show             { display: flex !important; flex-direction: column; }
+  #commands.t-solo, #output.t-solo { display: none !important; }
+
+  /* Bottom nav bar */
+  #mobile-nav { display: flex; }
+
+  /* Keyboard button on touch tablets */
+  #btn-keyboard { display: inline-flex !important; }
+
+  /* Comfortable touch targets */
+  .mnav-btn  { min-height: 48px; padding: 8px 0 10px; font-size: 11px; }
+  .cmd-tab   { min-height: 38px; }
+  .section-header { min-height: 44px; }
+  .tbtn      { min-height: 36px; padding: 5px 10px; }
+
+  /* Top bar — scrollable for all buttons */
+  .top-bar {
+    overflow-x: auto; overflow-y: hidden;
+    height: auto !important; min-height: 48px;
+    padding: 6px 12px; gap: 6px;
+    flex-shrink: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .top-bar::-webkit-scrollbar { display: none; }
+  #song-title { font-size: 15px; }
+  #user-badge { display: none; }
+
+  /* Spacing */
+  .editor-scroll { padding: 14px 14px 80px; }
+  .section-block { padding: 11px 12px 14px; }
+  .lyrics-ta     { font-size: 14px; }
+  .panel-body    { padding: 14px; }
+}
+
+/* Small tablet / wide phone (641–768px) — narrower side panel */
+@media (min-width: 641px) and (max-width: 768px) {
+  #commands { width: 240px !important; }
+  #output   { width: 240px !important; }
 }
 
 /* ─── MOBILE (≤640px) ─── */
@@ -1277,12 +1353,10 @@ body {
   #commands.m-show { display: flex !important; flex-direction: column; }
 
   /* ── Split view: editor as top background, panel as bottom sheet ── */
-  /* Editor visible behind the sheet */
   #editor.m-bg {
     display: flex !important;
     flex-direction: column;
     z-index: 40;
-    /* top 40% — clamp the scroll area so the section is visible */
   }
   #editor.m-bg .editor-scroll {
     max-height: calc(40dvh - 48px);
@@ -1319,11 +1393,8 @@ body {
   /* Show mobile nav */
   #mobile-nav { display: flex; }
 
-  /* Keyboard toggle button — mobile only */
-  #btn-keyboard {
-    display: inline-flex !important;
-    color: var(--txt1);
-  }
+  /* Keyboard toggle button */
+  #btn-keyboard { display: inline-flex !important; color: var(--txt1); }
   #btn-keyboard.kbd-on {
     color: var(--blue);
     border-color: rgba(91,156,246,0.4);
@@ -1332,12 +1403,9 @@ body {
 
   /* Top bar */
   .top-bar {
-    overflow-x: auto;
-    overflow-y: hidden;
-    height: auto !important;
-    min-height: 48px;
-    padding: 6px 10px;
-    gap: 5px;
+    overflow-x: auto; overflow-y: hidden;
+    height: auto !important; min-height: 48px;
+    padding: 6px 10px; gap: 5px;
     flex-shrink: 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -1347,15 +1415,11 @@ body {
   .tbtn { padding: 5px 8px; font-size: 11px; gap: 3px; }
   #user-badge { display: none; }
 
-  /* Editor scroll */
+  /* Editor / sections / output */
   .editor-scroll { padding: 14px 12px 80px; }
-
-  /* Section cards */
   .section-block { padding: 10px 11px 12px; }
   .lyrics-ta     { font-size: 14px; }
-
-  /* Output panel */
-  .panel-body { padding: 14px; }
+  .panel-body    { padding: 14px; }
   #output .pcard { margin-bottom: 12px; }
 }
 
@@ -3497,15 +3561,44 @@ async function setRegistration(open) {
   await adminAPI('set_registration', { open });
 }
 
-// ── Mobile panel switcher (split-view) ──────────────────────────────────────
+// ── Breakpoint helpers ───────────────────────────────────────────────────────
+function isPhone()  { return window.matchMedia('(max-width: 640px)').matches; }
+function isTablet() { return window.matchMedia('(min-width: 641px) and (max-width: 1024px)').matches; }
+
+// ── Tablet panel switcher (2-col layout) ─────────────────────────────────────
+function tabletTab(panel) {
+  const commands = document.getElementById('commands');
+  const output   = document.getElementById('output');
+
+  // Reset tablet classes
+  commands.classList.remove('t-hide', 't-solo');
+  output.classList.remove('t-show', 't-solo');
+
+  if (panel === 'editor') {
+    // Solo editor: hide both side panels for focused writing
+    commands.classList.add('t-solo');
+    output.classList.add('t-solo');
+  } else if (panel === 'output') {
+    commands.classList.add('t-hide');
+    output.classList.add('t-show');
+  }
+  // panel === 'commands': default CSS state — commands visible, output hidden
+
+  // Nav active state
+  ['commands','editor','output'].forEach(p => {
+    document.getElementById('mnav-' + p)?.classList.toggle('active', p === panel);
+  });
+}
+
+// ── Mobile panel switcher (split-view bottom sheet) ──────────────────────────
 function mobileTab(panel) {
-  if (!window.matchMedia('(max-width: 640px)').matches) return;
+  if (isTablet()) { tabletTab(panel); return; }
+  if (!isPhone()) return;
 
   const editor   = document.getElementById('editor');
   const commands = document.getElementById('commands');
   const output   = document.getElementById('output');
 
-  // Reset all states
   [editor, commands, output].forEach(el => {
     if (el) el.classList.remove('m-show', 'm-sheet', 'm-bg');
   });
@@ -3513,25 +3606,20 @@ function mobileTab(panel) {
   if (panel === 'editor') {
     editor.classList.add('m-show');
   } else {
-    // Editor visible as top-40% backdrop
     editor.classList.add('m-bg');
-    // Selected panel slides up as bottom sheet
     const sheetEl = panel === 'commands' ? commands : output;
     sheetEl.classList.add('m-show', 'm-sheet');
-    // Scroll last-focused section into view in the background editor
     if (lastFocusedTa) {
       setTimeout(() => lastFocusedTa.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
     }
   }
 
-  // Nav button active states
   ['commands','editor','output'].forEach(p => {
-    const btn = document.getElementById('mnav-' + p);
-    if (btn) btn.classList.toggle('active', p === panel);
+    document.getElementById('mnav-' + p)?.classList.toggle('active', p === panel);
   });
 }
 
-// ── Mobile keyboard toggle ───────────────────────────────────────────────────
+// ── Keyboard toggle ──────────────────────────────────────────────────────────
 let mobileKbdOpen = false;
 
 function setAllTextareasInputMode(mode) {
@@ -3539,49 +3627,57 @@ function setAllTextareasInputMode(mode) {
 }
 
 function initMobileKeyboard() {
-  if (!window.matchMedia('(max-width: 640px)').matches) return;
-  setAllTextareasInputMode('none');   // no auto-keyboard on tap
+  if (!isPhone()) return;
+  setAllTextareasInputMode('none');   // suppress auto-keyboard on phone
   mobileKbdOpen = false;
 }
 
 function toggleMobileKeyboard() {
-  if (!window.matchMedia('(max-width: 640px)').matches) return;
-  mobileKbdOpen = !mobileKbdOpen;
   const btn = document.getElementById('btn-keyboard');
+
+  if (isTablet()) {
+    // Tablet: just focus the last textarea and switch to editor view
+    const ta = lastFocusedTa || document.querySelector('.lyrics-ta');
+    if (ta) { ta.focus(); tabletTab('editor'); }
+    return;
+  }
+
+  if (!isPhone()) return;
+
+  mobileKbdOpen = !mobileKbdOpen;
   if (mobileKbdOpen) {
-    // Open keyboard on the last focused (or first) textarea
     const ta = lastFocusedTa || document.querySelector('.lyrics-ta');
     if (ta) {
       ta.setAttribute('inputmode', 'text');
       ta.focus();
-      // Switch to editor panel so the textarea is visible
       mobileTab('editor');
     }
-    if (btn) btn.classList.add('kbd-on');
+    btn?.classList.add('kbd-on');
   } else {
     setAllTextareasInputMode('none');
     if (document.activeElement?.classList.contains('lyrics-ta')) document.activeElement.blur();
-    if (btn) btn.classList.remove('kbd-on');
+    btn?.classList.remove('kbd-on');
     mobileKbdOpen = false;
   }
 }
 
-// When user manually focuses a textarea (e.g. after switching inputmode), keep btn state in sync
+// Keep keyboard button state in sync when textarea loses focus (phone only)
 document.addEventListener('blur', e => {
-  if (!window.matchMedia('(max-width: 640px)').matches) return;
+  if (!isPhone()) return;
   if (e.target.classList?.contains('lyrics-ta')) {
-    // Only close if it wasn't intentional (inputmode='none' taps don't trigger keyboard)
-    const btn = document.getElementById('btn-keyboard');
-    if (btn) btn.classList.remove('kbd-on');
+    document.getElementById('btn-keyboard')?.classList.remove('kbd-on');
     mobileKbdOpen = false;
     setAllTextareasInputMode('none');
   }
 }, true);
 
 function initMobile() {
-  if (window.matchMedia('(max-width: 640px)').matches) {
+  if (isPhone()) {
     mobileTab('editor');
     initMobileKeyboard();
+  } else if (isTablet()) {
+    tabletTab('commands');   // default: editor + commands side by side
+    // No keyboard suppression — tablets show keyboard naturally on textarea tap
   }
 }
 
