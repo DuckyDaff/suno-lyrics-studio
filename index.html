@@ -610,14 +610,14 @@ body {
 .sact:hover { background: rgba(255,255,255,0.06); color: var(--txt1); border-color: rgba(255,255,255,0.1); }
 
 .sec-nikud, .sec-latin, .sec-phonetic, .sec-dir { font-size: 14px; padding: 3px 8px; }
-.sec-nikud { color: var(--txt2); border-color: rgba(255,255,255,0.07); background: transparent; }
-.sec-nikud:hover { color: var(--txt1); border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); box-shadow: none; }
-.sec-latin { color: var(--txt2); border-color: rgba(255,255,255,0.07); background: transparent; }
-.sec-latin:hover { color: var(--txt1); border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); box-shadow: none; }
-.sec-phonetic { color: var(--txt2); border-color: rgba(255,255,255,0.07); background: transparent; }
-.sec-phonetic:hover { color: var(--txt1); border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); box-shadow: none; }
-.sec-dir { color: var(--txt2); border-color: rgba(255,255,255,0.07); background: transparent; font-family: 'JetBrains Mono','Consolas','Courier New',monospace; letter-spacing: 0.5px; }
-.sec-dir:hover { color: var(--txt1); border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); box-shadow: none; }
+.sec-nikud { color: var(--purple); border-color: rgba(124,92,191,0.3); background: rgba(124,92,191,0.06); }
+.sec-nikud:hover { background: rgba(124,92,191,0.14); border-color: rgba(124,92,191,0.5); box-shadow: none; }
+.sec-latin { color: var(--cyan); border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.06); }
+.sec-latin:hover { background: rgba(0,212,255,0.13); border-color: rgba(0,212,255,0.5); box-shadow: none; }
+.sec-phonetic { color: var(--green); border-color: rgba(26,173,122,0.3); background: rgba(26,173,122,0.06); }
+.sec-phonetic:hover { background: rgba(26,173,122,0.13); border-color: rgba(26,173,122,0.5); box-shadow: none; }
+.sec-dir { color: var(--orange); border-color: rgba(196,118,46,0.3); background: rgba(196,118,46,0.06); font-family: 'JetBrains Mono','Consolas','Courier New',monospace; letter-spacing: 0.5px; }
+.sec-dir:hover { background: rgba(196,118,46,0.14); border-color: rgba(196,118,46,0.5); box-shadow: none; }
 
 .lyrics-ta {
   width: 100%;
@@ -3951,6 +3951,49 @@ const SUNO_COMMANDS = {
               '[BPM: 80]','[BPM: 100]','[BPM: 120]','[BPM: 140]',
               '[Key: C Major]','[Key: A Minor]','[Key: G Major]','[Key: D Minor]',
               '[Time: 4/4]','[Time: 3/4]','[Time: 6/8]']
+    },
+    {
+      name: 'מבנה ותזמון', color: '#5b9cf6', open: false,
+      chips: ['[Intro: X bars]','[Verse: X bars]','[Bridge: X bars]','[Chorus: 16 bars]',
+              '[Pre-Chorus]','[Post-Chorus]','[C-Part]','[Breakdown]',
+              '[Minimalist Sparse Verse]','[Crescendo]','[Outro]','[End]',
+              '[Hard stop]','[Fade out]','[Echo tail]','[Reverb tail]']
+    },
+    {
+      name: 'ים-תיכוני ואתני', color: '#e8922a', open: false,
+      chips: ['[Mawwal]','[Vocal Improvisation: Soulful Melisma]','[Melismatic and Soulful]',
+              '[Solo: Darbuka]','[Solo: Oud]','[Buzuqi Solo]','[High-speed Buzuqi Riff]',
+              '[Taksim]','[Ethnic percussion breakdown]','[Ethnic Phonk Drop]',
+              '[Koto Sting]','[Traditional Koto melodies]','[Atmospheric strings]']
+    },
+    {
+      name: 'טראפ ומועדון', color: '#c84040', open: false,
+      chips: ['[Drop: Heavy Trap Beat]','[Halftime Trap Drop]','[808 bass slams]',
+              '[Aggressive 808 bass syncopation]','[Bass slides]',
+              '[Adlib: SKRT SKRT]','[Adlib: YEAH]','[Adlib: BOOM]',
+              '[Turntable scratch]','[DJ Scratch: "Word"]','[Vocal Chops]',
+              '[Glitch Vocal Break]','[Vocal Sample: "Word"]',
+              '[Nani?!]','[Kora!]','[Sugoi!]','[Rapid snare rolls]','[Fast Snare Rolls]']
+    },
+    {
+      name: "ג'אז ובלוז", color: '#b88a1e', open: false,
+      chips: ['[breath]','[pause]','[whispered]','[Growl]',
+              '[Muted Trumpet Solo]','[Double Bass Solo]','[Bluesy Phrasing]']
+    },
+    {
+      name: 'הגשה ווקאלית', color: '#d070c0', open: false,
+      chips: ['[Spoken word]','[Whisper]','[Scream]','[Laughing voice]','[Crying voice]',
+              '[Vocal run]','[Distant chanting]','[Multiple voice chorus SATB]',
+              '[Very high falsetto]','[Fast double-time rapping]','[Deep raspy voice]',
+              '[High-pitched Glitch]','[Stuttering effects]','[Aggressive delivery]',
+              '[Deeply Weathered Baritone]']
+    },
+    {
+      name: 'הפקה ואפקטים', color: '#28c4af', open: false,
+      chips: ['[Stadium crowd ambience]','[Vocal drone: deep resonant]','[Vinyl crackle]',
+              '[Vinyl Stop FX]','[Atmospheric sub-bass]','[Filtered Sample Build-up]',
+              '[Building Energy]','[Maximum Loudness]','[No percussion]','[No beat]',
+              '[Audio_Reference: Melodic inspiration only]']
     }
   ]
 };
