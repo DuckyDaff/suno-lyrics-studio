@@ -671,6 +671,141 @@ body {
 }
 .pcard-clear:hover { color: var(--txt1); }
 
+/* ── Full Preview button ── */
+.full-preview-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: inherit;
+  border: 1px solid rgba(91,156,246,0.35);
+  border-radius: 5px;
+  background: rgba(91,156,246,0.08);
+  color: var(--blue);
+  cursor: pointer;
+  transition: all .15s;
+  touch-action: manipulation;
+  white-space: nowrap;
+}
+.full-preview-btn:hover { background: rgba(91,156,246,0.2); border-color: var(--blue); }
+
+/* ── Full Preview modal ── */
+#full-preview-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.8);
+  backdrop-filter: blur(10px);
+  z-index: 260;
+  justify-content: center;
+  align-items: center;
+}
+#full-preview-overlay.open { display: flex; }
+#full-preview-modal {
+  background: rgba(14,12,40,0.98);
+  border: 1px solid rgba(91,156,246,0.3);
+  border-radius: 16px;
+  padding: 0;
+  width: 600px;
+  max-width: 95vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 80px rgba(0,0,0,.85), inset 0 1px 0 rgba(120,180,255,0.08);
+  overflow: hidden;
+}
+#full-preview-modal .fpm-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+#full-preview-modal .fpm-title {
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--grad-main);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#full-preview-modal .fpm-counter {
+  font-size: 11px;
+  color: var(--txt2);
+}
+.fpm-counter.warn { color: var(--orange); }
+.fpm-counter.over { color: var(--red); }
+#full-preview-modal .fpm-close {
+  background: none;
+  border: none;
+  color: var(--txt2);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color .15s;
+}
+#full-preview-modal .fpm-close:hover { color: var(--txt0); }
+#full-preview-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  font-size: 13px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  font-family: 'Consolas','Courier New',monospace;
+  color: var(--txt1);
+  direction: ltr;
+}
+#full-preview-body .sec-lbl-fp {
+  color: var(--purple);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+#full-preview-modal .fpm-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+.fpm-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--grad-purple);
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  transition: all .15s;
+  box-shadow: 0 2px 10px rgba(130,80,255,0.35);
+}
+.fpm-copy-btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+.fpm-copy-btn:active { transform: scale(.97); }
+.fpm-close-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(100,75,200,0.3);
+  background: transparent;
+  color: var(--txt1);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: all .15s;
+}
+.fpm-close-btn:hover { background: rgba(30,22,65,0.8); color: var(--txt0); }
+
 /* ── Add-tag button ── */
 .add-tag-btn {
   display: inline-flex;
@@ -1278,10 +1413,12 @@ body {
   color: var(--txt0);
   font-size: 12.5px;
   line-height: 1.75;
-  resize: none;
+  resize: vertical;
   outline: none;
   font-family: 'Consolas','Courier New',monospace;
-  direction: ltr;
+  direction: rtl;
+  unicode-bidi: plaintext;
+  text-align: right;
   transition: border-color .2s, box-shadow .2s;
 }
 #import-ta:focus {
@@ -1892,14 +2029,38 @@ body {
       </div>
     </div>
 
-    <div class="pcard" style="flex:1;display:flex;flex-direction:column;min-height:0;">
-      <div class="pcard-hdr">
-        <span>Full Lyrics</span>
+    <div class="pcard">
+      <div class="pcard-hdr" style="justify-content:space-between">
+        <span>תצוגה מלאה</span>
+        <button class="full-preview-btn" onclick="openFullPreview()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12"/><circle cx="12" cy="12" r="3"/></svg>
+          Full Preview
+        </button>
       </div>
-      <div id="full-lyrics-out"></div>
       <div class="lyrics-char-counter" id="lyrics-counter">0 / 3000 תווים</div>
+      <!-- Hidden output used by copy/preview -->
+      <div id="full-lyrics-out" style="display:none"></div>
     </div>
 
+  </div>
+</div>
+
+<!-- FULL PREVIEW MODAL -->
+<div id="full-preview-overlay" onclick="if(event.target===this)closeFullPreview()">
+  <div id="full-preview-modal">
+    <div class="fpm-hdr">
+      <span class="fpm-title">Full Preview</span>
+      <span class="fpm-counter" id="fpm-counter">0 / 3000 תווים</span>
+      <button class="fpm-close" onclick="closeFullPreview()">×</button>
+    </div>
+    <div id="full-preview-body"></div>
+    <div class="fpm-actions">
+      <button class="fpm-close-btn" onclick="closeFullPreview()">סגור</button>
+      <button class="fpm-copy-btn" onclick="copyFullPreview()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        העתק הכל
+      </button>
+    </div>
   </div>
 </div>
 
@@ -2233,6 +2394,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape' && activeAmbigPopup) hideAmbigPopup();
     if (e.key === 'Escape' && document.getElementById('import-overlay').classList.contains('open')) closeImportModal();
     if (e.key === 'Escape' && document.getElementById('add-tag-overlay').classList.contains('open')) closeAddTagModal();
+    if (e.key === 'Escape' && document.getElementById('full-preview-overlay').classList.contains('open')) closeFullPreview();
   });
 });
 
@@ -3286,8 +3448,111 @@ async function latinizeSection(id) {
 }
 
 // ════════════════════════════════════════════
-//  PHONETIC (instant, offline roughLatinize)
+//  PHONETIC RESPELLING  (English words only)
+//  e.g. "galaxy" → "gal-ak-see"
 // ════════════════════════════════════════════
+
+// Common function words — pass through unchanged
+const PHONETIC_SKIP = new Set([
+  'a','an','the','in','on','at','to','for','of','and','but','or','nor','so',
+  'yet','is','are','was','were','be','been','being','have','has','had','do',
+  'does','did','will','would','could','should','may','might','shall','this',
+  'that','these','those','with','from','they','not','can','its','my','your',
+  'our','his','her','their','by','as','if','up','out','no','oh','ah','it','me'
+]);
+
+function phoneticRespell(text) {
+  return text.replace(/[a-zA-Z]+/g, w => {
+    const result = _respellWord(w.toLowerCase());
+    if (/^[A-Z]/.test(w)) return result[0].toUpperCase() + result.slice(1);
+    return result;
+  });
+}
+
+function _respellWord(w) {
+  if (w.length <= 2 || PHONETIC_SKIP.has(w)) return w;
+  let p = w;
+
+  // ── Consonant clusters ────────────────────────
+  p = p.replace(/^kn/, 'n');
+  p = p.replace(/^wr/, 'r');
+  p = p.replace(/tion/g, 'shun');
+  p = p.replace(/sion(?=[^s]|$)/g, 'zhun');
+  p = p.replace(/ture/g, 'chur');
+  p = p.replace(/tch/g, 'ch');
+  p = p.replace(/ck/g, 'k');
+  p = p.replace(/ph/g, 'f');
+  p = p.replace(/wh/g, 'w');
+  p = p.replace(/qu/g, 'kw');
+  p = p.replace(/x/g, 'ks');       // always: galaxy→galaksee
+  p = p.replace(/ght/g, 't');
+  p = p.replace(/gh(?=[aeiou])/g, 'g');
+  p = p.replace(/gh/g, '');
+  p = p.replace(/c(?=[eiy])/g, 's');
+  p = p.replace(/mb$/, 'm');
+  p = p.replace(/gue$/, 'g');
+
+  // ── R-coloured vowels ─────────────────────────
+  p = p.replace(/are|air/g, 'air');
+  p = p.replace(/ear/g, 'eer');
+  p = p.replace(/ar(?=[^ey])/g, 'ahr');
+  p = p.replace(/ore?(?=[^a-z]|$)/g, 'or');
+  p = p.replace(/[eiu]r(?=[^aeiou]|$)/g, 'ur');
+
+  // ── Vowel digraphs ────────────────────────────
+  p = p.replace(/oo/g, 'oo');
+  p = p.replace(/ee|ea/g, 'ee');
+  p = p.replace(/ey$|ei$/g, 'ay');
+  p = p.replace(/ai|ay/g, 'ay');
+  p = p.replace(/oa/g, 'oh');
+  p = p.replace(/oi|oy/g, 'oy');
+  p = p.replace(/ew|eu/g, 'yoo');
+  p = p.replace(/au|aw/g, 'aw');
+  p = p.replace(/ow(?=[^n]|$)/g, 'oh');   // show→shoh, but down→down
+  p = p.replace(/ou/g, 'ow');
+
+  // ── Magic-e (silent trailing e) ───────────────
+  p = p.replace(/([^aeiou])a([^aeiouy])e$/g, '$1ay$2');
+  p = p.replace(/([^aeiou])e([^aeiouy])e$/g, '$1ee$2');
+  p = p.replace(/([^aeiou])i([^aeiouy])e$/g, '$1y$2');
+  p = p.replace(/([^aeiou])o([^aeiouy])e$/g, '$1oh$2');
+  p = p.replace(/([^aeiou])u([^aeiouy])e$/g, '$1yoo$2');
+
+  // ── Final letters ─────────────────────────────
+  p = p.replace(/y$/, 'ee');
+  p = p.replace(/le$/, 'ul');
+
+  return _syllabify(p);
+}
+
+function _syllabify(word) {
+  const vowelRe = /[aeiouy]+/g;
+  const matches = [...word.matchAll(vowelRe)];
+  if (matches.length <= 1) return word;
+
+  const parts = [];
+  let pos = 0;
+  for (let i = 0; i < matches.length; i++) {
+    const m    = matches[i];
+    const next = matches[i + 1];
+    if (!next) { parts.push(word.slice(pos)); break; }
+    const vEnd = m.index + m[0].length;
+    const cons = word.slice(vEnd, next.index);
+    // 0 or 1 consonant → cut at vEnd; 2+ → split in middle
+    const cut = cons.length <= 1 ? vEnd : vEnd + Math.ceil(cons.length / 2);
+    parts.push(word.slice(pos, cut));
+    pos = cut;
+  }
+
+  // Merge orphan single chars into neighbour
+  const out = [];
+  for (const part of parts) {
+    if (part.length <= 1 && out.length) out[out.length - 1] += part;
+    else out.push(part);
+  }
+  return out.join('-');
+}
+
 function phoneticSelected() {
   const ta = getFocusedTextarea();
   if (!ta) { showToast('לחץ בתוך תיבת טקסט תחילה', 'error'); return; }
@@ -3295,7 +3560,7 @@ function phoneticSelected() {
   const hasSelection = start !== end;
   const text = hasSelection ? ta.value.substring(start, end) : ta.value;
   if (!text.trim()) { showToast('אין טקסט להמרה', 'error'); return; }
-  const result = roughLatinize(text);
+  const result = phoneticRespell(text);
   if (hasSelection) {
     ta.setRangeText(result, start, end, 'select');
   } else {
@@ -3303,17 +3568,17 @@ function phoneticSelected() {
   }
   ta.dispatchEvent(new Event('input'));
   pushUndo();
-  showToast('המרה פונטית בוצעה!', 'success');
+  showToast('Phonetic respelling בוצע!', 'success');
 }
 
 function phoneticSection(id) {
   const ta = document.getElementById('ta-' + id);
   if (!ta || !ta.value.trim()) { showToast('המקטע ריק', 'error'); return; }
-  const result = roughLatinize(ta.value);
+  const result = phoneticRespell(ta.value);
   ta.value = result;
   updateSectionText(id, result);
   pushUndo();
-  showToast('המרה פונטית בוצעה!', 'success');
+  showToast('Phonetic respelling בוצע!', 'success');
 }
 
 // ════════════════════════════════════════════
@@ -3335,7 +3600,6 @@ function getFocusedTextarea() {
 //  OUTPUT
 // ════════════════════════════════════════════
 function updateOutput() {
-  const out = document.getElementById('full-lyrics-out');
   let html = '';
   let rawText = '';
   sections.forEach(sec => {
@@ -3343,7 +3607,6 @@ function updateOutput() {
     const hasOwnHeader = text.trimStart().startsWith('[');
     if (hasOwnHeader) {
       rawText += text + '\n\n';
-      // Show first line (the tag) as the coloured header, rest as body
       const nl = text.indexOf('\n');
       const headerLine = nl >= 0 ? text.substring(0, nl) : text;
       const body       = nl >= 0 ? text.substring(nl + 1) : '';
@@ -3354,12 +3617,74 @@ function updateOutput() {
       html += `<span class="sec-lbl-out">${escHtml(label)}</span>\n${escHtml(text)}\n\n`;
     }
   });
-  out.innerHTML = html.trim();
+
+  // Keep hidden output in sync (used by full preview)
+  const out = document.getElementById('full-lyrics-out');
+  if (out) out.innerHTML = html.trim();
+
+  // Store raw text for preview modal
+  window._fullLyricsRaw = rawText.trim();
+  window._fullLyricsHtml = html.trim();
 
   const lyricsLen = rawText.trim().length;
   const counter = document.getElementById('lyrics-counter');
   counter.textContent = `${lyricsLen} / 3000 תווים`;
   counter.className = 'lyrics-char-counter' + (lyricsLen > 3000 ? ' over' : lyricsLen > 2500 ? ' warn' : '');
+}
+
+// ── Full Preview modal ───────────────────────────────────────
+function openFullPreview() {
+  // Build coloured HTML for modal
+  let html = '';
+  let rawText = '';
+  sections.forEach(sec => {
+    const text = sec.text || '';
+    const hasOwnHeader = text.trimStart().startsWith('[');
+    if (hasOwnHeader) {
+      rawText += text + '\n\n';
+      const nl = text.indexOf('\n');
+      const headerLine = nl >= 0 ? text.substring(0, nl) : text;
+      const body       = nl >= 0 ? text.substring(nl + 1) : '';
+      html += `<span class="sec-lbl-fp">${escHtml(headerLine)}</span>\n${escHtml(body)}\n\n`;
+    } else {
+      const label = `[${sec.name}]`;
+      rawText += label + '\n' + text + '\n\n';
+      html += `<span class="sec-lbl-fp">${escHtml(label)}</span>\n${escHtml(text)}\n\n`;
+    }
+  });
+
+  document.getElementById('full-preview-body').innerHTML = html.trim() || '<span style="color:var(--txt2)">אין תוכן עדיין...</span>';
+  window._fullLyricsRaw = rawText.trim();
+
+  const len = rawText.trim().length;
+  const ctr = document.getElementById('fpm-counter');
+  ctr.textContent = `${len} / 3000 תווים`;
+  ctr.className = 'fpm-counter' + (len > 3000 ? ' over' : len > 2500 ? ' warn' : '');
+
+  document.getElementById('full-preview-overlay').classList.add('open');
+}
+
+function closeFullPreview() {
+  document.getElementById('full-preview-overlay').classList.remove('open');
+}
+
+function copyFullPreview() {
+  const text = window._fullLyricsRaw || '';
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('הטקסט המלא הועתק!', 'success');
+    closeFullPreview();
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('הטקסט המלא הועתק!', 'success');
+    closeFullPreview();
+  });
 }
 
 function updateStyleCounter() {
@@ -3931,24 +4256,28 @@ function closeImportModal(e) {
 
 // Insert [Tag] on its own line above the selected text (or at cursor)
 function insertImportTag(tag) {
-  const ta = document.getElementById('import-ta');
+  const ta    = document.getElementById('import-ta');
   const start = ta.selectionStart;
   const end   = ta.selectionEnd;
   const val   = ta.value;
 
   // Find start of the line where selection begins
   const lineStart = val.lastIndexOf('\n', start - 1) + 1;
-  const insertion = `[${tag}]\n`;
+
+  // Ensure a blank line before the tag if not at the very top
+  const prefix = lineStart > 0 ? '\n' : '';
+  const insertion = `${prefix}[${tag}]\n`;
 
   ta.value = val.slice(0, lineStart) + insertion + val.slice(lineStart);
-  // Restore cursor after inserted tag line
-  const newPos = lineStart + insertion.length + (start - lineStart);
-  ta.setSelectionRange(newPos, newPos + (end - start));
+
+  // Place cursor at start of content after the inserted tag
+  const newCursor = lineStart + insertion.length;
+  ta.setSelectionRange(newCursor, newCursor + (end - start));
   ta.focus();
   updateImportUI(ta.value);
 }
 
-// Update the live UI: preview vs tag-bar, count label
+// Update the live UI: preview + tag-bar (always show tag bar when text present)
 function updateImportUI(text) {
   const hasBrackets = /^\[([^\]]+)\]$/m.test(text);
   const tagBar  = document.getElementById('import-tag-bar');
@@ -3962,9 +4291,10 @@ function updateImportUI(text) {
     return;
   }
 
+  // Always show tag bar so user can keep adding tags
+  tagBar.style.display = 'flex';
+
   if (hasBrackets) {
-    // Bracket mode: show section preview, hide tag bar
-    tagBar.style.display  = 'none';
     preview.style.display = 'flex';
     const parsed = parseImportedSong(text);
     preview.innerHTML = parsed.map((s, i) => `
@@ -3975,13 +4305,10 @@ function updateImportUI(text) {
       </div>`).join('');
     countEl.textContent = parsed.length > 0 ? `${parsed.length} מקטעים זוהו` : '';
   } else {
-    // No brackets: show tag insertion bar
-    tagBar.style.display  = 'flex';
     preview.style.display = 'none';
-    // Count blank-line blocks as hint
     const blocks = text.split(/\n[ \t]*\n+/).map(b => b.trim()).filter(Boolean);
     countEl.textContent = blocks.length > 1
-      ? `${blocks.length} פסקאות — הוסף תגיות לחלוקה, או ייבא כתיבה אחת`
+      ? `${blocks.length} פסקאות — סמן טקסט ולחץ על תג לחלוקה`
       : 'ייבוא כמקטע אחד';
   }
 }
@@ -3991,15 +4318,20 @@ function parseImportedSong(text) {
   const hasBrackets = /^\[([^\]]+)\]$/m.test(text);
 
   if (hasBrackets) {
-    // ── Bracket-based parse ──────────────────────────────────
     const result = [];
     let currentName = null, currentTag = null, currentLines = [];
     for (const line of text.split('\n')) {
       const m = line.trim().match(/^\[([^\]]+)\]$/);
       if (m) {
         if (currentName !== null) {
+          // Clean: trim each line, remove leading/trailing blank lines
+          const body = currentLines
+            .map(l => l.trimEnd())
+            .join('\n')
+            .replace(/^\n+|\n+$/g, '');
           const tagLine = currentTag !== currentName ? `[${currentTag}]\n` : '';
-          result.push({ name: currentName, text: (tagLine + currentLines.join('\n')).trim() });
+          const full = (tagLine + body).trim();
+          if (full) result.push({ name: currentName, text: full });
         }
         const tag = m[1].trim();
         const baseName = (tag.indexOf(':') >= 0 ? tag.substring(0, tag.indexOf(':')) : tag).trim();
@@ -4012,19 +4344,16 @@ function parseImportedSong(text) {
       }
     }
     if (currentName !== null) {
+      const body = currentLines.map(l => l.trimEnd()).join('\n').replace(/^\n+|\n+$/g, '');
       const tagLine = currentTag !== currentName ? `[${currentTag}]\n` : '';
-      result.push({ name: currentName, text: (tagLine + currentLines.join('\n')).trim() });
+      const full = (tagLine + body).trim();
+      if (full) result.push({ name: currentName, text: full });
     }
-    const knownNames = new Set(TAG_LIBRARY.find(c => c.en === 'Structure')?.tags ?? []);
-    return result.filter(s => {
-      const base = s.name.includes(':') ? s.name.split(':')[0].trim() : s.name;
-      return s.text.trim().length > 0 || knownNames.has(s.name) || knownNames.has(base);
-    });
+    return result;
   }
 
-  // ── No brackets → single section ────────────────────────────
-  // Import the whole text as one block; name = "Verse 1" by default.
-  const trimmed = text.trim();
+  // No brackets → single section, clean whitespace
+  const trimmed = text.replace(/\r\n/g, '\n').replace(/[ \t]+$/gm, '').trim();
   if (!trimmed) return [];
   return [{ name: 'Verse 1', text: trimmed }];
 }
