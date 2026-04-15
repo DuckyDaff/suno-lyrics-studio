@@ -133,6 +133,35 @@ body {
   direction: rtl;
 }
 .cat-header:hover { background: rgba(110,80,255,0.08); }
+
+/* ── Drag-to-reorder ── */
+.drag-handle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 3px;
+  cursor: grab;
+  opacity: 0;
+  transition: opacity .15s;
+  flex-shrink: 0;
+}
+.drag-handle:active { cursor: grabbing; }
+.drag-handle span {
+  display: block;
+  width: 14px; height: 1.5px;
+  background: var(--txt2);
+  border-radius: 1px;
+}
+.cat-header:hover .drag-handle,
+.cmd-group-hdr:hover .drag-handle { opacity: 1; }
+.cat.dragging, .cmd-group.dragging {
+  opacity: .35;
+  pointer-events: none;
+}
+.cat.drag-above  { box-shadow: 0 -2px 0 var(--purple); }
+.cat.drag-below  { box-shadow: 0 2px 0 var(--purple); }
+.cmd-group.drag-above { box-shadow: 0 -2px 0 var(--blue); }
+.cmd-group.drag-below { box-shadow: 0 2px 0 var(--blue); }
 .cat-dot {
   width: 7px; height: 7px;
   border-radius: 50%;
@@ -964,6 +993,7 @@ body {
   text-transform: uppercase;
   color: var(--txt1);
   direction: rtl;
+  position: relative;
 }
 .cmd-group-hdr:hover { background: var(--bg3); }
 .cmd-group-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
@@ -1985,9 +2015,15 @@ let sectionIdCounter = 0;
 //  INIT
 // ════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+  // Apply saved reorder before rendering
+  applyTagLibraryOrder();
+  applyCmdOrder('style');
+  applyCmdOrder('lyrics');
+
   renderTagLibrary();
   renderCommandPanel('style');
   renderCommandPanel('lyrics');
+  initAllDrag();
   renderQuickAddButtons();
   // Build initial sections without polluting undo stack
   undoPaused = true;
@@ -2030,8 +2066,10 @@ function renderTagLibrary(filter = '') {
 
     const catEl = document.createElement('div');
     catEl.className = 'cat ' + (f ? 'open' : 'closed');
+    catEl.dataset.catIdx = ci;
     catEl.innerHTML = `
       <div class="cat-header" onclick="this.parentElement.classList.toggle('open'); this.parentElement.classList.toggle('closed')">
+        <span class="drag-handle" title="גרור לשינוי סדר"><span></span><span></span><span></span></span>
         <span class="cat-dot" style="background:${cat.color}"></span>
         <span class="cat-name">${cat.name}</span>
         <span class="cat-count">${filteredTags.length}</span>
@@ -3427,8 +3465,11 @@ function renderCommandPanel(tab) {
     const el = document.createElement('div');
     el.className = 'cmd-group ' + (group.open ? 'open' : 'closed');
     el.id = `cmd-group-${tab}-${gi}`;
+    el.dataset.cmdIdx = gi;
+    el.dataset.cmdTab = tab;
     el.innerHTML = `
       <div class="cmd-group-hdr" onclick="toggleCmdGroup('${tab}',${gi})">
+        <span class="drag-handle" title="גרור לשינוי סדר"><span></span><span></span><span></span></span>
         <span class="cmd-group-dot" style="background:${group.color}"></span>
         <span>${group.name}</span>
         <span class="cmd-group-chevron">›</span>
@@ -3455,6 +3496,172 @@ function renderCommandPanel(tab) {
 function toggleCmdGroup(tab, gi) {
   const el = document.getElementById(`cmd-group-${tab}-${gi}`);
   if (el) { el.classList.toggle('open'); el.classList.toggle('closed'); }
+}
+
+// ════════════════════════════════════════════
+//  DRAG-TO-REORDER (tag library + cmd groups)
+// ════════════════════════════════════════════
+
+const STORAGE_KEY_TAGS = 'melodraft_tag_order';
+const STORAGE_KEY_CMD  = 'melodraft_cmd_order';
+
+// Load saved order (array of original indices) or null
+function loadOrder(key, len) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(key));
+    if (Array.isArray(saved) && saved.length === len) return saved;
+  } catch {}
+  return null;
+}
+function saveOrder(key, order) {
+  localStorage.setItem(key, JSON.stringify(order));
+}
+
+// Apply a saved index-order to TAG_LIBRARY in-place
+function applyTagLibraryOrder() {
+  const order = loadOrder(STORAGE_KEY_TAGS, TAG_LIBRARY.length);
+  if (!order) return;
+  const orig = [...TAG_LIBRARY];
+  order.forEach((oi, ni) => { TAG_LIBRARY[ni] = orig[oi]; });
+}
+
+// Apply a saved index-order to SUNO_COMMANDS[tab] in-place
+function applyCmdOrder(tab) {
+  const groups = SUNO_COMMANDS[tab];
+  const order  = loadOrder(STORAGE_KEY_CMD + '_' + tab, groups.length);
+  if (!order) return;
+  const orig = [...groups];
+  order.forEach((oi, ni) => { groups[ni] = orig[oi]; });
+}
+
+// Generic drag-reorder for a container of .cat or .cmd-group elements
+let _dragEl   = null;
+let _dragOver = null;
+let _dragBelow = false;
+
+function initDragReorder(container, itemSelector, onReorder) {
+  container.addEventListener('mousedown', e => {
+    const handle = e.target.closest('.drag-handle');
+    if (!handle) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const item = handle.closest(itemSelector);
+    if (!item) return;
+
+    _dragEl = item;
+    _dragEl.classList.add('dragging');
+    const startY = e.clientY;
+    const items  = () => [...container.querySelectorAll(itemSelector + ':not(.dragging)')];
+
+    function onMove(ev) {
+      const y = ev.clientY;
+      let target = null, below = false;
+      for (const it of items()) {
+        const r = it.getBoundingClientRect();
+        if (y >= r.top && y <= r.bottom) {
+          below = y > r.top + r.height / 2;
+          target = it;
+          break;
+        }
+      }
+      if (_dragOver && _dragOver !== target) {
+        _dragOver.classList.remove('drag-above','drag-below');
+      }
+      _dragOver  = target;
+      _dragBelow = below;
+      if (target) target.classList.add(below ? 'drag-below' : 'drag-above');
+    }
+
+    function onUp() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      _dragEl.classList.remove('dragging');
+      if (_dragOver) {
+        _dragOver.classList.remove('drag-above','drag-below');
+        if (_dragBelow) {
+          _dragOver.after(_dragEl);
+        } else {
+          _dragOver.before(_dragEl);
+        }
+      }
+      _dragEl = _dragOver = null;
+      onReorder([...container.querySelectorAll(itemSelector)]);
+    }
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup',   onUp);
+  });
+
+  // Touch support
+  container.addEventListener('touchstart', e => {
+    const handle = e.target.closest('.drag-handle');
+    if (!handle) return;
+    const item = handle.closest(itemSelector);
+    if (!item) return;
+    _dragEl = item;
+    _dragEl.classList.add('dragging');
+
+    function onTouchMove(ev) {
+      ev.preventDefault();
+      const t  = ev.touches[0];
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const target = el?.closest(itemSelector + ':not(.dragging)');
+      if (_dragOver && _dragOver !== target) _dragOver.classList.remove('drag-above','drag-below');
+      _dragOver = target;
+      if (target) {
+        const r = target.getBoundingClientRect();
+        _dragBelow = t.clientY > r.top + r.height / 2;
+        target.classList.add(_dragBelow ? 'drag-below' : 'drag-above');
+      }
+    }
+    function onTouchEnd() {
+      item.removeEventListener('touchmove', onTouchMove);
+      item.removeEventListener('touchend',  onTouchEnd);
+      _dragEl.classList.remove('dragging');
+      if (_dragOver) {
+        _dragOver.classList.remove('drag-above','drag-below');
+        _dragBelow ? _dragOver.after(_dragEl) : _dragOver.before(_dragEl);
+      }
+      _dragEl = _dragOver = null;
+      onReorder([...container.querySelectorAll(itemSelector)]);
+    }
+    item.addEventListener('touchmove', onTouchMove, { passive: false });
+    item.addEventListener('touchend',  onTouchEnd);
+  }, { passive: true });
+}
+
+// Called after reorder — save new order for tag library
+function onTagLibraryReorder(els) {
+  const order = els.map(el => parseInt(el.dataset.catIdx));
+  saveOrder(STORAGE_KEY_TAGS, order);
+  // Update TAG_LIBRARY in-place to match new DOM order
+  const orig = [...TAG_LIBRARY];
+  order.forEach((oi, ni) => { TAG_LIBRARY[ni] = orig[oi]; });
+  // Update dataset indices so future reorders are correct
+  els.forEach((el, ni) => { el.dataset.catIdx = ni; });
+}
+
+// Called after reorder — save new order for cmd group
+function onCmdGroupReorder(tab, els) {
+  const order = els.map(el => parseInt(el.dataset.cmdIdx));
+  saveOrder(STORAGE_KEY_CMD + '_' + tab, order);
+  const orig = [...SUNO_COMMANDS[tab]];
+  order.forEach((oi, ni) => { SUNO_COMMANDS[tab][ni] = orig[oi]; });
+  els.forEach((el, ni) => { el.dataset.cmdIdx = ni; });
+}
+
+// Init drag on both libraries after first render
+function initAllDrag() {
+  const tagContainer = document.getElementById('categories');
+  if (tagContainer) {
+    initDragReorder(tagContainer, '.cat', onTagLibraryReorder);
+  }
+  ['style','lyrics'].forEach(tab => {
+    const panel = document.getElementById(`cmd-${tab}-panel`);
+    if (panel) {
+      initDragReorder(panel, '.cmd-group', els => onCmdGroupReorder(tab, els));
+    }
+  });
 }
 
 function switchCmdTab(tab) {
