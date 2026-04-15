@@ -3968,13 +3968,13 @@ function renderCommandPanel(tab) {
       const btn = document.createElement('button');
       btn.className = 'cmd-chip' + (tab === 'lyrics' ? ' lyrics-chip' : '');
       btn.textContent = chip;
-      if (tab === 'style') {
-        const bg = group.color + '20';
-        const bc = group.color + '50';
-        btn.style.cssText = `background:${bg};border-color:${bc};color:${group.color}`;
-      }
-      // Both tabs insert [chip] at cursor in the focused lyrics textarea
-      btn.onclick = () => insertCommandToLyrics(`[${chip}]`);
+      // Apply group color to all tabs
+      const bg = group.color + '20';
+      const bc = group.color + '50';
+      btn.style.cssText = `background:${bg};border-color:${bc};color:${group.color}`;
+      // Lyrics chips already contain [brackets]; style chips need wrapping
+      const cmd = chip.startsWith('[') ? chip : `[${chip}]`;
+      btn.onclick = () => insertCommandToLyrics(cmd);
       chipsEl.appendChild(btn);
     });
     panel.appendChild(el);
