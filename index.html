@@ -1100,9 +1100,10 @@ body {
   color: var(--purple);
   font-family: 'Consolas','Courier New',monospace;
 }
+/* ── Import textarea ── */
 #import-ta {
   flex: 1;
-  min-height: 340px;
+  min-height: 200px;
   background: rgba(8,8,25,0.85);
   border: 1px solid rgba(100,75,200,0.3);
   border-radius: 10px;
@@ -1121,6 +1122,89 @@ body {
   box-shadow: 0 0 0 2px rgba(130,80,255,0.08);
 }
 #import-ta::placeholder { color: var(--txt2); }
+
+/* ── Tag insertion bar (no-bracket mode) ── */
+#import-tag-bar {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 9px;
+  padding: 8px 10px;
+}
+#import-tag-bar .itb-label {
+  font-size: 10px;
+  color: var(--txt2);
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+#import-tag-bar .itb-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.itag-btn {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-family: 'Consolas','Courier New',monospace;
+  font-weight: 600;
+  border-radius: 5px;
+  border: 1px solid rgba(130,80,255,0.3);
+  background: rgba(130,80,255,0.08);
+  color: var(--purple);
+  cursor: pointer;
+  transition: all .15s;
+  touch-action: manipulation;
+}
+.itag-btn:hover { background: rgba(130,80,255,0.2); border-color: var(--purple); }
+.itag-btn:active { transform: scale(.96); }
+
+/* ── Section preview (bracket mode) ── */
+#import-preview {
+  display: none;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 160px;
+  overflow-y: auto;
+  background: rgba(8,8,25,0.6);
+  border: 1px solid rgba(100,75,200,0.2);
+  border-radius: 9px;
+  padding: 6px 8px;
+}
+#import-preview .iprev-row {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 3px 4px;
+  border-radius: 5px;
+  transition: background .1s;
+}
+#import-preview .iprev-row:hover { background: rgba(130,80,255,0.06); }
+.iprev-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.iprev-name {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--txt1);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 70px;
+}
+.iprev-snip {
+  font-size: 10.5px;
+  color: var(--txt2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: rtl;
+}
+
+/* ── Actions ── */
 .import-actions {
   display: flex;
   justify-content: flex-end;
@@ -1656,11 +1740,22 @@ body {
 <div id="import-overlay" onclick="closeImportModal(event)">
   <div id="import-modal">
     <h3>ייבוא שיר שלם</h3>
-    <div class="import-hint">
-      הדבק שיר בפורמט Suno — יחולק אוטומטית למקטעים לפי תגיות כמו
-      <code>[Verse 1]</code> <code>[Chorus]</code> <code>[Bridge: תיאור]</code>
+    <div class="import-hint" id="import-hint-text">
+      הדבק שיר — אם יש תגיות <code>[Verse 1]</code> <code>[Chorus]</code> הוא יחולק אוטומטית.
+      אחרת, סמן טקסט ולחץ על תג להוספת חלוקה ידנית.
     </div>
-    <textarea id="import-ta" placeholder="[Verse 1: description]&#10;מילות הבית...&#10;&#10;[Chorus]&#10;מילות הפזמון..."></textarea>
+
+    <!-- Tag insertion bar — shown when no brackets detected -->
+    <div id="import-tag-bar">
+      <div class="itb-label">הוסף תג מעל הטקסט הנבחר:</div>
+      <div class="itb-row" id="import-tag-btns"></div>
+    </div>
+
+    <textarea id="import-ta" placeholder="[Verse 1]&#10;מילות הבית...&#10;&#10;[Chorus]&#10;מילות הפזמון..."></textarea>
+
+    <!-- Section preview — shown when brackets detected -->
+    <div id="import-preview"></div>
+
     <div class="import-actions">
       <span class="import-parsed-count" id="import-count"></span>
       <button class="import-cancel" onclick="closeImportModal()">ביטול</button>
@@ -3400,10 +3495,39 @@ function toggleTagLibCard() {
 // ════════════════════════════════════════════
 //  SONG IMPORT
 // ════════════════════════════════════════════
+// ── Section color palette (for preview dots) ────────────────
+const SECTION_COLORS = ['#9b72ef','#5b9cf6','#2ec491','#e0709a','#e8924a','#d4a017','#e85c5c','#28c4af'];
+function sectionColor(i) { return SECTION_COLORS[i % SECTION_COLORS.length]; }
+
+// ── Import tag bar tags ──────────────────────────────────────
+const IMPORT_TAGS = [
+  'Verse 1','Verse 2','Verse 3',
+  'Chorus','Pre-Chorus','Bridge',
+  'Intro','Outro','Hook','Interlude'
+];
+
 function openImportModal() {
   document.getElementById('import-overlay').classList.add('open');
   document.getElementById('import-count').textContent = '';
-  setTimeout(() => document.getElementById('import-ta').focus(), 50);
+  // Build tag buttons
+  const row = document.getElementById('import-tag-btns');
+  if (row && !row.children.length) {
+    IMPORT_TAGS.forEach(tag => {
+      const btn = document.createElement('button');
+      btn.className = 'itag-btn';
+      btn.textContent = `[${tag}]`;
+      btn.addEventListener('mousedown', e => {
+        e.preventDefault(); // don't steal focus from textarea
+        insertImportTag(tag);
+      });
+      row.appendChild(btn);
+    });
+  }
+  setTimeout(() => {
+    const ta = document.getElementById('import-ta');
+    ta.focus();
+    updateImportUI(ta.value);
+  }, 50);
 }
 
 function closeImportModal(e) {
@@ -3412,14 +3536,69 @@ function closeImportModal(e) {
   }
 }
 
+// Insert [Tag] on its own line above the selected text (or at cursor)
+function insertImportTag(tag) {
+  const ta = document.getElementById('import-ta');
+  const start = ta.selectionStart;
+  const end   = ta.selectionEnd;
+  const val   = ta.value;
+
+  // Find start of the line where selection begins
+  const lineStart = val.lastIndexOf('\n', start - 1) + 1;
+  const insertion = `[${tag}]\n`;
+
+  ta.value = val.slice(0, lineStart) + insertion + val.slice(lineStart);
+  // Restore cursor after inserted tag line
+  const newPos = lineStart + insertion.length + (start - lineStart);
+  ta.setSelectionRange(newPos, newPos + (end - start));
+  ta.focus();
+  updateImportUI(ta.value);
+}
+
+// Update the live UI: preview vs tag-bar, count label
+function updateImportUI(text) {
+  const hasBrackets = /^\[([^\]]+)\]$/m.test(text);
+  const tagBar  = document.getElementById('import-tag-bar');
+  const preview = document.getElementById('import-preview');
+  const countEl = document.getElementById('import-count');
+
+  if (!text.trim()) {
+    tagBar.style.display  = 'none';
+    preview.style.display = 'none';
+    countEl.textContent   = '';
+    return;
+  }
+
+  if (hasBrackets) {
+    // Bracket mode: show section preview, hide tag bar
+    tagBar.style.display  = 'none';
+    preview.style.display = 'flex';
+    const parsed = parseImportedSong(text);
+    preview.innerHTML = parsed.map((s, i) => `
+      <div class="iprev-row">
+        <span class="iprev-dot" style="background:${sectionColor(i)}"></span>
+        <span class="iprev-name">${escHtml(s.name)}</span>
+        <span class="iprev-snip">${escHtml(s.text.replace(/\n/g,' ').slice(0,60))}</span>
+      </div>`).join('');
+    countEl.textContent = parsed.length > 0 ? `${parsed.length} מקטעים זוהו` : '';
+  } else {
+    // No brackets: show tag insertion bar
+    tagBar.style.display  = 'flex';
+    preview.style.display = 'none';
+    // Count blank-line blocks as hint
+    const blocks = text.split(/\n[ \t]*\n+/).map(b => b.trim()).filter(Boolean);
+    countEl.textContent = blocks.length > 1
+      ? `${blocks.length} פסקאות — הוסף תגיות לחלוקה, או ייבא כתיבה אחת`
+      : 'ייבוא כמקטע אחד';
+  }
+}
+
 // Parse a full Suno-format song text into sections.
-// If the text has [Tag] bracket headers → split by those.
-// Otherwise → split by blank lines and assign generic section names.
 function parseImportedSong(text) {
-  // ── Bracket-based parse ──────────────────────────────────────
   const hasBrackets = /^\[([^\]]+)\]$/m.test(text);
 
   if (hasBrackets) {
+    // ── Bracket-based parse ──────────────────────────────────
     const result = [];
     let currentName = null, currentTag = null, currentLines = [];
     for (const line of text.split('\n')) {
@@ -3450,16 +3629,11 @@ function parseImportedSong(text) {
     });
   }
 
-  // ── Blank-line fallback ──────────────────────────────────────
-  // Split on one or more blank lines; name blocks sequentially.
-  const defaultNames = ['Verse 1','Chorus','Verse 2','Chorus','Bridge','Verse 3','Outro'];
-  let nameIdx = 0;
-  return text
-    .split(/\n[ \t]*\n+/)
-    .map(block => block.trim())
-    .filter(block => block.length > 0)
-    .map(block => ({ name: defaultNames[nameIdx] ?? `Part ${++nameIdx}`, text: block, _inc: nameIdx++ }))
-    .map(({ name, text }) => ({ name, text }));
+  // ── No brackets → single section ────────────────────────────
+  // Import the whole text as one block; name = "Verse 1" by default.
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+  return [{ name: 'Verse 1', text: trimmed }];
 }
 
 function doImport() {
@@ -3483,18 +3657,14 @@ function doImport() {
   updateOutput();
   closeImportModal();
   ta.value = '';
-  showToast(`${parsed.length} מקטעים יובאו בהצלחה`, 'success');
+  showToast(`${parsed.length === 1 ? 'מקטע אחד יובא' : parsed.length + ' מקטעים יובאו'} בהצלחה`, 'success');
 }
 
-// Live section count preview while typing in import textarea
+// Live UI update while typing
 document.addEventListener('DOMContentLoaded', () => {
   const importTa = document.getElementById('import-ta');
   if (importTa) {
-    importTa.addEventListener('input', () => {
-      const parsed = parseImportedSong(importTa.value);
-      const el = document.getElementById('import-count');
-      if (el) el.textContent = parsed.length > 0 ? `${parsed.length} מקטעים זוהו` : '';
-    });
+    importTa.addEventListener('input', () => updateImportUI(importTa.value));
   }
 });
 
