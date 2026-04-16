@@ -2000,22 +2000,22 @@ body {
 
     <input id="song-title" type="text" data-i18n-ph="songTitle" placeholder="שם השיר..." value="Untitled Song">
 
-    <button class="tbtn undo-btn" id="btn-undo" onclick="undo()" title="בטל (Ctrl+Z)" disabled>
+    <button class="tbtn undo-btn" id="btn-undo" onclick="undo()" title="בטל (Ctrl+Z)" data-i18n-title="undoTitle" disabled>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v6h6"/><path d="M3 13C5 8 9.5 5 15 5a9 9 0 0 1 0 18c-3.4 0-6.4-1.5-8.5-4"/></svg>
       <span data-i18n="undo">ביטול</span>
     </button>
-    <button class="tbtn undo-btn" id="btn-redo" onclick="redo()" title="שחזר (Ctrl+Y)" disabled>
+    <button class="tbtn undo-btn" id="btn-redo" onclick="redo()" title="שחזר (Ctrl+Y)" data-i18n-title="redoTitle" disabled>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 7v6h-6"/><path d="M21 13c-2 5-6.5 8-12 8a9 9 0 0 1 0-18c3.4 0 6.4 1.5 8.5 4"/></svg>
     </button>
     <button class="tbtn add-line" onclick="openModal()">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
       <span data-i18n="addTagLine">+ שורת תג</span>
     </button>
-    <button class="tbtn" id="btn-global-dir" onclick="toggleAllDir()" title="שנה כיוון לכל התיבות">
+    <button class="tbtn" id="btn-global-dir" onclick="toggleAllDir()" title="שנה כיוון לכל התיבות" data-i18n-title="globalDirTitle">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10H7M21 6H7M21 14H7M21 18H7"/><polyline points="3 3 3 21"/></svg>
       <span id="global-dir-lbl">RTL</span>
     </button>
-    <button class="tbtn" onclick="openImportModal()" title="ייבוא שיר שלם">
+    <button class="tbtn" onclick="openImportModal()" title="ייבוא שיר שלם" data-i18n-title="importTitle2">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       <span data-i18n="import">ייבוא</span>
     </button>
@@ -2025,35 +2025,35 @@ body {
         <span data-i18n="templates">תבניות</span>
       </button>
       <div class="templates-dd" id="tpl-dd">
-        <div class="tpl-sep">🎤 פופ ומיינסטרים</div>
+        <div class="tpl-sep" data-i18n="tplCat1">🎤 פופ ומיינסטרים</div>
         <div class="tpl-item" onclick="loadTemplate('pop')"><span class="tpl-dot" style="background:#e070a0"></span>Pop</div>
         <div class="tpl-item" onclick="loadTemplate('rnb')"><span class="tpl-dot" style="background:#d070c0"></span>R&B / Neo-Soul</div>
         <div class="tpl-item" onclick="loadTemplate('dancepop')"><span class="tpl-dot" style="background:#00d4ff"></span>Dance Pop</div>
-        <div class="tpl-sep">⚡ ריתמי ועוצמה</div>
+        <div class="tpl-sep" data-i18n="tplCat2">⚡ ריתמי ועוצמה</div>
         <div class="tpl-item" onclick="loadTemplate('rock')"><span class="tpl-dot" style="background:#c84040"></span>Rock</div>
         <div class="tpl-item" onclick="loadTemplate('metal')"><span class="tpl-dot" style="background:#8a1010"></span>Heavy Metal</div>
         <div class="tpl-item" onclick="loadTemplate('hiphop')"><span class="tpl-dot" style="background:#e8922a"></span>Hip-Hop</div>
         <div class="tpl-item" onclick="loadTemplate('trap')"><span class="tpl-dot" style="background:#c04080"></span>Trap</div>
         <div class="tpl-item" onclick="loadTemplate('funk')"><span class="tpl-dot" style="background:#ff9f43"></span>Funk</div>
-        <div class="tpl-sep">🎛️ אלקטרוני</div>
+        <div class="tpl-sep" data-i18n="tplCat3">🎛️ אלקטרוני</div>
         <div class="tpl-item" onclick="loadTemplate('edm')"><span class="tpl-dot" style="background:#9b72ef"></span>EDM / Electronic</div>
         <div class="tpl-item" onclick="loadTemplate('lofi')"><span class="tpl-dot" style="background:#5b9cf6"></span>Lo-Fi Hip-Hop</div>
-        <div class="tpl-sep">🪘 ים-תיכוני ואתני</div>
-        <div class="tpl-item" onclick="loadTemplate('mizrahi')"><span class="tpl-dot" style="background:#b88a1e"></span>מזרחי</div>
-        <div class="tpl-item" onclick="loadTemplate('greek')"><span class="tpl-dot" style="background:#1aaa96"></span>יווני / מדיטרני</div>
+        <div class="tpl-sep" data-i18n="tplCat4">🪘 ים-תיכוני ואתני</div>
+        <div class="tpl-item" onclick="loadTemplate('mizrahi')"><span class="tpl-dot" style="background:#b88a1e"></span><span data-i18n="tplMizrahi">מזרחי</span></div>
+        <div class="tpl-item" onclick="loadTemplate('greek')"><span class="tpl-dot" style="background:#1aaa96"></span><span data-i18n="tplGreek">יווני / מדיטרני</span></div>
         <div class="tpl-item" onclick="loadTemplate('reggae')"><span class="tpl-dot" style="background:#1aad7a"></span>Reggae</div>
-        <div class="tpl-sep">🎸 אורגני ואקוסטי</div>
+        <div class="tpl-sep" data-i18n="tplCat5">🎸 אורגני ואקוסטי</div>
         <div class="tpl-item" onclick="loadTemplate('ballad')"><span class="tpl-dot" style="background:#28c4af"></span>Ballad</div>
         <div class="tpl-item" onclick="loadTemplate('folk')"><span class="tpl-dot" style="background:#7bc8f0"></span>Folk Acoustic</div>
         <div class="tpl-item" onclick="loadTemplate('country')"><span class="tpl-dot" style="background:#c4762e"></span>Country</div>
         <div class="tpl-item" onclick="loadTemplate('jazz')"><span class="tpl-dot" style="background:#b88a1e"></span>Jazz</div>
-        <div class="tpl-sep">🎬 סינמטי</div>
+        <div class="tpl-sep" data-i18n="tplCat6">🎬 סינמטי</div>
         <div class="tpl-item" onclick="loadTemplate('cinematic')"><span class="tpl-dot" style="background:#7c5cbf"></span>Cinematic / Epic</div>
       </div>
     </div>
 
     <!-- Keyboard toggle (mobile/tablet) -->
-    <button class="tbtn" id="btn-keyboard" onclick="toggleMobileKeyboard()" title="פתח/סגור מקלדת">
+    <button class="tbtn" id="btn-keyboard" onclick="toggleMobileKeyboard()" title="פתח/סגור מקלדת" data-i18n-title="keyboardTitle">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M8 17h8"/></svg>
       <span data-i18n="keyboard">מקלדת</span>
     </button>
@@ -2065,7 +2065,7 @@ body {
     </div>
 
     <!-- Theme toggle -->
-    <button class="tbtn" id="btn-theme" onclick="toggleTheme()" title="מצב בהיר/כהה" style="padding:6px 9px;">
+    <button class="tbtn" id="btn-theme" onclick="toggleTheme()" title="מצב בהיר/כהה" data-i18n-title="themeTitle" style="padding:6px 9px;">
       <svg id="theme-icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <svg id="theme-icon-sun"  width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
     </button>
@@ -2073,10 +2073,10 @@ body {
     <!-- User corner -->
     <div id="user-corner">
       <span id="user-badge-uc"></span>
-      <button class="ucbtn ucbtn-admin" id="btn-admin" onclick="openAdminPanel()" title="ניהול משתמשים" style="display:none">
+      <button class="ucbtn ucbtn-admin" id="btn-admin" onclick="openAdminPanel()" title="ניהול משתמשים" data-i18n-title="adminTitle" style="display:none">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </button>
-      <button class="ucbtn ucbtn-logout" onclick="logout()" title="יציאה">
+      <button class="ucbtn ucbtn-logout" onclick="logout()" title="יציאה" data-i18n-title="logoutTitle">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       </button>
     </div>
@@ -2092,13 +2092,13 @@ body {
       Full Preview ↗
     </button>
     <div class="ttbar-pill">
-      <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudWord()" title="ניקוד המילה בסמן">
+      <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudWord()" title="ניקוד המילה בסמן" data-i18n-title="nikudWordTitle">
         <span>נ׳</span><span data-i18n="nikud"> ניקוד</span>
       </button>
-      <button class="ttbtn tt-latin" id="btn-latin" onclick="latinizeWord()" title="לטינזציה המילה בסמן">
+      <button class="ttbtn tt-latin" id="btn-latin" onclick="latinizeWord()" title="לטינזציה המילה בסמן" data-i18n-title="latinWordTitle">
         <span>Aa</span><span data-i18n="latin"> לטינזציה</span>
       </button>
-      <button class="ttbtn tt-phonetic" id="btn-phonetic" onclick="phoneticWord()" title="פונטי המילה בסמן">
+      <button class="ttbtn tt-phonetic" id="btn-phonetic" onclick="phoneticWord()" title="פונטי המילה בסמן" data-i18n-title="phoneticWordTitle">
         <span>/ˈ/</span><span data-i18n="phonetic"> פונטי</span>
       </button>
     </div>
@@ -2122,7 +2122,7 @@ body {
           <span class="sb-card-title">Style Prompt</span>
           <div class="sb-card-actions">
             <button class="copy-btn" id="copy-btn" onclick="copyOutput();event.stopPropagation()">COPY</button>
-            <button class="pcard-clear" onclick="clearStylePrompt();event.stopPropagation()" title="נקה">✕</button>
+            <button class="pcard-clear" onclick="clearStylePrompt();event.stopPropagation()" title="נקה" data-i18n-title="clearStylePrompt">✕</button>
             <span class="pcard-chevron open" id="sb-chevron-style">›</span>
           </div>
         </div>
@@ -2130,7 +2130,7 @@ body {
           <textarea id="style-prompt" data-i18n-ph="stylePlaceholder" placeholder="לחץ על שבבים לימין..." oninput="updateStyleCounter()"></textarea>
           <div class="style-footer">
             <div class="char-counter" id="style-counter">0 / 120</div>
-            <button class="tbtn style-rand-btn" onclick="randomizeStylePrompt()" title="צור Style Prompt רנדומלי">🎲 Randomize</button>
+            <button class="tbtn style-rand-btn" onclick="randomizeStylePrompt()" title="צור Style Prompt רנדומלי" data-i18n-title="randomizeTitle">🎲 Randomize</button>
           </div>
         </div>
       </div>
@@ -2166,9 +2166,9 @@ body {
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
           <span class="sb-card-title">Tag Library</span>
           <div class="sb-card-actions">
-            <button class="add-tag-btn" onclick="event.stopPropagation();openAddTagModal()" title="הוסף תג חדש">
+            <button class="add-tag-btn" onclick="event.stopPropagation();openAddTagModal()" title="הוסף תג חדש" data-i18n-title="addNewTagTitle">
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
-              תג חדש
+              <span data-i18n="newTagBtn">תג חדש</span>
             </button>
             <span class="pcard-chevron open" id="sb-chevron-tags">›</span>
           </div>
@@ -2197,10 +2197,10 @@ body {
     </div>
     <div id="full-preview-body"></div>
     <div class="fpm-actions">
-      <button class="fpm-close-btn" onclick="closeFullPreview()">סגור</button>
+      <button class="fpm-close-btn" onclick="closeFullPreview()" data-i18n="closeBtn">סגור</button>
       <button class="fpm-copy-btn" onclick="copyFullPreview()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        העתק הכל
+        <span data-i18n="copyAll">העתק הכל</span>
       </button>
     </div>
   </div>
@@ -2209,15 +2209,15 @@ body {
 <!-- ADD TAG MODAL -->
 <div id="add-tag-overlay" onclick="if(event.target===this)closeAddTagModal()">
   <div id="add-tag-modal">
-    <h3>הוסף תג חדש לספרייה</h3>
+    <h3 data-i18n="addTagLib">הוסף תג חדש לספרייה</h3>
 
     <div class="atm-field">
-      <div class="atm-label">שם התג</div>
-      <input class="atm-input" id="atm-tag-input" placeholder="למשל: Dreamy, Aggressive..." oninput="atmUpdatePreview()">
+      <div class="atm-label" data-i18n="tagNameLabel">שם התג</div>
+      <input class="atm-input" id="atm-tag-input" placeholder="למשל: Dreamy, Aggressive..." data-i18n-ph="tagNamePlaceholder" oninput="atmUpdatePreview()">
     </div>
 
     <div class="atm-field">
-      <div class="atm-label">ספרייה</div>
+      <div class="atm-label" data-i18n="libraryLabel">ספרייה</div>
       <select class="atm-select" id="atm-lib-select" onchange="atmLibChanged()">
         <option value="tags">Tag Library</option>
         <option value="style">Suno Commands — Style</option>
@@ -2226,22 +2226,22 @@ body {
     </div>
 
     <div class="atm-field">
-      <div class="atm-label">קטגוריה</div>
+      <div class="atm-label" data-i18n="categoryLabel">קטגוריה</div>
       <select class="atm-select" id="atm-cat-select" onchange="atmUpdatePreview()"></select>
     </div>
 
     <div class="atm-field">
-      <div class="atm-label">תצוגה מקדימה</div>
+      <div class="atm-label" data-i18n="previewLabel">תצוגה מקדימה</div>
       <span class="atm-preview-pill" id="atm-preview">—</span>
     </div>
 
     <div class="atm-error" id="atm-error"></div>
 
     <div class="atm-actions">
-      <button class="atm-cancel" onclick="closeAddTagModal()">ביטול</button>
+      <button class="atm-cancel" onclick="closeAddTagModal()" data-i18n="cancel">ביטול</button>
       <button class="atm-confirm" onclick="doAddTag()">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"/></svg>
-        הוסף תג
+        <span data-i18n="addTagBtn">הוסף תג</span>
       </button>
     </div>
   </div>
@@ -2256,29 +2256,29 @@ body {
 <!-- IMPORT MODAL -->
 <div id="import-overlay" onclick="closeImportModal(event)">
   <div id="import-modal">
-    <h3>ייבוא שיר שלם</h3>
+    <h3 data-i18n="importTitle">ייבוא שיר שלם</h3>
     <div class="import-hint" id="import-hint-text">
-      הדבק שיר — אם יש תגיות <code>[Verse 1]</code> <code>[Chorus]</code> הוא יחולק אוטומטית.
-      אחרת, סמן טקסט ולחץ על תג להוספת חלוקה ידנית.
+      <span data-i18n="importHelp1">הדבק שיר — אם יש תגיות <code>[Verse 1]</code> <code>[Chorus]</code> הוא יחולק אוטומטית.</span>
+      <span data-i18n="importHelp2">אחרת, סמן טקסט ולחץ על תג להוספת חלוקה ידנית.</span>
     </div>
 
     <!-- Tag insertion bar — shown when no brackets detected -->
     <div id="import-tag-bar">
-      <div class="itb-label">הוסף תג מעל הטקסט הנבחר:</div>
+      <div class="itb-label" data-i18n="importAddTagLabel">הוסף תג מעל הטקסט הנבחר:</div>
       <div class="itb-row" id="import-tag-btns"></div>
     </div>
 
-    <textarea id="import-ta" placeholder="[Verse 1]&#10;מילות הבית...&#10;&#10;[Chorus]&#10;מילות הפזמון..."></textarea>
+    <textarea id="import-ta" placeholder="[Verse 1]&#10;מילות הבית...&#10;&#10;[Chorus]&#10;מילות הפזמון..." data-i18n-ph="importPlaceholder"></textarea>
 
     <!-- Section preview — shown when brackets detected -->
     <div id="import-preview"></div>
 
     <div class="import-actions">
       <span class="import-parsed-count" id="import-count"></span>
-      <button class="import-cancel" onclick="closeImportModal()">ביטול</button>
+      <button class="import-cancel" onclick="closeImportModal()" data-i18n="cancel">ביטול</button>
       <button class="import-confirm" onclick="doImport()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        ייבוא שיר
+        <span data-i18n="importBtn">ייבוא שיר</span>
       </button>
     </div>
   </div>
@@ -2287,7 +2287,7 @@ body {
 <!-- MODAL: Add Section -->
 <div id="modal-overlay" onclick="closeModal(event)">
   <div id="modal">
-    <h3>בחר סוג מקטע</h3>
+    <h3 data-i18n="chooseSectionType">בחר סוג מקטע</h3>
     <div class="modal-tags" id="modal-tags"></div>
   </div>
 </div>
@@ -2456,20 +2456,20 @@ function pushUndo() {
 }
 
 function undo() {
-  if (undoPointer <= 0) { showToast('אין מה לבטל', ''); return; }
+  if (undoPointer <= 0) { showToast(t('toastNothingToUndo'), ''); return; }
   clearAllAmbigStates();
   undoPointer--;
   restoreSnapshot(undoStack[undoPointer]);
-  showToast('בוטל ↩', '');
+  showToast(t('toastUndone'), '');
   updateUndoBtn();
 }
 
 function redo() {
-  if (undoPointer >= undoStack.length - 1) { showToast('אין מה לשחזר', ''); return; }
+  if (undoPointer >= undoStack.length - 1) { showToast(t('toastNothingToRedo'), ''); return; }
   clearAllAmbigStates();
   undoPointer++;
   restoreSnapshot(undoStack[undoPointer]);
-  showToast('שוחזר ↪', '');
+  showToast(t('toastRedone'), '');
   updateUndoBtn();
 }
 
@@ -2559,7 +2559,7 @@ function renderTagLibrary(filter = '') {
     catEl.dataset.catIdx = ci;
     catEl.innerHTML = `
       <div class="cat-header" onclick="this.parentElement.classList.toggle('open'); this.parentElement.classList.toggle('closed')">
-        <span class="drag-handle" title="גרור לשינוי סדר"><span></span><span></span><span></span></span>
+        <span class="drag-handle" title="${t('dragTitle')}"><span></span><span></span><span></span></span>
         <span class="cat-dot" style="background:${cat.color}"></span>
         <span class="cat-name">${cat.name}</span>
         <span class="cat-count">${filteredTags.length}</span>
@@ -2596,7 +2596,7 @@ function addTagToPrompt(tag, color, el) {
     ta.value = cur ? cur + ', ' + tag : tag;
     el && el.classList.toggle('in-prompt');
     updateStyleCounter();
-    showToast(`נוסף: ${tag}`, 'success');
+    showToast(t('toastAdded').replace('${cmd}', tag), 'success');
   } else {
     // Remove if already present
     ta.value = ta.value.replace(new RegExp(',?\\s*' + escapeRe(tag) + ',?\\s*', 'g'), ', ').replace(/^,\s*|,\s*$/g, '').trim();
@@ -2682,7 +2682,7 @@ function renderSections() {
       </div>
       <div class="lyrics-wrapper">
         <textarea class="lyrics-ta" id="ta-${sec.id}"
-          placeholder="הקלד מילים..."
+          placeholder="${t('lyricsPlaceholder')}"
           style="direction:${sec.dir||'rtl'}"
           oninput="updateSectionText(${sec.id}, this.value); autoResizeTa(this)"
           onpaste="setTimeout(()=>{ updateSectionText(${sec.id}, this.value); autoResizeTa(this); },0)"
@@ -2775,7 +2775,7 @@ function renderQuickAddButtons() {
   });
   const moreBtn = document.createElement('button');
   moreBtn.className = 'add-sec-btn';
-  moreBtn.innerHTML = `<span style="color:var(--blue)">+</span> אחר...`;
+  moreBtn.innerHTML = `<span style="color:var(--blue)">+</span> ${t('otherSection')}`;
   moreBtn.onclick = openModal;
   row.appendChild(moreBtn);
 }
@@ -2811,7 +2811,7 @@ function addSectionFromTag(tag) {
   const structTags = TAG_LIBRARY.find(c => c.en === 'Structure').tags;
   if (structTags.includes(tag)) {
     addSection(tag);
-    showToast(`מקטע "${tag}" נוסף`, 'success');
+    showToast(t('toastSectionAdded').replace('${n}', tag), 'success');
   } else {
     addTagToPrompt(tag);
   }
@@ -3203,17 +3203,17 @@ function showAmbigPopup(spanEl, item, sectionId) {
   const popup = document.getElementById('ambig-popup');
 
   popup.innerHTML = `
-    <div class="ap-title">הומוגרף — <span class="ap-word-orig">${escHtml(item.word)}</span></div>
+    <div class="ap-title">${t('homographHeader')}<span class="ap-word-orig">${escHtml(item.word)}</span></div>
     <div class="ap-opts">
       <button class="ap-opt ap-masc ${item.currentGender === 'masc' ? 'ap-selected' : ''}"
               onclick="setAmbigGender('${item.word.replace(/'/g,"\\'")}','masc',${sectionId})">
         <span class="ap-nikud">${escHtml(item.masc)}</span>
-        <span class="ap-label">זכר ♂</span>
+        <span class="ap-label">${t('genderMale')}</span>
       </button>
       <button class="ap-opt ap-fem ${item.currentGender === 'fem' ? 'ap-selected' : ''}"
               onclick="setAmbigGender('${item.word.replace(/'/g,"\\'")}','fem',${sectionId})">
         <span class="ap-nikud">${escHtml(item.fem)}</span>
-        <span class="ap-label">נקבה ♀</span>
+        <span class="ap-label">${t('genderFemale')}</span>
       </button>
     </div>`;
 
@@ -3278,16 +3278,16 @@ function setAmbigGender(word, gender, sectionId) {
 // ════════════════════════════════════════════
 async function nikudSelected() {
   const ta = getFocusedTextarea();
-  if (!ta) { showToast('לחץ בתוך תיבת טקסט תחילה', 'error'); return; }
+  if (!ta) { showToast(t('toastClickBox'), 'error'); return; }
 
   const sectionId  = parseInt(ta.id.replace('ta-', ''));
   const start = ta.selectionStart, end = ta.selectionEnd;
   const hasSelection = start !== end;
   const text = hasSelection ? ta.value.substring(start, end) : ta.value;
-  if (!text.trim()) { showToast('אין טקסט לניקוד', 'error'); return; }
+  if (!text.trim()) { showToast(t('toastNoTextNikud'), 'error'); return; }
 
   const btn = document.getElementById('btn-nikud');
-  btn.innerHTML = '<span class="spin"></span> מנקד...';
+  btn.innerHTML = `<span class="spin"></span> ${t('toastNikudingProgress')}`;
   btn.disabled = true;
 
   try {
@@ -3312,14 +3312,14 @@ async function nikudSelected() {
       showToast(`${ambiguous.length} מילה${ambiguous.length > 1 ? 'ות' : ''} הומוגרפיות — לחץ על מילה מסומנת לבחירת מין`, 'success');
     } else {
       clearAmbigState(sectionId);
-      showToast('ניקוד בוצע!', 'success');
+      showToast(t('toastNikudDone'), 'success');
     }
   } catch (e) {
     console.error('[nikud]', e);
-    showToast('ניקוד נכשל – בדוק חיבור', 'error');
+    showToast(t('toastNikudFailed'), 'error');
     showNikudHelp();
   } finally {
-    btn.innerHTML = '<span>נ׳</span> ניקוד';
+    btn.innerHTML = `<span>נ׳</span><span data-i18n="nikud">${t('nikud')}</span>`;
     btn.disabled = false;
   }
 }
@@ -3327,9 +3327,9 @@ async function nikudSelected() {
 // Nikud on full section
 async function nikudSection(id) {
   const ta = document.getElementById('ta-' + id);
-  if (!ta || !ta.value.trim()) { showToast('המקטע ריק', 'error'); return; }
+  if (!ta || !ta.value.trim()) { showToast(t('toastEmptySection'), 'error'); return; }
 
-  showToast('מנקד...', '');
+  showToast(t('toastNikudingProgress'), '');
   try {
     const rawData  = await callDictaNakdanRaw(ta.value);
     const nikudded = buildNikudText(rawData, null);
@@ -3345,10 +3345,10 @@ async function nikudSection(id) {
       showToast(`${ambiguous.length} מילה${ambiguous.length > 1 ? 'ות' : ''} הומוגרפיות — לחץ על מילה מסומנת`, 'success');
     } else {
       clearAmbigState(id);
-      showToast('ניקוד בוצע!', 'success');
+      showToast(t('toastNikudDone'), 'success');
     }
   } catch(e) {
-    showToast('שגיאה בניקוד', 'error');
+    showToast(t('toastNikudError'), 'error');
   }
 }
 
@@ -3554,15 +3554,15 @@ function applyPhonetic(text) {
 
 async function latinizeSelected() {
   const ta = getFocusedTextarea();
-  if (!ta) { showToast('לחץ בתוך תיבת טקסט תחילה', 'error'); return; }
+  if (!ta) { showToast(t('toastClickBox'), 'error'); return; }
 
   const start = ta.selectionStart, end = ta.selectionEnd;
   const hasSelection = start !== end;
   const text = hasSelection ? ta.value.substring(start, end) : ta.value;
-  if (!text.trim()) { showToast('אין טקסט ללטינזציה', 'error'); return; }
+  if (!text.trim()) { showToast(t('toastNoTextBox'), 'error'); return; }
 
   const btn = document.getElementById('btn-latin');
-  btn.innerHTML = '<span class="spin"></span> ממיר...';
+  btn.innerHTML = `<span class="spin"></span> ${t('toastConverting')}`;
   btn.disabled = true;
 
   try {
@@ -3580,25 +3580,25 @@ async function latinizeSelected() {
       ta.value = result;
     }
     ta.dispatchEvent(new Event('input'));
-    showToast('לטינזציה בוצעה!', 'success');
+    showToast(t('toastLatinDone'), 'success');
   } catch(e) {
-    showToast('שגיאה בהמרה', 'error');
+    showToast(t('toastLatinError'), 'error');
   } finally {
-    btn.innerHTML = '<span>Aa</span> לטינזציה';
+    btn.innerHTML = `<span>Aa</span><span data-i18n="latin">${t('latin')}</span>`;
     btn.disabled = false;
   }
 }
 
 async function latinizeSection(id) {
   const ta = document.getElementById('ta-' + id);
-  if (!ta || !ta.value.trim()) { showToast('המקטע ריק', 'error'); return; }
-  showToast('ממיר...', '');
+  if (!ta || !ta.value.trim()) { showToast(t('toastEmptySection'), 'error'); return; }
+  showToast(t('toastConverting'), '');
   let source = ta.value;
   try { source = await callDictaNakdan(ta.value); } catch {}
   const result = doLatinize(source);
   ta.value = result;
   updateSectionText(id, result);
-  showToast('לטינזציה בוצעה!', 'success');
+  showToast(t('toastLatinDone'), 'success');
 }
 
 // ════════════════════════════════════════════
@@ -3709,11 +3709,11 @@ function _syllabify(word) {
 
 function phoneticSelected() {
   const ta = getFocusedTextarea();
-  if (!ta) { showToast('לחץ בתוך תיבת טקסט תחילה', 'error'); return; }
+  if (!ta) { showToast(t('toastClickBox'), 'error'); return; }
   const start = ta.selectionStart, end = ta.selectionEnd;
   const hasSelection = start !== end;
   const text = hasSelection ? ta.value.substring(start, end) : ta.value;
-  if (!text.trim()) { showToast('אין טקסט להמרה', 'error'); return; }
+  if (!text.trim()) { showToast(t('toastNoTextPhonetic'), 'error'); return; }
   const result = applyPhonetic(text);
   if (hasSelection) {
     ta.setRangeText(result, start, end, 'select');
@@ -3722,17 +3722,17 @@ function phoneticSelected() {
   }
   ta.dispatchEvent(new Event('input'));
   pushUndo();
-  showToast('Phonetic respelling בוצע!', 'success');
+  showToast(t('toastPhoneticDone'), 'success');
 }
 
 function phoneticSection(id) {
   const ta = document.getElementById('ta-' + id);
-  if (!ta || !ta.value.trim()) { showToast('המקטע ריק', 'error'); return; }
+  if (!ta || !ta.value.trim()) { showToast(t('toastEmptySection'), 'error'); return; }
   const result = applyPhonetic(ta.value);
   ta.value = result;
   updateSectionText(id, result);
   pushUndo();
-  showToast('Phonetic respelling בוצע!', 'success');
+  showToast(t('toastPhoneticDone'), 'success');
 }
 
 // ════════════════════════════════════════════
@@ -3740,7 +3740,7 @@ function phoneticSection(id) {
 // ════════════════════════════════════════════
 async function nikudAll() {
   const toProcess = sections.filter(s => s.text && s.text.trim());
-  if (!toProcess.length) { showToast('אין תיבות עם טקסט', 'error'); return; }
+  if (!toProcess.length) { showToast(t('toastNoText'), 'error'); return; }
   const btn = document.getElementById('btn-nikud');
   if (btn) btn.disabled = true;
   let i = 0;
@@ -3756,13 +3756,13 @@ async function nikudAll() {
     } catch (e) {}
   }
   updateOutput(); pushUndo();
-  if (btn) { btn.innerHTML = '<span>נ׳</span> ניקוד'; btn.disabled = false; }
-  showToast(`ניקוד בוצע על ${toProcess.length} תיבות!`, 'success');
+  if (btn) { btn.innerHTML = `<span>נ׳</span><span data-i18n="nikud">${t('nikud')}</span>`; btn.disabled = false; }
+  showToast(t('toastNikudAll').replace('${n}', toProcess.length), 'success');
 }
 
 async function latinizeAll() {
   const toProcess = sections.filter(s => s.text && s.text.trim());
-  if (!toProcess.length) { showToast('אין תיבות עם טקסט', 'error'); return; }
+  if (!toProcess.length) { showToast(t('toastNoText'), 'error'); return; }
   const btn = document.getElementById('btn-latin');
   if (btn) btn.disabled = true;
   let i = 0;
@@ -3779,13 +3779,13 @@ async function latinizeAll() {
     } catch (e) {}
   }
   updateOutput(); pushUndo();
-  if (btn) { btn.innerHTML = '<span>Aa</span> לטינזציה'; btn.disabled = false; }
-  showToast(`לטינזציה בוצעה על ${toProcess.length} תיבות!`, 'success');
+  if (btn) { btn.innerHTML = `<span>Aa</span><span data-i18n="latin">${t('latin')}</span>`; btn.disabled = false; }
+  showToast(t('toastLatinAll').replace('${n}', toProcess.length), 'success');
 }
 
 function phoneticAll() {
   const toProcess = sections.filter(s => s.text && s.text.trim());
-  if (!toProcess.length) { showToast('אין תיבות עם טקסט', 'error'); return; }
+  if (!toProcess.length) { showToast(t('toastNoText'), 'error'); return; }
   for (const sec of toProcess) {
     const result = applyPhonetic(sec.text);
     sec.text = result;
@@ -3793,7 +3793,7 @@ function phoneticAll() {
     if (ta) { ta.value = result; ta.dispatchEvent(new Event('input')); }
   }
   updateOutput(); pushUndo();
-  showToast(`Phonetic בוצע על ${toProcess.length} תיבות!`, 'success');
+  showToast(t('toastPhoneticAll').replace('${n}', toProcess.length), 'success');
 }
 
 // ════════════════════════════════════════════
@@ -3835,9 +3835,9 @@ function commitTaChange(ta) {
 // ── Top-bar word-level tools ─────────────────────────────────────────
 async function nikudWord() {
   const ta = getFocusedTextarea();
-  if (!ta) { showToast('לחץ על מילה תחילה', 'error'); return; }
+  if (!ta) { showToast(t('toastClickWord'), 'error'); return; }
   const w = getWordAtCursor(ta);
-  if (!w) { showToast('אין מילה בסמן', 'error'); return; }
+  if (!w) { showToast(t('toastNoWord'), 'error'); return; }
   const btn = document.getElementById('btn-nikud');
   if (btn) { btn.innerHTML = '<span class="spin"></span>'; btn.disabled = true; }
   try {
@@ -3846,19 +3846,19 @@ async function nikudWord() {
     ta.setRangeText(nikudded, w.start, w.end, 'end');
     ta.dispatchEvent(new Event('input'));
     commitTaChange(ta); pushUndo();
-    showToast('ניקוד בוצע!', 'success');
+    showToast(t('toastNikudDone'), 'success');
   } catch(e) {
-    showToast('שגיאה בניקוד', 'error');
+    showToast(t('toastNikudError'), 'error');
   } finally {
-    if (btn) { btn.innerHTML = '<span>נ׳</span> ניקוד'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = `<span>נ׳</span><span data-i18n="nikud">${t('nikud')}</span>`; btn.disabled = false; }
   }
 }
 
 async function latinizeWord() {
   const ta = getFocusedTextarea();
-  if (!ta) { showToast('לחץ על מילה תחילה', 'error'); return; }
+  if (!ta) { showToast(t('toastClickWord'), 'error'); return; }
   const w = getWordAtCursor(ta);
-  if (!w) { showToast('אין מילה בסמן', 'error'); return; }
+  if (!w) { showToast(t('toastNoWord'), 'error'); return; }
   const btn = document.getElementById('btn-latin');
   if (btn) { btn.innerHTML = '<span class="spin"></span>'; btn.disabled = true; }
   try {
@@ -3868,24 +3868,24 @@ async function latinizeWord() {
     ta.setRangeText(result, w.start, w.end, 'end');
     ta.dispatchEvent(new Event('input'));
     commitTaChange(ta); pushUndo();
-    showToast('לטינזציה בוצעה!', 'success');
+    showToast(t('toastLatinDone'), 'success');
   } catch(e) {
-    showToast('שגיאה בהמרה', 'error');
+    showToast(t('toastLatinError'), 'error');
   } finally {
-    if (btn) { btn.innerHTML = '<span>Aa</span> לטינזציה'; btn.disabled = false; }
+    if (btn) { btn.innerHTML = `<span>Aa</span><span data-i18n="latin">${t('latin')}</span>`; btn.disabled = false; }
   }
 }
 
 function phoneticWord() {
   const ta = getFocusedTextarea();
-  if (!ta) { showToast('לחץ על מילה תחילה', 'error'); return; }
+  if (!ta) { showToast(t('toastClickWord'), 'error'); return; }
   const w = getWordAtCursor(ta);
-  if (!w) { showToast('אין מילה בסמן', 'error'); return; }
+  if (!w) { showToast(t('toastNoWord'), 'error'); return; }
   const result = applyPhonetic(w.text);
   ta.setRangeText(result, w.start, w.end, 'end');
   ta.dispatchEvent(new Event('input'));
   commitTaChange(ta); pushUndo();
-  showToast('Phonetic בוצע!', 'success');
+  showToast(t('toastPhoneticWordDone'), 'success');
 }
 
 // ════════════════════════════════════════════
@@ -3945,7 +3945,7 @@ function openFullPreview() {
     }
   });
 
-  document.getElementById('full-preview-body').innerHTML = html.trim() || '<span style="color:var(--txt2)">אין תוכן עדיין...</span>';
+  document.getElementById('full-preview-body').innerHTML = html.trim() || `<span style="color:var(--txt2)">${t('noContentYet')}</span>`;
   window._fullLyricsRaw = rawText.trim();
 
   const len = rawText.trim().length;
@@ -3963,7 +3963,7 @@ function closeFullPreview() {
 function copyFullPreview() {
   const text = window._fullLyricsRaw || '';
   navigator.clipboard.writeText(text).then(() => {
-    showToast('הטקסט המלא הועתק!', 'success');
+    showToast(t('toastFullCopied'), 'success');
     closeFullPreview();
   }).catch(() => {
     // Fallback
@@ -3974,7 +3974,7 @@ function copyFullPreview() {
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    showToast('הטקסט המלא הועתק!', 'success');
+    showToast(t('toastFullCopied'), 'success');
     closeFullPreview();
   });
 }
@@ -4011,7 +4011,7 @@ function copyOutput() {
     btn.textContent = 'COPIED!';
     btn.classList.add('ok');
     setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('ok'); }, 2000);
-    showToast('הועתק!', 'success');
+    showToast(t('toastCopied'), 'success');
   });
 }
 
@@ -4052,6 +4052,99 @@ const I18N = {
     moveDown: 'העבר למטה',
     stylePlaceholder: 'לחץ על שבבים לימין...',
     tagSearch: 'חיפוש תג...',
+    // Templates dropdown categories
+    tplCat1: '🎤 פופ ומיינסטרים',
+    tplCat2: '⚡ ריתמי ועוצמה',
+    tplCat3: '🎛️ אלקטרוני',
+    tplCat4: '🪘 ים-תיכוני ואתני',
+    tplCat5: '🎸 אורגני ואקוסטי',
+    tplCat6: '🎬 סינמטי',
+    tplMizrahi: 'מזרחי',
+    tplGreek: 'יווני / מדיטרני',
+    // Modals and buttons
+    closeBtn: 'סגור',
+    copyAll: 'העתק הכל',
+    cancel: 'ביטול',
+    addTagLib: 'הוסף תג חדש לספרייה',
+    tagNameLabel: 'שם התג',
+    libraryLabel: 'ספרייה',
+    categoryLabel: 'קטגוריה',
+    previewLabel: 'תצוגה מקדימה',
+    addTagBtn: 'הוסף תג',
+    newTagBtn: 'תג חדש',
+    importTitle: 'ייבוא שיר שלם',
+    importHelp1: 'הדבק שיר — אם יש תגיות [Verse 1] [Chorus] הוא יחולק אוטומטית.',
+    importHelp2: 'אחרת, סמן טקסט ולחץ על תג להוספת חלוקה ידנית.',
+    importAddTagLabel: 'הוסף תג מעל הטקסט הנבחר:',
+    importBtn: 'ייבוא שיר',
+    chooseSectionType: 'בחר סוג מקטע',
+    otherSection: 'אחר...',
+    // Sidebar
+    clearStylePrompt: 'נקה',
+    randomizeTitle: 'צור Style Prompt רנדומלי',
+    // Title tooltips
+    undoTitle: 'בטל (Ctrl+Z)',
+    redoTitle: 'שחזר (Ctrl+Y)',
+    globalDirTitle: 'שנה כיוון לכל התיבות',
+    importTitle2: 'ייבוא שיר שלם',
+    keyboardTitle: 'פתח/סגור מקלדת',
+    themeTitle: 'מצב בהיר/כהה',
+    adminTitle: 'ניהול משתמשים',
+    logoutTitle: 'יציאה',
+    nikudWordTitle: 'ניקוד המילה בסמן',
+    latinWordTitle: 'לטינזציה המילה בסמן',
+    phoneticWordTitle: 'פונטי המילה בסמן',
+    dragTitle: 'גרור לשינוי סדר',
+    addNewTagTitle: 'הוסף תג חדש',
+    // Placeholders
+    importPlaceholder: '[Verse 1]\nמילות הבית...\n\n[Chorus]\nמילות הפזמון...',
+    tagNamePlaceholder: 'למשל: Dreamy, Aggressive...',
+    lyricsPlaceholder: 'הקלד מילים...',
+    // Toast messages
+    toastNothingToUndo: 'אין מה לבטל',
+    toastUndone: 'בוטל ↩',
+    toastNothingToRedo: 'אין מה לשחזר',
+    toastRedone: 'שוחזר ↪',
+    toastSectionAdded: 'מקטע "${n}" נוסף',
+    toastEmptySection: 'המקטע ריק',
+    toastConverting: 'ממיר...',
+    toastNikudDone: 'ניקוד בוצע!',
+    toastNikudError: 'שגיאה בניקוד',
+    toastNikudFailed: 'ניקוד נכשל – בדוק חיבור',
+    toastLatinDone: 'לטינזציה בוצעה!',
+    toastLatinError: 'שגיאה בהמרה',
+    toastPhoneticDone: 'Phonetic respelling בוצע!',
+    toastPhoneticWordDone: 'Phonetic בוצע!',
+    toastNoText: 'אין תיבות עם טקסט',
+    toastNikudAll: 'ניקוד בוצע על ${n} תיבות!',
+    toastLatinAll: 'לטינזציה בוצעה על ${n} תיבות!',
+    toastPhoneticAll: 'Phonetic בוצע על ${n} תיבות!',
+    toastClickWord: 'לחץ על מילה תחילה',
+    toastNoWord: 'אין מילה בסמן',
+    toastClickBox: 'לחץ בתוך תיבת טקסט תחילה',
+    toastClickLyricsBox: 'לחץ בתוך תיבת מילים תחילה',
+    toastNoTextBox: 'אין טקסט ללטינזציה',
+    toastNoTextNikud: 'אין טקסט לניקוד',
+    toastNoTextPhonetic: 'אין טקסט להמרה',
+    toastCopied: 'הועתק!',
+    toastFullCopied: 'הטקסט המלא הועתק!',
+    toastRandomStyle: 'Style Prompt רנדומלי נוצר!',
+    toastTemplateLoaded: 'תבנית נטענה!',
+    toastAdded: 'נוסף: ${cmd}',
+    toastInserted: 'הוכנס: ${cmd}',
+    toastNoImportText: 'אין טקסט לייבוא',
+    toastNoSections: 'לא נמצאו מקטעים — ודא שהטקסט מכיל תוכן',
+    toastImportDone: '${n} מקטע/ים יובא/ו בהצלחה',
+    toastTagAdded: 'התג "${tag}" נוסף בהצלחה',
+    toastStyleInserted: 'Style Prompt הוכנס!',
+    toastNikudingProgress: 'מנקד...',
+    // Dynamic innerHTML
+    homographHeader: 'הומוגרף — ',
+    genderMale: 'זכר ♂',
+    genderFemale: 'נקבה ♀',
+    noContentYet: 'אין תוכן עדיין...',
+    loading: 'טוען...',
+    noUsers: 'אין משתמשים',
   },
   en: {
     songTitle: 'Song title...',
@@ -4077,6 +4170,99 @@ const I18N = {
     moveDown: 'Move down',
     stylePlaceholder: 'Click chips on the right...',
     tagSearch: 'Search tag...',
+    // Templates dropdown categories
+    tplCat1: '🎤 Pop & Mainstream',
+    tplCat2: '⚡ Rhythm & Power',
+    tplCat3: '🎛️ Electronic',
+    tplCat4: '🪘 Mediterranean & Ethnic',
+    tplCat5: '🎸 Organic & Acoustic',
+    tplCat6: '🎬 Cinematic',
+    tplMizrahi: 'Mizrahi',
+    tplGreek: 'Greek / Mediterranean',
+    // Modals and buttons
+    closeBtn: 'Close',
+    copyAll: 'Copy All',
+    cancel: 'Cancel',
+    addTagLib: 'Add New Tag to Library',
+    tagNameLabel: 'Tag Name',
+    libraryLabel: 'Library',
+    categoryLabel: 'Category',
+    previewLabel: 'Preview',
+    addTagBtn: 'Add Tag',
+    newTagBtn: 'New Tag',
+    importTitle: 'Import Full Song',
+    importHelp1: 'Paste song — if it has tags [Verse 1] [Chorus] it will split automatically.',
+    importHelp2: 'Otherwise, select text and click a tag to add sections manually.',
+    importAddTagLabel: 'Add tag above selected text:',
+    importBtn: 'Import Song',
+    chooseSectionType: 'Choose Section Type',
+    otherSection: 'Other...',
+    // Sidebar
+    clearStylePrompt: 'Clear',
+    randomizeTitle: 'Generate random Style Prompt',
+    // Title tooltips
+    undoTitle: 'Undo (Ctrl+Z)',
+    redoTitle: 'Redo (Ctrl+Y)',
+    globalDirTitle: 'Change direction for all boxes',
+    importTitle2: 'Import full song',
+    keyboardTitle: 'Open/close keyboard',
+    themeTitle: 'Light/dark mode',
+    adminTitle: 'Manage users',
+    logoutTitle: 'Logout',
+    nikudWordTitle: 'Nikud word at cursor',
+    latinWordTitle: 'Latinize word at cursor',
+    phoneticWordTitle: 'Phonetic word at cursor',
+    dragTitle: 'Drag to reorder',
+    addNewTagTitle: 'Add new tag',
+    // Placeholders
+    importPlaceholder: '[Verse 1]\nVerse lyrics...\n\n[Chorus]\nChorus lyrics...',
+    tagNamePlaceholder: 'E.g.: Dreamy, Aggressive...',
+    lyricsPlaceholder: 'Type lyrics...',
+    // Toast messages
+    toastNothingToUndo: 'Nothing to undo',
+    toastUndone: 'Undone ↩',
+    toastNothingToRedo: 'Nothing to redo',
+    toastRedone: 'Redone ↪',
+    toastSectionAdded: 'Section "${n}" added',
+    toastEmptySection: 'Section is empty',
+    toastConverting: 'Converting...',
+    toastNikudDone: 'Nikud done!',
+    toastNikudError: 'Nikud error',
+    toastNikudFailed: 'Nikud failed – check connection',
+    toastLatinDone: 'Latinization done!',
+    toastLatinError: 'Conversion error',
+    toastPhoneticDone: 'Phonetic respelling done!',
+    toastPhoneticWordDone: 'Phonetic done!',
+    toastNoText: 'No boxes with text',
+    toastNikudAll: 'Nikud done on ${n} boxes!',
+    toastLatinAll: 'Latinization done on ${n} boxes!',
+    toastPhoneticAll: 'Phonetic done on ${n} boxes!',
+    toastClickWord: 'Click on a word first',
+    toastNoWord: 'No word at cursor',
+    toastClickBox: 'Click in a text box first',
+    toastClickLyricsBox: 'Click in a lyrics box first',
+    toastNoTextBox: 'No text to latinize',
+    toastNoTextNikud: 'No text to nikud',
+    toastNoTextPhonetic: 'No text to convert',
+    toastCopied: 'Copied!',
+    toastFullCopied: 'Full text copied!',
+    toastRandomStyle: 'Random Style Prompt created!',
+    toastTemplateLoaded: 'Template loaded!',
+    toastAdded: 'Added: ${cmd}',
+    toastInserted: 'Inserted: ${cmd}',
+    toastNoImportText: 'No text to import',
+    toastNoSections: 'No sections found — ensure the text contains content',
+    toastImportDone: '${n} section(s) imported successfully',
+    toastTagAdded: 'Tag "${tag}" added successfully',
+    toastStyleInserted: 'Style Prompt inserted!',
+    toastNikudingProgress: 'Nikuding...',
+    // Dynamic innerHTML
+    homographHeader: 'Homograph — ',
+    genderMale: 'Male ♂',
+    genderFemale: 'Female ♀',
+    noContentYet: 'No content yet...',
+    loading: 'Loading...',
+    noUsers: 'No users',
   }
 };
 
@@ -4098,6 +4284,10 @@ function applyLang() {
   // Placeholders via data-i18n-ph
   document.querySelectorAll('[data-i18n-ph]').forEach(el => {
     el.placeholder = t(el.dataset.i18nPh);
+  });
+  // Title attributes via data-i18n-title
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    el.title = t(el.dataset.i18nTitle);
   });
   // Lang buttons active state
   document.getElementById('lang-he')?.classList.toggle('active', currentLang === 'he');
@@ -4218,7 +4408,7 @@ function randomizeStylePrompt() {
   const el = document.getElementById('style-prompt');
   el.value = tags.join(', ');
   updateStyleCounter();
-  showToast('Style Prompt רנדומלי נוצר!', 'success');
+  showToast(t('toastRandomStyle'), 'success');
 }
 
 const TEMPLATES = {
@@ -4462,7 +4652,7 @@ function loadTemplate(key) {
   renderSections();
   updateOutput();
   document.getElementById('tpl-dd').classList.remove('open');
-  showToast('תבנית נטענה!', 'success');
+  showToast(t('toastTemplateLoaded'), 'success');
 }
 
 // ════════════════════════════════════════════
@@ -4673,7 +4863,7 @@ function renderCommandPanel(tab) {
     el.dataset.cmdTab = tab;
     el.innerHTML = `
       <div class="cmd-group-hdr" onclick="toggleCmdGroup('${tab}',${gi})">
-        <span class="drag-handle" title="גרור לשינוי סדר"><span></span><span></span><span></span></span>
+        <span class="drag-handle" title="${t('dragTitle')}"><span></span><span></span><span></span></span>
         <span class="cmd-group-dot" style="background:${group.color}"></span>
         <span>${group.name}</span>
         <span class="cmd-group-chevron">›</span>
@@ -4880,19 +5070,19 @@ function addStyleCommand(cmd) {
   if (!cur.includes(cmd)) {
     ta.value = cur ? cur + ', ' + cmd : cmd;
     updateStyleCounter();
-    showToast(`נוסף: ${cmd}`, 'success');
+    showToast(t('toastAdded').replace('${cmd}', cmd), 'success');
   }
 }
 
 function insertCommandToLyrics(cmd) {
   const ta = getFocusedTextarea();
-  if (!ta) { showToast('לחץ בתוך תיבת מילים תחילה', 'error'); return; }
+  if (!ta) { showToast(t('toastClickLyricsBox'), 'error'); return; }
   const start = ta.selectionStart, end = ta.selectionEnd;
   ta.value = ta.value.substring(0, start) + cmd + ta.value.substring(end);
   ta.selectionStart = ta.selectionEnd = start + cmd.length;
   ta.focus();
   updateSectionText(parseInt(ta.id.replace('ta-', '')), ta.value);
-  showToast(`הוכנס: ${cmd}`, 'success');
+  showToast(t('toastInserted').replace('${cmd}', cmd), 'success');
 }
 
 function toggleTagLibCard() {
@@ -5060,11 +5250,11 @@ function parseImportedSong(text) {
 function doImport() {
   const ta = document.getElementById('import-ta');
   const text = ta.value.trim();
-  if (!text) { showToast('אין טקסט לייבוא', 'error'); return; }
+  if (!text) { showToast(t('toastNoImportText'), 'error'); return; }
 
   const parsed = parseImportedSong(text);
   if (parsed.length === 0) {
-    showToast('לא נמצאו מקטעים — ודא שהטקסט מכיל תוכן', 'error');
+    showToast(t('toastNoSections'), 'error');
     return;
   }
 
@@ -5078,7 +5268,7 @@ function doImport() {
   updateOutput();
   closeImportModal();
   ta.value = '';
-  showToast(`${parsed.length === 1 ? 'מקטע אחד יובא' : parsed.length + ' מקטעים יובאו'} בהצלחה`, 'success');
+  showToast(t('toastImportDone').replace('${n}', parsed.length), 'success');
 }
 
 // Live UI update while typing
@@ -5176,7 +5366,7 @@ function applyTheme(theme) {
   if (moonIcon) moonIcon.style.display = theme === 'light' ? 'none'  : '';
   if (sunIcon)  sunIcon.style.display  = theme === 'light' ? ''      : 'none';
   const btn = document.getElementById('btn-theme');
-  if (btn) btn.title = theme === 'light' ? 'מצב כהה' : 'מצב בהיר';
+  if (btn) btn.title = t('themeTitle');
 }
 
 // Apply saved theme immediately
@@ -5335,7 +5525,7 @@ function doAddTag() {
   }
 
   closeAddTagModal();
-  showToast(`התג "${rawTag}" נוסף בהצלחה`, 'success');
+  showToast(t('toastTagAdded').replace('${tag}', rawTag), 'success');
 }
 
 // ── Custom tag persistence ────────────────────────────────────
@@ -5384,7 +5574,7 @@ async function adminAPI(action, body) {
 
 async function loadAdminPanel() {
   const container = document.getElementById('adm-users');
-  container.innerHTML = '<div style="color:var(--txt2);font-size:13px;text-align:center;padding:20px;">טוען...</div>';
+  container.innerHTML = `<div style="color:var(--txt2);font-size:13px;text-align:center;padding:20px;">${t('loading')}</div>`;
   try {
     const [usersRes, regRes] = await Promise.all([
       adminAPI('users'),
@@ -5397,7 +5587,7 @@ async function loadAdminPanel() {
     }
     const users = usersRes.users;
     if (!users.length) {
-      container.innerHTML = '<div style="color:var(--txt2);font-size:13px;text-align:center;padding:16px;">אין משתמשים</div>';
+      container.innerHTML = `<div style="color:var(--txt2);font-size:13px;text-align:center;padding:16px;">${t('noUsers')}</div>`;
       return;
     }
     container.innerHTML = users.map(u => `
