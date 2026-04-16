@@ -581,6 +581,25 @@ body {
 .tbtn.add-line:hover { border-color: rgba(255,255,255,0.15); color: var(--txt1); background: rgba(255,255,255,0.05); }
 .tbtn.templates { position: relative; }
 
+/* ─── LANGUAGE TOGGLE ─── */
+.lang-pill {
+  display: flex; gap: 2px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 7px; padding: 2px; flex-shrink: 0;
+}
+.lang-btn {
+  background: none; border: none;
+  color: var(--txt2); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.8px; padding: 3px 7px;
+  border-radius: 5px; cursor: pointer; transition: all 0.15s;
+  font-family: inherit;
+}
+.lang-btn.active { background: var(--bg3); color: var(--txt0); }
+.lang-btn:hover:not(.active) { color: var(--txt1); }
+[data-theme="light"] .lang-pill { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .lang-btn.active { background: var(--bg3); }
+
 .templates-dd {
   display: none;
   position: absolute;
@@ -1979,18 +1998,18 @@ body {
       <span class="logo-name">MeloDraft</span>
     </div>
 
-    <input id="song-title" type="text" placeholder="שם השיר..." value="Untitled Song">
+    <input id="song-title" type="text" data-i18n-ph="songTitle" placeholder="שם השיר..." value="Untitled Song">
 
     <button class="tbtn undo-btn" id="btn-undo" onclick="undo()" title="בטל (Ctrl+Z)" disabled>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v6h6"/><path d="M3 13C5 8 9.5 5 15 5a9 9 0 0 1 0 18c-3.4 0-6.4-1.5-8.5-4"/></svg>
-      ביטול
+      <span data-i18n="undo">ביטול</span>
     </button>
     <button class="tbtn undo-btn" id="btn-redo" onclick="redo()" title="שחזר (Ctrl+Y)" disabled>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 7v6h-6"/><path d="M21 13c-2 5-6.5 8-12 8a9 9 0 0 1 0-18c3.4 0 6.4 1.5 8.5 4"/></svg>
     </button>
     <button class="tbtn add-line" onclick="openModal()">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-      + שורת תג
+      <span data-i18n="addTagLine">+ שורת תג</span>
     </button>
     <button class="tbtn" id="btn-global-dir" onclick="toggleAllDir()" title="שנה כיוון לכל התיבות">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10H7M21 6H7M21 14H7M21 18H7"/><polyline points="3 3 3 21"/></svg>
@@ -1998,12 +2017,12 @@ body {
     </button>
     <button class="tbtn" onclick="openImportModal()" title="ייבוא שיר שלם">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      ייבוא
+      <span data-i18n="import">ייבוא</span>
     </button>
     <div class="tbtn templates" id="tpl-wrap">
       <button style="background:none;border:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;" onclick="toggleTemplates()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        תבניות
+        <span data-i18n="templates">תבניות</span>
       </button>
       <div class="templates-dd" id="tpl-dd">
         <div class="tpl-sep">🎤 פופ ומיינסטרים</div>
@@ -2036,8 +2055,14 @@ body {
     <!-- Keyboard toggle (mobile/tablet) -->
     <button class="tbtn" id="btn-keyboard" onclick="toggleMobileKeyboard()" title="פתח/סגור מקלדת">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M8 17h8"/></svg>
-      מקלדת
+      <span data-i18n="keyboard">מקלדת</span>
     </button>
+
+    <!-- Language toggle -->
+    <div class="lang-pill">
+      <button class="lang-btn active" id="lang-he" onclick="setLang('he')">HEB</button>
+      <button class="lang-btn" id="lang-en" onclick="setLang('en')">ENG</button>
+    </div>
 
     <!-- Theme toggle -->
     <button class="tbtn" id="btn-theme" onclick="toggleTheme()" title="מצב בהיר/כהה" style="padding:6px 9px;">
@@ -2068,13 +2093,13 @@ body {
     </button>
     <div class="ttbar-pill">
       <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudWord()" title="ניקוד המילה בסמן">
-        <span>נ׳</span> ניקוד
+        <span>נ׳</span><span data-i18n="nikud"> ניקוד</span>
       </button>
       <button class="ttbtn tt-latin" id="btn-latin" onclick="latinizeWord()" title="לטינזציה המילה בסמן">
-        <span>Aa</span> לטינזציה
+        <span>Aa</span><span data-i18n="latin"> לטינזציה</span>
       </button>
       <button class="ttbtn tt-phonetic" id="btn-phonetic" onclick="phoneticWord()" title="פונטי המילה בסמן">
-        <span>/ˈ/</span> פונטי
+        <span>/ˈ/</span><span data-i18n="phonetic"> פונטי</span>
       </button>
     </div>
   </div>
@@ -2102,7 +2127,7 @@ body {
           </div>
         </div>
         <div class="sb-card-body" id="sb-body-style">
-          <textarea id="style-prompt" placeholder="לחץ על שבבים לימין..." oninput="updateStyleCounter()"></textarea>
+          <textarea id="style-prompt" data-i18n-ph="stylePlaceholder" placeholder="לחץ על שבבים לימין..." oninput="updateStyleCounter()"></textarea>
           <div class="style-footer">
             <div class="char-counter" id="style-counter">0 / 120</div>
             <button class="tbtn style-rand-btn" onclick="randomizeStylePrompt()" title="צור Style Prompt רנדומלי">🎲 Randomize</button>
@@ -2150,7 +2175,7 @@ body {
         </div>
         <div class="sb-card-body" id="sb-body-tags">
           <div class="tag-lib-search-wrap">
-            <input type="text" id="tag-search" placeholder="חיפוש תג..." oninput="filterTags(this.value)">
+            <input type="text" id="tag-search" data-i18n-ph="tagSearch" placeholder="חיפוש תג..." oninput="filterTags(this.value)">
           </div>
           <div class="categories" id="categories"></div>
         </div>
@@ -2647,12 +2672,12 @@ function renderSections() {
           <span class="x" onclick="removeSection(${sec.id})">×</span>
         </span>
         <div class="section-actions">
-          <button class="sact sec-nikud" onclick="nikudSection(${sec.id})" title="ניקוד המקטע">נ׳ ניקוד</button>
-          <button class="sact sec-latin" onclick="latinizeSection(${sec.id})" title="לטינזציה מדויקת">Aa לטין</button>
-          <button class="sact sec-phonetic" onclick="phoneticSection(${sec.id})" title="פונטי מהיר">/ˈ/ פונטי</button>
-          <button class="sact sec-dir" id="dir-btn-${sec.id}" onclick="toggleDir(${sec.id})" title="שנה כיוון טקסט">${(sec.dir||'rtl').toUpperCase()}</button>
-          <button class="sact" onclick="moveSectionUp(${sec.id})" title="העבר למעלה">↑</button>
-          <button class="sact" onclick="moveSectionDown(${sec.id})" title="העבר למטה">↓</button>
+          <button class="sact sec-nikud" onclick="nikudSection(${sec.id})" title="${t('nikudSection')}">נ׳ ${t('nikudShort')}</button>
+          <button class="sact sec-latin" onclick="latinizeSection(${sec.id})" title="${t('latinSection')}">Aa ${t('latinShort')}</button>
+          <button class="sact sec-phonetic" onclick="phoneticSection(${sec.id})" title="${t('phoneticSection')}">/ˈ/ ${t('phoneticShort')}</button>
+          <button class="sact sec-dir" id="dir-btn-${sec.id}" onclick="toggleDir(${sec.id})" title="${t('dirSection')}">${(sec.dir||'rtl').toUpperCase()}</button>
+          <button class="sact" onclick="moveSectionUp(${sec.id})" title="${t('moveUp')}">↑</button>
+          <button class="sact" onclick="moveSectionDown(${sec.id})" title="${t('moveDown')}">↓</button>
         </div>
       </div>
       <div class="lyrics-wrapper">
@@ -3895,7 +3920,7 @@ function updateOutput() {
 
   const lyricsLen = rawText.trim().length;
   const counter = document.getElementById('lyrics-counter');
-  counter.textContent = `${lyricsLen} / 3000 תווים`;
+  counter.textContent = `${lyricsLen} / 3000 ${t('charsUnit')}`;
   counter.className = 'lyrics-char-counter' + (lyricsLen > 3000 ? ' over' : lyricsLen > 2500 ? ' warn' : '');
 }
 
@@ -3925,7 +3950,7 @@ function openFullPreview() {
 
   const len = rawText.trim().length;
   const ctr = document.getElementById('fpm-counter');
-  ctr.textContent = `${len} / 3000 תווים`;
+  ctr.textContent = `${len} / 3000 ${t('charsUnit')}`;
   ctr.className = 'fpm-counter' + (len > 3000 ? ' over' : len > 2500 ? ' warn' : '');
 
   document.getElementById('full-preview-overlay').classList.add('open');
@@ -3996,6 +4021,102 @@ function copyOutput() {
 function toggleTemplates() {
   document.getElementById('tpl-dd').classList.toggle('open');
 }
+
+// ════════════════════════════════════════════
+//  I18N — HEB / ENG language toggle
+// ════════════════════════════════════════════
+let currentLang = localStorage.getItem('melodraft_lang') || 'he';
+
+const I18N = {
+  he: {
+    songTitle: 'שם השיר...',
+    undo: 'ביטול',
+    addTagLine: '+ שורת תג',
+    import: 'ייבוא',
+    templates: 'תבניות',
+    keyboard: 'מקלדת',
+    nikud: ' ניקוד',
+    latin: ' לטינזציה',
+    phonetic: ' פונטי',
+    nikudShort: 'ניקוד',
+    latinShort: 'לטין',
+    phoneticShort: 'פונטי',
+    charsUnit: 'תווים',
+    editorTab: 'עורך',
+    toolsTab: 'כלים',
+    nikudSection: 'ניקוד המקטע',
+    latinSection: 'לטינזציה מדויקת',
+    phoneticSection: 'פונטי מהיר',
+    dirSection: 'שנה כיוון טקסט',
+    moveUp: 'העבר למעלה',
+    moveDown: 'העבר למטה',
+    stylePlaceholder: 'לחץ על שבבים לימין...',
+    tagSearch: 'חיפוש תג...',
+  },
+  en: {
+    songTitle: 'Song title...',
+    undo: 'Undo',
+    addTagLine: '+ Tag row',
+    import: 'Import',
+    templates: 'Templates',
+    keyboard: 'Keyboard',
+    nikud: ' Niqqud',
+    latin: ' Latinize',
+    phonetic: ' Phonetic',
+    nikudShort: 'Niqqud',
+    latinShort: 'Latin',
+    phoneticShort: 'Phonetic',
+    charsUnit: 'chars',
+    editorTab: 'Editor',
+    toolsTab: 'Tools',
+    nikudSection: 'Niqqud section',
+    latinSection: 'Latinize section',
+    phoneticSection: 'Phonetic respell',
+    dirSection: 'Toggle text direction',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    stylePlaceholder: 'Click chips on the right...',
+    tagSearch: 'Search tag...',
+  }
+};
+
+function t(key) {
+  return I18N[currentLang]?.[key] ?? I18N['he']?.[key] ?? key;
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('melodraft_lang', lang);
+  applyLang();
+}
+
+function applyLang() {
+  // Static text via data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  // Placeholders via data-i18n-ph
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    el.placeholder = t(el.dataset.i18nPh);
+  });
+  // Lang buttons active state
+  document.getElementById('lang-he')?.classList.toggle('active', currentLang === 'he');
+  document.getElementById('lang-en')?.classList.toggle('active', currentLang === 'en');
+  // Re-render sections so section action buttons update
+  renderSections();
+  // Refresh counter text (uses t('charsUnit'))
+  updateOutput();
+}
+
+// Apply saved language on boot — deferred so renderSections/updateOutput exist
+document.addEventListener('DOMContentLoaded', () => {
+  if (currentLang !== 'he') applyLang();
+  else {
+    // Just sync lang button active state + placeholders
+    document.getElementById('lang-he')?.classList.add('active');
+    document.getElementById('lang-en')?.classList.remove('active');
+  }
+});
 
 // ════════════════════════════════════════════
 //  STYLE RANDOMIZER — coherent genre families
@@ -5437,11 +5558,11 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="mobile-nav">
   <button class="mnav-btn active" id="mnav-editor" onclick="mobileTab('editor')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-    עורך
+    <span data-i18n="editorTab">עורך</span>
   </button>
   <button class="mnav-btn" id="mnav-sidebar" onclick="mobileTab('sidebar')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-    כלים
+    <span data-i18n="toolsTab">כלים</span>
   </button>
 </div>
 </body>
