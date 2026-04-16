@@ -2050,25 +2050,24 @@ body {
 
   <!-- TEXT TOOLS BAR (below top-bar) -->
   <div id="status-bar">
-    <span class="ttbar-label">כל התיבות ▾</span>
-    <div class="ttbar-pill">
-      <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudAll()" title="ניקוד לכל התיבות (Ctrl+Shift+N)">
-        <span>נ׳</span> ניקוד
-      </button>
-      <button class="ttbtn tt-latin" id="btn-latin" onclick="latinizeAll()" title="לטינזציה לכל התיבות (Ctrl+Shift+L)">
-        <span>Aa</span> לטינזציה
-      </button>
-      <button class="ttbtn tt-phonetic" id="btn-phonetic" onclick="phoneticAll()" title="פונטי לכל התיבות">
-        <span>/ˈ/</span> פונטי
-      </button>
-    </div>
-    <div style="flex:1"></div>
     <div class="lyrics-char-counter" id="lyrics-counter">0 / 3000 תווים</div>
     <div id="full-lyrics-out" style="display:none"></div>
+    <div style="flex:1"></div>
     <button class="full-preview-btn" onclick="openFullPreview()">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12"/><circle cx="12" cy="12" r="3"/></svg>
       Full Preview ↗
     </button>
+    <div class="ttbar-pill">
+      <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudWord()" title="ניקוד המילה בסמן">
+        <span>נ׳</span> ניקוד
+      </button>
+      <button class="ttbtn tt-latin" id="btn-latin" onclick="latinizeWord()" title="לטינזציה המילה בסמן">
+        <span>Aa</span> לטינזציה
+      </button>
+      <button class="ttbtn tt-phonetic" id="btn-phonetic" onclick="phoneticWord()" title="פונטי המילה בסמן">
+        <span>/ˈ/</span> פונטי
+      </button>
+    </div>
   </div>
 
   <!-- Main row: section cards (left) + sidebar tools (right) -->
@@ -3773,6 +3772,83 @@ function getFocusedTextarea() {
   const active = document.activeElement;
   if (active && active.classList.contains('lyrics-ta')) return active;
   return lastFocusedTa;
+}
+
+// Returns {text, start, end} for the word under cursor, or the selection if one exists.
+// Matches Hebrew letters+nikud or Latin letters.
+function getWordAtCursor(ta) {
+  const text = ta.value;
+  const selStart = ta.selectionStart, selEnd = ta.selectionEnd;
+  if (selStart !== selEnd) return { text: text.substring(selStart, selEnd), start: selStart, end: selEnd };
+  // Expand outward from cursor
+  const isWordChar = ch => /[\u05D0-\u05EA\u05B0-\u05C7a-zA-Z\u2019']/.test(ch);
+  let start = selStart, end = selStart;
+  while (start > 0 && isWordChar(text[start - 1])) start--;
+  while (end < text.length && isWordChar(text[end])) end++;
+  if (start === end) return null;
+  return { text: text.substring(start, end), start, end };
+}
+
+// Helper: commit textarea change back to the section model
+function commitTaChange(ta) {
+  const id = parseInt(ta.id.replace('ta-', ''));
+  if (!isNaN(id)) updateSectionText(id, ta.value);
+}
+
+// ── Top-bar word-level tools ─────────────────────────────────────────
+async function nikudWord() {
+  const ta = getFocusedTextarea();
+  if (!ta) { showToast('לחץ על מילה תחילה', 'error'); return; }
+  const w = getWordAtCursor(ta);
+  if (!w) { showToast('אין מילה בסמן', 'error'); return; }
+  const btn = document.getElementById('btn-nikud');
+  if (btn) { btn.innerHTML = '<span class="spin"></span>'; btn.disabled = true; }
+  try {
+    const rawData = await callDictaNakdanRaw(w.text);
+    const nikudded = buildNikudText(rawData, null);
+    ta.setRangeText(nikudded, w.start, w.end, 'end');
+    ta.dispatchEvent(new Event('input'));
+    commitTaChange(ta); pushUndo();
+    showToast('ניקוד בוצע!', 'success');
+  } catch(e) {
+    showToast('שגיאה בניקוד', 'error');
+  } finally {
+    if (btn) { btn.innerHTML = '<span>נ׳</span> ניקוד'; btn.disabled = false; }
+  }
+}
+
+async function latinizeWord() {
+  const ta = getFocusedTextarea();
+  if (!ta) { showToast('לחץ על מילה תחילה', 'error'); return; }
+  const w = getWordAtCursor(ta);
+  if (!w) { showToast('אין מילה בסמן', 'error'); return; }
+  const btn = document.getElementById('btn-latin');
+  if (btn) { btn.innerHTML = '<span class="spin"></span>'; btn.disabled = true; }
+  try {
+    let source = w.text;
+    try { source = await callDictaNakdan(w.text); } catch(e) {}
+    const result = doLatinize(source);
+    ta.setRangeText(result, w.start, w.end, 'end');
+    ta.dispatchEvent(new Event('input'));
+    commitTaChange(ta); pushUndo();
+    showToast('לטינזציה בוצעה!', 'success');
+  } catch(e) {
+    showToast('שגיאה בהמרה', 'error');
+  } finally {
+    if (btn) { btn.innerHTML = '<span>Aa</span> לטינזציה'; btn.disabled = false; }
+  }
+}
+
+function phoneticWord() {
+  const ta = getFocusedTextarea();
+  if (!ta) { showToast('לחץ על מילה תחילה', 'error'); return; }
+  const w = getWordAtCursor(ta);
+  if (!w) { showToast('אין מילה בסמן', 'error'); return; }
+  const result = applyPhonetic(w.text);
+  ta.setRangeText(result, w.start, w.end, 'end');
+  ta.dispatchEvent(new Event('input'));
+  commitTaChange(ta); pushUndo();
+  showToast('Phonetic בוצע!', 'success');
 }
 
 // ════════════════════════════════════════════
