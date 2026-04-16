@@ -1095,15 +1095,24 @@ body {
   outline: none;
   font-family: inherit;
 }
+.style-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--border); padding: 3px 6px 3px 10px;
+}
 .char-counter {
-  padding: 4px 11px;
+  padding: 0;
   font-size: 14px;
   color: var(--txt2);
-  border-top: 1px solid var(--border);
   text-align: right;
+  border-top: none;
 }
 .char-counter.warn { color: var(--orange); }
 .char-counter.over { color: var(--red); }
+.style-rand-btn {
+  font-size: 11px; padding: 3px 8px; border-radius: 5px;
+  color: var(--purple); border-color: rgba(124,92,191,0.35);
+  background: rgba(124,92,191,0.07); cursor: pointer;
+}
 
 #full-lyrics-out {
   padding: 9px 11px;
@@ -2094,7 +2103,10 @@ body {
         </div>
         <div class="sb-card-body" id="sb-body-style">
           <textarea id="style-prompt" placeholder="לחץ על שבבים לימין..." oninput="updateStyleCounter()"></textarea>
-          <div class="char-counter" id="style-counter">0 / 120</div>
+          <div class="style-footer">
+            <div class="char-counter" id="style-counter">0 / 120</div>
+            <button class="tbtn style-rand-btn" onclick="randomizeStylePrompt()" title="צור Style Prompt רנדומלי">🎲 Randomize</button>
+          </div>
         </div>
       </div>
 
@@ -3983,6 +3995,109 @@ function copyOutput() {
 // ════════════════════════════════════════════
 function toggleTemplates() {
   document.getElementById('tpl-dd').classList.toggle('open');
+}
+
+// ════════════════════════════════════════════
+//  STYLE RANDOMIZER — coherent genre families
+// ════════════════════════════════════════════
+const RAND_FAMILIES = [
+  { // Electronic / Dance
+    genre:  ['Pop','Dance Pop','Synth-pop','EDM','Future Bass','Electropop'],
+    mood:   ['Upbeat','Catchy','Euphoric','Club vibe','High Energy','Bright'],
+    instr:  ['Synthesizer','Drum machine','Bass synth','Arpeggiator','Sidechain compression','Four-on-the-floor'],
+    vox:    ['Female vocals','Male vocals','Vocal harmonies','Vocoder','Falsetto'],
+    prod:   ['Polished production','Wide stereo','Big drop','Layered synths'],
+    bpm:    ['118 BPM','120 BPM','126 BPM','128 BPM','132 BPM']
+  },
+  { // Soul / Funk / R&B
+    genre:  ['R&B','Neo-Soul','Funk','Soul','Groove'],
+    mood:   ['Soulful','Groovy','Smooth','Passionate','Sensual','Warm'],
+    instr:  ['Rhodes piano','Slap bass','Wah guitar','Brass section','Clavinet','Gospel organ'],
+    vox:    ['Soulful female vocals','Melismatic vocals','Vocal runs','Male vocals','Background vocals'],
+    prod:   ['Warm analog mix','Vintage feel','Tight groove','Live feel'],
+    bpm:    ['75 BPM','85 BPM','92 BPM','100 BPM','102 BPM']
+  },
+  { // Hip-Hop / Urban
+    genre:  ['Hip-Hop','Trap','Boom-bap','Drill','Dark Hip-Hop'],
+    mood:   ['Dark','Gritty','Street vibe','Aggressive','Confident','Raw'],
+    instr:  ['808 bass','Rapid Hi-Hats','Snare crack','Synth pad','Sample chops','Sub bass'],
+    vox:    ['Rap vocals','Male vocals','Vocal ad-libs','Auto-tune hook'],
+    prod:   ['Hard-hitting','Heavy bass','Lo-fi texture','Sparse beat'],
+    bpm:    ['85 BPM','90 BPM','92 BPM','130 BPM','140 BPM']
+  },
+  { // Rock / Metal
+    genre:  ['Rock','Alternative Rock','Hard Rock','Indie Rock','Blues Rock'],
+    mood:   ['Energetic','Powerful','Raw','Gritty','Intense','Rebellious'],
+    instr:  ['Electric guitar','Distorted guitar','Bass guitar','Live drums','Power chords','Guitar riff'],
+    vox:    ['Male vocals','Raspy vocals','Powerful vocals','Female vocals','Screaming'],
+    prod:   ['Raw production','Live sound','Wall of sound','Gritty mix'],
+    bpm:    ['100 BPM','120 BPM','135 BPM','140 BPM','160 BPM']
+  },
+  { // Organic / Acoustic
+    genre:  ['Folk','Acoustic','Singer-songwriter','Indie Folk','Country','Bluegrass'],
+    mood:   ['Warm','Intimate','Nostalgic','Storytelling','Heartfelt','Natural'],
+    instr:  ['Acoustic guitar','Fingerpicking','Harmonica','Upright bass','Banjo','Light percussion'],
+    vox:    ['Warm male vocals','Intimate female vocals','Breathy','Gentle harmonies'],
+    prod:   ['Natural sound','Lo-fi texture','Sparse','Minimal production'],
+    bpm:    ['70 BPM','80 BPM','85 BPM','90 BPM','100 BPM']
+  },
+  { // Jazz / Blues
+    genre:  ['Jazz','Swing','Bossa Nova','Blues','Smooth Jazz','Jazz Fusion'],
+    mood:   ['Sophisticated','Smooth','Laid-back','Intimate','Playful','Melancholic'],
+    instr:  ['Jazz piano','Double bass','Saxophone','Trumpet','Brushed drums','Muted trumpet'],
+    vox:    ['Jazz vocals','Scatting','Breathy female vocals','Male vocals'],
+    prod:   ['Live sound','Warm mix','Natural reverb','Acoustic space'],
+    bpm:    ['80 BPM','100 BPM','120 BPM','140 BPM','160 BPM']
+  },
+  { // Cinematic / Orchestral
+    genre:  ['Cinematic','Epic Orchestral','Film Score','Ambient','Neoclassical'],
+    mood:   ['Epic','Dramatic','Emotional','Triumphant','Mysterious','Haunting'],
+    instr:  ['String section','Brass section','Choir','Timpani','Grand piano','Synth pads'],
+    vox:    ['No vocals','Soprano soloist','Choir','Wordless vocals'],
+    prod:   ['Lush reverb','Big dynamics','Layered','Cinematic sound'],
+    bpm:    ['60 BPM','70 BPM','78 BPM','85 BPM','90 BPM']
+  },
+  { // Mediterranean / Ethnic
+    genre:  ['Mizrahi','Mediterranean Pop','Greek','Middle Eastern','Arabic Pop'],
+    mood:   ['Emotional','Passionate','Festive','Nostalgic','Sensual','Soulful'],
+    instr:  ['Oud','Darbuka','Buzuq','Violin','Ethnic strings','Qanun'],
+    vox:    ['Soulful male vocals','Melismatic','Emotional female vocals','Maqam singing'],
+    prod:   ['Ethnic fusion','Live ensemble','Natural reverb'],
+    bpm:    ['90 BPM','100 BPM','108 BPM','118 BPM','120 BPM']
+  },
+  { // Lo-Fi / Chill
+    genre:  ['Lo-Fi Hip-Hop','Chillhop','Downtempo','Ambient','Study beats'],
+    mood:   ['Chill','Relaxed','Dreamy','Nostalgic','Mellow','Hazy'],
+    instr:  ['Rhodes piano','Vinyl crackle','Lazy drums','Jazz chords','Warm bass','Muted guitar'],
+    vox:    ['No vocals','Distant vocals','Whispered','Vocal samples'],
+    prod:   ['Lo-fi texture','Tape saturation','Warm mix','Dusty sound'],
+    bpm:    ['65 BPM','70 BPM','75 BPM','80 BPM','85 BPM']
+  },
+  { // Ballad / Emotional
+    genre:  ['Ballad','Power Ballad','Emotional Pop','Piano Ballad','Soft Rock'],
+    mood:   ['Emotional','Heartfelt','Melancholic','Uplifting','Vulnerable','Romantic'],
+    instr:  ['Grand piano','String quartet','Cello','Acoustic guitar','Soft drums'],
+    vox:    ['Powerful female vocals','Soulful male vocals','Falsetto','Intimate','Breathy'],
+    prod:   ['Slow build','Lush reverb','Dynamic range','Cinematic swell'],
+    bpm:    ['60 BPM','66 BPM','72 BPM','78 BPM','85 BPM']
+  }
+];
+
+function randomizeStylePrompt() {
+  const pick = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+  const fam = RAND_FAMILIES[Math.floor(Math.random() * RAND_FAMILIES.length)];
+  const tags = [
+    ...pick(fam.genre,  1),
+    ...pick(fam.mood,   2),
+    ...pick(fam.instr,  2),
+    ...pick(fam.vox,    1),
+    ...pick(fam.prod,   1),
+    ...pick(fam.bpm,    1)
+  ].filter(Boolean);
+  const el = document.getElementById('style-prompt');
+  el.value = tags.join(', ');
+  updateStyleCounter();
+  showToast('Style Prompt רנדומלי נוצר!', 'success');
 }
 
 const TEMPLATES = {
