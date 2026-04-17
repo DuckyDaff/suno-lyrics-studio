@@ -3936,9 +3936,20 @@ function insertNikudMark(mark) {
   if (!ta) { showToast(t('toastClickWord'), 'error'); return; }
 
   const pos = ta.selectionStart;
-  // setRangeText inserts without touching scroll position or causing layout jumps
-  ta.setRangeText(mark, pos, pos, 'end');
-  // Trigger the existing oninput pipeline (updateSectionText + autoResizeTa)
+  const val = ta.value;
+  const nikudRe = /[\u05B0-\u05C7]/;
+
+  // If a nikud mark sits immediately before the cursor (just inserted, or cursor placed after one),
+  // replace it instead of stacking another mark on the same letter.
+  if (pos > 0 && nikudRe.test(val[pos - 1])) {
+    ta.setRangeText(mark, pos - 1, pos, 'end');
+  // If a nikud mark sits immediately after the cursor, replace it.
+  } else if (pos < val.length && nikudRe.test(val[pos])) {
+    ta.setRangeText(mark, pos, pos + 1, 'end');
+  // No adjacent nikud — plain insert.
+  } else {
+    ta.setRangeText(mark, pos, pos, 'end');
+  }
   ta.dispatchEvent(new Event('input'));
 }
 
