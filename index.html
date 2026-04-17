@@ -4609,7 +4609,133 @@ document.addEventListener('DOMContentLoaded', () => {
 //  STUDIO REGION — library + logic
 // ════════════════════════════════════════════
 const STUDIO_LIBRARY = [
-  { name: 'Percussion', color: '#e05050', open: true, chips: [
+
+  // ── ROLES & FUNCTIONS ────────────────────────────────
+  { name: '🎯 Lead & Melody', color: '#00d4ff', open: true, chips: [
+    'Lead synth melody line',
+    'Lead guitar solo line',
+    'Lead piano melody',
+    'Lead violin melody',
+    'Lead trumpet melody',
+    'Lead flute melody',
+    'Solo saxophone lead',
+    'Lead cello melodic line',
+    'Lead acoustic guitar melody',
+    'Lead vocal melody hook'
+  ]},
+  { name: '🎹 Accompaniment', color: '#b66dff', open: false, chips: [
+    'Synth chord accompaniment',
+    'Guitar rhythm chord backing',
+    'Piano chord accompaniment',
+    'String pad accompaniment',
+    'Organ backing chords',
+    'Rhodes comping chords',
+    'Acoustic guitar strummed backing',
+    'Ukulele chord accompaniment',
+    'Harp arpeggio backing',
+    'Choir vocal harmony backing',
+    'Keyboard sustained chord layer',
+    'Warm string ensemble backing'
+  ]},
+  { name: '🔊 Pad & Atmosphere', color: '#5bc4c4', open: false, chips: [
+    'Warm synth pad swell',
+    'String section sustained pad',
+    'Choir aah atmosphere pad',
+    'Organ sustained chord pad',
+    'Ambient background wash',
+    'Brass section sustained layer',
+    'Vocal ooh pad layer',
+    'Piano sustain pedal wash',
+    'Woodwind sustained breath texture',
+    'Electronic ambient drone layer'
+  ]},
+  { name: '🎸 Bass Line', color: '#1aad7a', open: false, chips: [
+    'Synth bass groove line',
+    'Electric bass walking line',
+    'Piano left-hand bass notes',
+    '808 sub bass pulse',
+    'Fretless bass smooth line',
+    'Slap bass funk groove',
+    'Double bass pizzicato pulse',
+    'Bass guitar root note groove',
+    'Tuba low brass bass line',
+    'Acoustic bass steady line'
+  ]},
+  { name: '🥁 Rhythm & Groove', color: '#e8922a', open: false, chips: [
+    'Guitar syncopated rhythm stabs',
+    'Piano comping rhythm pattern',
+    'Synth arpeggiated rhythm loop',
+    'Brass punchy rhythm hits',
+    'String pizzicato rhythm',
+    'Muted guitar funk groove stabs',
+    'Keyboard staccato rhythm stabs',
+    'Marimba rhythmic pulse pattern',
+    'Clavi rhythmic chops',
+    'Brass short note rhythm hits'
+  ]},
+  { name: '🎵 Counter-Melody', color: '#ff9f43', open: false, chips: [
+    'Violin counter-melody line',
+    'Flute counter-melody phrase',
+    'Synth counter-melody line',
+    'Guitar melodic response phrase',
+    'Brass horn counter-phrase',
+    'Cello counter-melody below vocals',
+    'Oboe winding counter-line',
+    'Trumpet counter-melody riff',
+    'Vocal harmony counter-line',
+    'Piano right-hand counter-phrase'
+  ]},
+  { name: '✨ Fills & Accents', color: '#e05050', open: false, chips: [
+    'Short guitar lick fill',
+    'Piano run ascending fill',
+    'Brass accent stab hit',
+    'Synth sharp accent hit',
+    'Drum fill burst break',
+    'String pizzicato accent hit',
+    'Crash cymbal accent moment',
+    'Bass guitar accent pop note',
+    'Woodwind trill fill',
+    'Xylophone sparkle accent'
+  ]},
+  { name: '🔁 Ostinato & Riff', color: '#28c4af', open: false, chips: [
+    'Piano ostinato repeating figure',
+    'Guitar repeating riff loop',
+    'Synth melodic hook riff',
+    'String ostinato pulse figure',
+    'Bass guitar riff groove loop',
+    'Brass fanfare repeating riff',
+    'Marimba ostinato loop',
+    'Vocal hook riff pattern',
+    'Keyboard repeating arpeggio figure',
+    'Syncopated rhythmic ostinato'
+  ]},
+  { name: '⬆️ Buildup & Transition', color: '#ff6b9d', open: false, chips: [
+    'Synth sweep rise into drop',
+    'Drum roll transition fill',
+    'String crescendo build to peak',
+    'Bass impact note drop',
+    'Filter sweep rise buildup',
+    'Reverse cymbal swell into beat',
+    'Brass fanfare transition hit',
+    'Piano glissando sweep transition',
+    'Choir crescendo swell',
+    'Rising tension to sudden release'
+  ]},
+  { name: '🎤 Doubles & Support', color: '#54a0ff', open: false, chips: [
+    'Doubles lead vocal melody',
+    'Guitar doubles bass line',
+    'Synth doubles piano melody',
+    'Violin doubles vocal melody line',
+    'Low strings double bass line',
+    'Brass doubles guitar riff',
+    'Octave higher melody doubling',
+    'Octave lower melody doubling',
+    'Harmony a third above vocals',
+    'Harmony a fifth above melody'
+  ]},
+
+  // ── SOUNDS & TEXTURES ────────────────────────────────
+  { name: 'Percussion', color: '#e05050', open: false, chips: [
     'Bright crash cymbal hit', 'Shimmering ride cymbal',
     'Driving snare pattern', 'Sparse brushed snare',
     'Heavy kick drum punch', 'Soft muted kick',
