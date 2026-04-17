@@ -3937,8 +3937,7 @@ function insertNikudMark(mark) {
   const val = ta.value;
   const nikudRe = /[\u05B0-\u05C7]/;
 
-  // If a nikud mark sits immediately before the cursor (just inserted, or cursor placed after one),
-  // replace it instead of stacking another mark on the same letter.
+  // If a nikud mark sits immediately before the cursor, replace it instead of stacking.
   if (pos > 0 && nikudRe.test(val[pos - 1])) {
     ta.setRangeText(mark, pos - 1, pos, 'end');
   // If a nikud mark sits immediately after the cursor, replace it.
@@ -3948,7 +3947,10 @@ function insertNikudMark(mark) {
   } else {
     ta.setRangeText(mark, pos, pos, 'end');
   }
-  ta.dispatchEvent(new Event('input'));
+  // Use commitTaChange directly — NOT dispatchEvent('input').
+  // dispatchEvent triggers oninput → autoResizeTa → height:auto → layout jump → selection breaks.
+  // Nikud marks are zero-width combining chars; no height change is needed.
+  commitTaChange(ta);
 }
 
 function deleteNikudAtCursor() {
@@ -3960,10 +3962,10 @@ function deleteNikudAtCursor() {
   const nikudRe = /[\u05B0-\u05C7]/;
   if (pos > 0 && nikudRe.test(val[pos - 1])) {
     ta.setRangeText('', pos - 1, pos, 'end');
-    ta.dispatchEvent(new Event('input'));
+    commitTaChange(ta);
   } else if (pos < val.length && nikudRe.test(val[pos])) {
     ta.setRangeText('', pos, pos + 1, 'start');
-    ta.dispatchEvent(new Event('input'));
+    commitTaChange(ta);
   }
 }
 
