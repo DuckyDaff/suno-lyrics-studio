@@ -3297,7 +3297,7 @@ async function nikudSelected() {
 
     // Apply nikud to textarea (programmatic — no 'input' event)
     if (hasSelection) {
-      ta.setRangeText(nikudded, start, end, 'select');
+      ta.setRangeText(nikudded, start, end, 'end');
     } else {
       ta.value = nikudded;
     }
