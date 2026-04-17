@@ -1383,6 +1383,76 @@ body {
 /* ─── SELECTION highlight ─── */
 ::selection { background: rgba(74,158,255,.25); }
 
+/* ─── NIKUD KEYBOARD PANEL ─── */
+#nikud-kbd-panel {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  direction: rtl;
+  user-select: none;
+}
+.nkp-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: nowrap;
+}
+.nkp-sep {
+  width: 1px;
+  height: 28px;
+  background: var(--border2);
+  flex-shrink: 0;
+}
+.nkp-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 36px;
+  padding: 3px 5px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  cursor: pointer;
+  transition: all .12s;
+  color: var(--txt0);
+  font-family: 'David Libre','Frank Ruehl CLM','Noto Serif Hebrew',serif;
+}
+.nkp-btn:hover { background: var(--bg4); border-color: var(--cyan); color: var(--cyan); }
+.nkp-btn:active { transform: scale(.94); }
+.nkp-glyph {
+  font-size: 18px;
+  line-height: 1.3;
+  direction: rtl;
+}
+.nkp-name {
+  font-size: 9px;
+  font-family: inherit;
+  color: var(--txt2);
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  font-family: 'JetBrains Mono','Consolas',monospace;
+}
+.nkp-btn:hover .nkp-name { color: var(--cyan); }
+.nkp-btn.nkp-del { color: var(--red); border-color: rgba(201,64,64,0.2); background: rgba(201,64,64,0.05); }
+.nkp-btn.nkp-del:hover { background: rgba(201,64,64,0.12); border-color: var(--red); }
+.nkp-hint {
+  font-size: 11px;
+  color: var(--txt2);
+  margin-right: auto;
+  padding: 0 4px;
+  font-family: inherit;
+}
+.ttbtn.active { background: rgba(0,212,255,0.12); color: var(--cyan); border-color: rgba(0,212,255,0.3); }
+[data-theme="light"] .nkp-btn { background: #fff; border-color: rgba(0,0,0,0.12); }
+[data-theme="light"] .nkp-btn:hover { background: var(--cyan-bg); }
+
 /* ─── COMMANDS PANEL — TABS ─── */
 .cmd-tabs {
   display: flex;
@@ -2092,6 +2162,9 @@ body {
       Full Preview ↗
     </button>
     <div class="ttbar-pill">
+      <button class="ttbtn tt-nikud-kbd" id="btn-nikud-kbd" onclick="toggleNikudKbd()" title="מקלדת ניקוד" data-i18n-title="nikudKbdTitle">
+        <span>⌨</span><span data-i18n="nikudKbd"> מקלדת</span>
+      </button>
       <button class="ttbtn tt-nikud" id="btn-nikud" onclick="nikudWord()" title="ניקוד המילה בסמן" data-i18n-title="nikudWordTitle">
         <span>נ׳</span><span data-i18n="nikud"> ניקוד</span>
       </button>
@@ -2102,6 +2175,37 @@ body {
         <span>/ˈ/</span><span data-i18n="phonetic"> פונטי</span>
       </button>
     </div>
+  </div>
+
+  <!-- NIKUD KEYBOARD PANEL -->
+  <div id="nikud-kbd-panel" onmousedown="event.preventDefault()">
+    <div class="nkp-group">
+      <!-- Vowels -->
+      <button class="nkp-btn" onclick="insertNikudMark('\u05B0')" title="שווא"><span class="nkp-glyph">וְ</span><span class="nkp-name">שווא</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05B1')" title="חטף-סגול"><span class="nkp-glyph">וֱ</span><span class="nkp-name">ח.סגול</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05B2')" title="חטף-פתח"><span class="nkp-glyph">וֲ</span><span class="nkp-name">ח.פתח</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05B3')" title="חטף-קמץ"><span class="nkp-glyph">וֳ</span><span class="nkp-name">ח.קמץ</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05B4')" title="חיריק"><span class="nkp-glyph">וִ</span><span class="nkp-name">חיריק</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05B5')" title="צרי"><span class="nkp-glyph">וֵ</span><span class="nkp-name">צרי</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05B6')" title="סגול"><span class="nkp-glyph">וֶ</span><span class="nkp-name">סגול</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05B7')" title="פתח"><span class="nkp-glyph">וַ</span><span class="nkp-name">פתח</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05B8')" title="קמץ"><span class="nkp-glyph">וָ</span><span class="nkp-name">קמץ</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05B9')" title="חולם"><span class="nkp-glyph">וֹ</span><span class="nkp-name">חולם</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05BB')" title="קיבוץ"><span class="nkp-glyph">וֻ</span><span class="nkp-name">קיבוץ</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05BC')" title="שורוק / דגש"><span class="nkp-glyph">וּ</span><span class="nkp-name">שורוק</span></button>
+    </div>
+    <div class="nkp-sep"></div>
+    <div class="nkp-group">
+      <button class="nkp-btn" onclick="insertNikudMark('\u05BC')" title="דגש"><span class="nkp-glyph">בּ</span><span class="nkp-name">דגש</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05C1')" title="שין-ימין"><span class="nkp-glyph">שׁ</span><span class="nkp-name">שין ימין</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05C2')" title="שין-שמאל"><span class="nkp-glyph">שׂ</span><span class="nkp-name">שין שמאל</span></button>
+      <button class="nkp-btn" onclick="insertNikudMark('\u05BD')" title="מטג"><span class="nkp-glyph">אֽ</span><span class="nkp-name">מטג</span></button>
+    </div>
+    <div class="nkp-sep"></div>
+    <div class="nkp-group">
+      <button class="nkp-btn nkp-del" onclick="deleteNikudAtCursor()" title="מחק ניקוד"><span class="nkp-glyph">×</span><span class="nkp-name">מחק</span></button>
+    </div>
+    <span class="nkp-hint" data-i18n="nikudKbdHint">לחץ על אות בתיבה ואז בחר ניקוד</span>
   </div>
 
   <!-- Main row: section cards (left) + sidebar tools (right) -->
@@ -3800,15 +3904,74 @@ function phoneticAll() {
 //  HELPER: focused textarea
 // ════════════════════════════════════════════
 let lastFocusedTa = null;
+let lastCursorPos = 0;
 
 document.addEventListener('focusin', e => {
   if (e.target.classList.contains('lyrics-ta')) lastFocusedTa = e.target;
+});
+document.addEventListener('selectionchange', () => {
+  const active = document.activeElement;
+  if (active && active.classList.contains('lyrics-ta')) lastCursorPos = active.selectionStart;
 });
 
 function getFocusedTextarea() {
   const active = document.activeElement;
   if (active && active.classList.contains('lyrics-ta')) return active;
   return lastFocusedTa;
+}
+
+// ════════════════════════════════════════════
+//  NIKUD KEYBOARD
+// ════════════════════════════════════════════
+let nikudKbdActive = false;
+
+function toggleNikudKbd() {
+  nikudKbdActive = !nikudKbdActive;
+  const panel = document.getElementById('nikud-kbd-panel');
+  const btn   = document.getElementById('btn-nikud-kbd');
+  panel.style.display = nikudKbdActive ? 'flex' : 'none';
+  btn.classList.toggle('active', nikudKbdActive);
+}
+
+function insertNikudMark(mark) {
+  // Prefer the actively focused textarea; fall back to last focused
+  let ta = (document.activeElement && document.activeElement.classList.contains('lyrics-ta'))
+    ? document.activeElement : lastFocusedTa;
+  if (!ta) { showToast(t('toastClickWord'), 'error'); return; }
+
+  // Use selectionStart if textarea is focused, otherwise last saved cursor position
+  const pos = (document.activeElement === ta) ? ta.selectionStart : lastCursorPos;
+  const val = ta.value;
+  ta.value = val.slice(0, pos) + mark + val.slice(pos);
+  const newPos = pos + mark.length;
+  ta.focus();
+  ta.setSelectionRange(newPos, newPos);
+  lastCursorPos = newPos;
+  commitTaChange(ta);
+}
+
+function deleteNikudAtCursor() {
+  let ta = (document.activeElement && document.activeElement.classList.contains('lyrics-ta'))
+    ? document.activeElement : lastFocusedTa;
+  if (!ta) return;
+  const pos = (document.activeElement === ta) ? ta.selectionStart : lastCursorPos;
+  const val = ta.value;
+  // Look for nikud mark before cursor (or after cursor)
+  const nikudRe = /[\u05B0-\u05C7]/;
+  let deleted = false;
+  if (pos > 0 && nikudRe.test(val[pos - 1])) {
+    ta.value = val.slice(0, pos - 1) + val.slice(pos);
+    const newPos = pos - 1;
+    ta.focus(); ta.setSelectionRange(newPos, newPos);
+    lastCursorPos = newPos;
+    deleted = true;
+  } else if (pos < val.length && nikudRe.test(val[pos])) {
+    ta.value = val.slice(0, pos) + val.slice(pos + 1);
+    ta.focus(); ta.setSelectionRange(pos, pos);
+    lastCursorPos = pos;
+    deleted = true;
+  }
+  if (deleted) commitTaChange(ta);
 }
 
 // Returns {text, start, end} for the word under cursor, or the selection if one exists.
@@ -4091,6 +4254,9 @@ const I18N = {
     themeTitle: 'מצב בהיר/כהה',
     adminTitle: 'ניהול משתמשים',
     logoutTitle: 'יציאה',
+    nikudKbd: ' מקלדת',
+    nikudKbdTitle: 'מקלדת ניקוד',
+    nikudKbdHint: 'לחץ על אות בתיבה ואז בחר ניקוד',
     nikudWordTitle: 'ניקוד המילה בסמן',
     latinWordTitle: 'לטינזציה המילה בסמן',
     phoneticWordTitle: 'פונטי המילה בסמן',
@@ -4209,6 +4375,9 @@ const I18N = {
     themeTitle: 'Light/dark mode',
     adminTitle: 'Manage users',
     logoutTitle: 'Logout',
+    nikudKbd: ' Keyboard',
+    nikudKbdTitle: 'Nikud keyboard',
+    nikudKbdHint: 'Click a letter in the box then choose a vowel',
     nikudWordTitle: 'Nikud word at cursor',
     latinWordTitle: 'Latinize word at cursor',
     phoneticWordTitle: 'Phonetic word at cursor',
