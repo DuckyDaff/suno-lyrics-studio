@@ -2400,7 +2400,7 @@ body {
 // ════════════════════════════════════════════
 const TAG_LIBRARY = [
   {
-    name: 'מבנה', en: 'Structure', color: '#4a9eff',
+    name: 'Structure', en: 'Structure', color: '#4a9eff',
     tags: ['Intro','Inst. Intro','Spoken Intro','Verse','Verse 1','Verse 2','Verse 3',
            'Rap Verse','Pre-Chorus','Chorus','Power Chorus','Final Chorus',
            'Post-Chorus','Hook','Catchy Hook','Inst. Hook','Refrain','Bridge',
@@ -2409,7 +2409,7 @@ const TAG_LIBRARY = [
            'Coda','A Cappella','Anthem','Overture','Ad-libs','Freestyle']
   },
   {
-    name: 'פקודות', en: 'Commands', color: '#ff5c5c',
+    name: 'Commands', en: 'Commands', color: '#ff5c5c',
     tags: ['[BPM: 80]','[BPM: 100]','[BPM: 120]','[BPM: 140]','[BPM: 160]',
            '[Key: C Major]','[Key: A Minor]','[Key: D Minor]','[Key: G Major]',
            '[Time: 4/4]','[Time: 3/4]','[Time: 6/8]',
@@ -2417,7 +2417,7 @@ const TAG_LIBRARY = [
            '[Repeat x3]','[spoken]','[whispered]','[shouted]']
   },
   {
-    name: 'שירה', en: 'Vocals', color: '#b66dff',
+    name: 'Vocals', en: 'Vocals', color: '#b66dff',
     tags: ['Male vocals','Female vocals','Male singer','Female singer',
            'Duet','Mixed duet','Choir','Harmony','Falsetto','Tenor',
            'Bass voice','Soprano','Mezzo-soprano','Whisper vocals',
@@ -2425,7 +2425,7 @@ const TAG_LIBRARY = [
            'Country twang','Soulful','Gospel vocals','Ad-libs']
   },
   {
-    name: 'מצב רוח', en: 'Mood', color: '#ff9f43',
+    name: 'Mood', en: 'Mood', color: '#ff9f43',
     tags: ['Energetic','Melancholic','Uplifting','Dark','Happy','Sad',
            'Romantic','Aggressive','Peaceful','Nostalgic','Haunting',
            'Dreamy','Mysterious','Epic','Emotional','Playful','Intense',
@@ -2433,7 +2433,7 @@ const TAG_LIBRARY = [
            'Bittersweet','Sensual','Rebellious','Yearning']
   },
   {
-    name: 'כלי נגינה', en: 'Instruments', color: '#1dd1a1',
+    name: 'Instruments', en: 'Instruments', color: '#1dd1a1',
     tags: ['Acoustic guitar','Electric guitar','Bass guitar','Clean guitar',
            'Distorted guitar','Piano','Grand piano','Rhodes piano','Keyboard',
            'Synthesizer','Drums','Drum machine','808 bass','Hi-hats','Snare',
@@ -2442,7 +2442,7 @@ const TAG_LIBRARY = [
            'Bassoon','Choir pads','Synth pad','Arpeggiated synth']
   },
   {
-    name: 'ים תיכוני / מזרחי', en: 'Mediterranean', color: '#ffd060',
+    name: 'Mediterranean', en: 'Mediterranean', color: '#ffd060',
     tags: ['Oud','Darbuka','Qanun','Ney','Tabla','Saz','Buzuq','Riq',
            'Middle Eastern','Oriental','Israeli folk','Mizrahi',
            'Arabic scales','Maqam Hijaz','Maqam Rast','Maqam Bayat',
@@ -2450,7 +2450,7 @@ const TAG_LIBRARY = [
            'Flamenco','Greek folk','Belly dance beat','Debka']
   },
   {
-    name: 'פרודקשן / FX', en: 'Production', color: '#ff6b9d',
+    name: 'Production / FX', en: 'Production', color: '#ff6b9d',
     tags: ['Reverb','Heavy reverb','Echo','Delay','Distortion','Overdrive',
            'Lo-fi','Hi-fi','Studio quality','Live feel','Vinyl crackle',
            'Auto-tune','Vocal harmony','Pitch shift','Bass boost','Sub bass',
@@ -2458,14 +2458,14 @@ const TAG_LIBRARY = [
            'Glitchy','Ambient wash','Compression','Tape saturation']
   },
   {
-    name: 'סימון קצב', en: 'Notation', color: '#54a0ff',
+    name: 'Notation', en: 'Notation', color: '#54a0ff',
     tags: ['60 BPM','80 BPM','90 BPM','100 BPM','110 BPM','120 BPM',
            '128 BPM','140 BPM','160 BPM','175 BPM',
            '4/4','3/4','6/8','7/8','5/4',
            'Upbeat','Half time','Double time','Swing','Shuffle','Straight']
   },
   {
-    name: "ז'אנר", en: 'Genre', color: '#ee5a24',
+    name: 'Genre', en: 'Genre', color: '#ee5a24',
     tags: ['Pop','Indie pop','Synth pop','Art pop','K-pop',
            'Rock','Indie rock','Alternative rock','Hard rock',
            'Metal','Heavy metal','Nu metal','Post-rock',
@@ -2478,7 +2478,7 @@ const TAG_LIBRARY = [
            'Classical','Cinematic','Orchestral','Celtic']
   },
   {
-    name: 'הופעה חיה', en: 'Live', color: '#c44569',
+    name: 'Live Performance', en: 'Live', color: '#c44569',
     tags: ['Live performance','Concert','Acoustic live','Unplugged',
            'Arena rock','Intimate venue','Festival vibe','Stadium crowd',
            'Crowd noise','Applause','Live band','Live drums','One take']
@@ -4823,7 +4823,7 @@ function loadTemplate(key) {
 const SUNO_COMMANDS = {
   style: [
     {
-      name: 'קולות וביצוע', color: '#b66dff', open: false,
+      name: 'Vocals & Performance', color: '#b66dff', open: false,
       chips: ['Deep voice','Bass vocals','Baritone','Low register',
               'High tenor','Falsetto','Soprano','High register',
               'Choir','Duet','Mixed duet','Harmony','Background vocals',
@@ -4831,13 +4831,13 @@ const SUNO_COMMANDS = {
               'Country twang','Gospel','Melodic rap','Soulful']
     },
     {
-      name: 'אווירה', color: '#ff9f43', open: false,
+      name: 'Atmosphere', color: '#ff9f43', open: false,
       chips: ['Live performance','Concert feel','Crowd noise','Unplugged','Acoustic live','Stadium',
               'Epic','Cinematic','Film score','Dramatic','Dark atmosphere','Triumphant','Tension',
               'Heavy reverb','Echo','Lo-fi','Auto-tune','Wide stereo','Vinyl crackle','Tape saturation','Distortion']
     },
     {
-      name: 'כלי נגינה', color: '#1dd1a1', open: false,
+      name: 'Instruments', color: '#1dd1a1', open: false,
       chips: ['Acoustic guitar','Electric guitar','Bass guitar','Clean guitar','Distorted guitar',
               'Grand piano','Rhodes piano','Keyboard',
               'Violin','Cello','Strings','Oud','Darbuka','Flute','Nylon guitar',
@@ -4845,37 +4845,37 @@ const SUNO_COMMANDS = {
               'Orchestra','Brass section','Trumpet','Saxophone','French horn']
     },
     {
-      name: 'פופ', color: '#e070a0', open: false,
+      name: 'Pop', color: '#e070a0', open: false,
       chips: ['Acoustic guitar','Ukulele','Grand piano','Rhodes piano','Synth lead',
               'Bass guitar','String quartet','Brass section','Choir','Background vocals',
               'Handclaps','Tambourine','Drum machine','Glockenspiel','Wurlitzer']
     },
     {
-      name: 'היפ הופ', color: '#e8922a', open: false,
+      name: 'Hip Hop', color: '#e8922a', open: false,
       chips: ['808 bass','Boom bap drums','Sample chops','Vinyl crackle','Lo-fi drums',
               'Hi-hats','Snare crack','Kick drum','Rhodes keys','Brass horns',
               'Record scratch','Sub bass','Soul sample','Jazz sample','Organ stab']
     },
     {
-      name: 'אלקטרוני', color: '#28c4af', open: false,
+      name: 'Electronic', color: '#28c4af', open: false,
       chips: ['Synth lead','Synth bass','Arpeggiator','LFO filter','Sidechain compression',
               'Four-on-the-floor','Drum machine','Vocoder','Synth pad','FM synthesis',
               'Modular synth','White noise sweep','Stutter edit','Glitch','Polysynth']
     },
     {
-      name: 'דאבסטפ', color: '#c84040', open: false,
+      name: 'Dubstep', color: '#c84040', open: false,
       chips: ['Wobble bass','Wub bass','Growl bass','Reese bass','Half-time drums',
               'Snare crack','Sub bass','Distorted synth','Brostep','Filtered lead',
               'Screeching synth','Bass drop','Drum breaks','Laser sfx','Glitch fx']
     },
     {
-      name: 'טראנס', color: '#9b72ef', open: false,
+      name: 'Trance', color: '#9b72ef', open: false,
       chips: ['Supersaw lead','Trance arp','Trance gate','Pad strings','Kick drum',
               'Hi-hat rolls','Bassline','Melody riff','Synth stabs','Build up sweep',
               'Euphoric lead','138 BPM','Reverse cymbal','Pluck synth','Choir pad']
     },
     {
-      name: 'טראפ', color: '#4a9eff', open: false,
+      name: 'Trap', color: '#4a9eff', open: false,
       chips: ['808 bass','Trap hi-hats','Triplet hi-hats','Snare rolls','Dark strings',
               'Piano melody','Brass stabs','Ominous pad','Sub bass','Drum machine',
               'Flute melody','Bell melody','Distorted 808','Vocal chop','Dark atmosphere']
@@ -4938,51 +4938,51 @@ const SUNO_COMMANDS = {
       ]
     },
     {
-      name: 'ים תיכוני', color: '#d4a017', open: false,
+      name: 'Mediterranean', color: '#d4a017', open: false,
       chips: ['Oud','Darbuka','Qanun','Ney flute','Riq','Saz','Buzuq','Tabla',
               'Oriental strings','Maqam Hijaz','Maqam Rast','Maqam Bayat',
               'Belly dance rhythm','Debka beat','Greek bouzouki','Flamenco guitar','Mizrahi vocals']
     },
     {
-      name: 'אסייתי', color: '#e85c5c', open: false,
+      name: 'Asian', color: '#e85c5c', open: false,
       chips: ['Koto','Shamisen','Shakuhachi','Erhu','Pipa','Taiko drums','Guzheng',
               'Bamboo flute','Biwa','Pentatonic scale','Chinese strings',
               'Japanese drums','K-pop synths','Gayageum','Tsugaru']
     },
     {
-      name: 'הודי', color: '#e8924a', open: false,
+      name: 'Indian', color: '#e8924a', open: false,
       chips: ['Sitar','Tabla','Tanpura','Bansuri flute','Sarod','Harmonium',
               'Mridangam','Veena','Dhol','Raga scale','Bollywood strings',
               'Carnatic vocals','Bhangra rhythm','Santoor','Shehnai']
     },
     {
-      name: 'מדיטציה', color: '#5bc4c4', open: false,
+      name: 'Meditation', color: '#5bc4c4', open: false,
       chips: ['Singing bowls','Crystal bowls','Tibetan bells','Ambient pad','Drone',
               'Wind chimes','Rain sounds','Ocean waves','Nature sounds',
               '432Hz tuning','Binaural beats','Healing frequency','Soft piano',
               'Gentle flute','Om tone','Soft strings']
     },
     {
-      name: 'ג׳אז ובלוז', color: '#c8a050', open: false,
+      name: 'Jazz & Blues', color: '#c8a050', open: false,
       chips: ['Upright bass','Jazz piano','Brushed drums','Trumpet','Trombone',
               'Saxophone','Clarinet','Vibraphone','Walking bass','Swing rhythm',
               'Blues guitar','Wah guitar','Hammond organ','Bebop','Smooth jazz']
     },
     {
-      name: 'רוק ומטאל', color: '#e05050', open: false,
+      name: 'Rock & Metal', color: '#e05050', open: false,
       chips: ['Power chords','Distorted guitar','Double kick drums','Palm muting',
               'Guitar riff','Shredding solo','Drop D tuning','Blast beat',
               'Heavy riff','Wall of sound','Feedback guitar','Whammy bar',
               'Breakdown riff','Chugging guitars','Pinch harmonic']
     },
     {
-      name: 'R&B וסול', color: '#d070c0', open: false,
+      name: 'R&B & Soul', color: '#d070c0', open: false,
       chips: ['Rhodes piano','Warm bass','Funk guitar','Smooth strings','Gospel choir',
               'Wah guitar','Slap bass','Drum groove','Neo soul chords',
               'Vocal runs','Falsetto','Electric piano','Synth bass','Brass horns','Clavinet']
     },
     {
-      name: 'FX מיוחדים', color: '#7bc8f0', open: false,
+      name: 'Special FX', color: '#7bc8f0', open: false,
       chips: ['Vinyl scratching','Vocal chops','Reversed vocals','Pitch bend',
               'Tape stop','Record skip','Glitch stutter','Bitcrusher','Ring modulator',
               'Vocoder','Talkbox','Sidechain pump','Reverse reverb','Granular texture',
@@ -4993,48 +4993,48 @@ const SUNO_COMMANDS = {
   ],
   lyrics: [
     {
-      name: 'פתיחות', color: '#4a9eff', open: false,
+      name: 'Openings', color: '#4a9eff', open: false,
       chips: ['[Intro]','[Verse]','[Verse 1]','[Spoken Intro]','[Inst. Intro]','[Build Up]','[Overture]']
     },
     {
-      name: 'הפסקות וסולו', color: '#ff5c5c', open: false,
+      name: 'Breaks & Solos', color: '#ff5c5c', open: false,
       chips: ['[Break]','[Breakdown]','[Guitar Solo]','[Piano Solo]','[Synth Solo]','[Instrumental]','[Interlude]','[Drop]']
     },
     {
-      name: 'שינויי אנרגיה', color: '#ff9f43', open: false,
+      name: 'Energy Shifts', color: '#ff9f43', open: false,
       chips: ['[Pre-Chorus]','[Chorus]','[Power Chorus]','[Hook]','[Catchy Hook]','[Refrain]','[Bridge]']
     },
     {
-      name: 'דינמיקת קול', color: '#b66dff', open: false,
+      name: 'Vocal Dynamics', color: '#b66dff', open: false,
       chips: ['[Ad-libs]','[Freestyle]','[spoken]','[whispered]','[shouted]','[Emotional]','[Intense]','[Soft]','[Powerful]']
     },
     {
-      name: 'סיומות', color: '#1dd1a1', open: false,
+      name: 'Endings', color: '#1dd1a1', open: false,
       chips: ['[Outro]','[Outro (Fade)]','[Coda]','[Final Chorus]','[A Cappella]','[Anthem]']
     },
     {
-      name: 'מיוחד', color: '#ffd060', open: false,
+      name: 'Special', color: '#ffd060', open: false,
       chips: ['[Repeat x2]','[Repeat x3]','[Fade Out]','[Fade In]','[Silence]',
               '[BPM: 80]','[BPM: 100]','[BPM: 120]','[BPM: 140]',
               '[Key: C Major]','[Key: A Minor]','[Key: G Major]','[Key: D Minor]',
               '[Time: 4/4]','[Time: 3/4]','[Time: 6/8]']
     },
     {
-      name: 'מבנה ותזמון', color: '#5b9cf6', open: false,
+      name: 'Structure & Timing', color: '#5b9cf6', open: false,
       chips: ['[Intro: X bars]','[Verse: X bars]','[Bridge: X bars]','[Chorus: 16 bars]',
               '[Pre-Chorus]','[Post-Chorus]','[C-Part]','[Breakdown]',
               '[Minimalist Sparse Verse]','[Crescendo]','[Outro]','[End]',
               '[Hard stop]','[Fade out]','[Echo tail]','[Reverb tail]']
     },
     {
-      name: 'ים-תיכוני ואתני', color: '#e8922a', open: false,
+      name: 'Mediterranean & Ethnic', color: '#e8922a', open: false,
       chips: ['[Mawwal]','[Vocal Improvisation: Soulful Melisma]','[Melismatic and Soulful]',
               '[Solo: Darbuka]','[Solo: Oud]','[Buzuqi Solo]','[High-speed Buzuqi Riff]',
               '[Taksim]','[Ethnic percussion breakdown]','[Ethnic Phonk Drop]',
               '[Koto Sting]','[Traditional Koto melodies]','[Atmospheric strings]']
     },
     {
-      name: 'טראפ ומועדון', color: '#c84040', open: false,
+      name: 'Trap & Club', color: '#c84040', open: false,
       chips: ['[Drop: Heavy Trap Beat]','[Halftime Trap Drop]','[808 bass slams]',
               '[Aggressive 808 bass syncopation]','[Bass slides]',
               '[Adlib: SKRT SKRT]','[Adlib: YEAH]','[Adlib: BOOM]',
@@ -5043,12 +5043,12 @@ const SUNO_COMMANDS = {
               '[Nani?!]','[Kora!]','[Sugoi!]','[Rapid snare rolls]','[Fast Snare Rolls]']
     },
     {
-      name: "ג'אז ובלוז", color: '#b88a1e', open: false,
+      name: 'Jazz & Blues', color: '#b88a1e', open: false,
       chips: ['[breath]','[pause]','[whispered]','[Growl]',
               '[Muted Trumpet Solo]','[Double Bass Solo]','[Bluesy Phrasing]']
     },
     {
-      name: 'הגשה ווקאלית', color: '#d070c0', open: false,
+      name: 'Vocal Delivery', color: '#d070c0', open: false,
       chips: ['[Spoken word]','[Whisper]','[Scream]','[Laughing voice]','[Crying voice]',
               '[Vocal run]','[Distant chanting]','[Multiple voice chorus SATB]',
               '[Very high falsetto]','[Fast double-time rapping]','[Deep raspy voice]',
@@ -5056,7 +5056,7 @@ const SUNO_COMMANDS = {
               '[Deeply Weathered Baritone]']
     },
     {
-      name: 'הפקה ואפקטים', color: '#28c4af', open: false,
+      name: 'Production & FX', color: '#28c4af', open: false,
       chips: ['[Stadium crowd ambience]','[Vocal drone: deep resonant]','[Vinyl crackle]',
               '[Vinyl Stop FX]','[Atmospheric sub-bass]','[Filtered Sample Build-up]',
               '[Building Energy]','[Maximum Loudness]','[No percussion]','[No beat]',
