@@ -152,7 +152,7 @@ body {
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;   /* sidebar scrolls as a whole */
   flex-shrink: 0;
 }
 
@@ -164,7 +164,7 @@ body {
   flex-shrink: 0;
 }
 .sb-card.sb-flex {
-  flex: 1;
+  flex: 0 0 auto;   /* don't grow to fill — let sidebar scroll */
   min-height: 0;
 }
 .sb-card.sb-flex.sb-collapsed {
@@ -206,14 +206,17 @@ body {
 
 /* Commands body: tabs + scroll */
 #sb-body-commands .cmd-tabs { flex-shrink: 0; }
-#sb-body-commands .cmd-scroll { flex: 1; overflow-y: auto; min-height: 0; }
+#sb-body-commands .cmd-scroll { overflow-y: auto; max-height: 260px; min-height: 80px; }
 
 /* Tags body: search + categories */
 #sb-body-tags .tag-lib-search-wrap { flex-shrink: 0; }
-#sb-body-tags .categories { flex: 1; overflow-y: auto; min-height: 0; }
+#sb-body-tags .categories { overflow-y: auto; max-height: 260px; min-height: 80px; }
 
 /* Style prompt body: auto-height textarea */
 #sb-body-style { flex: 0 0 auto; min-height: 0; overflow: visible; }
+
+/* Studio body: chips scroll */
+#sb-body-studio #studio-chips-wrap { overflow-y: auto; max-height: 300px; }
 
 /* ─── STATUS BAR ─── */
 #status-bar {
