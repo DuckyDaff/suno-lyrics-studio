@@ -1428,9 +1428,10 @@ body {
 
 .studio-rand-row {
   display: flex; align-items: center; gap: 4px;
-  padding: 2px 8px 6px;
+  padding: 2px 8px 6px; flex-wrap: wrap;
 }
-.studio-rand-select { max-width: 150px; }
+.studio-rand-select { max-width: 118px; flex: 1; min-width: 80px; }
+.studio-rand-btn { flex-shrink: 0; padding: 3px 10px; }
 
 /* studio chip groups */
 .studio-cat { border-bottom: 1px solid var(--border); }
@@ -2385,10 +2386,23 @@ body {
 
           <!-- Randomize row -->
           <div class="studio-rand-row">
-            <select class="rand-select studio-rand-select" id="studio-rand-cat" title="בחר קטגוריה לרנדומייז">
-              <option value="-1">🎲 All categories</option>
+            <select class="rand-select studio-rand-select" id="studio-rand-genre" title="בחר ז׳אנר">
+              <option value="">🎵 All genres</option>
+              <option value="pop">Pop</option>
+              <option value="hiphop">Hip-Hop</option>
+              <option value="rnb">R&amp;B / Soul</option>
+              <option value="rock">Rock</option>
+              <option value="electronic">Electronic</option>
+              <option value="jazz">Jazz</option>
+              <option value="latin">Latin</option>
+              <option value="reggae">Reggae</option>
+              <option value="cinematic">Cinematic</option>
+              <option value="mediterranean">Mediterranean</option>
             </select>
-            <button class="tbtn style-rand-btn studio-rand-btn" onclick="randomizeStudio()">🎲 Randomize</button>
+            <select class="rand-select studio-rand-select" id="studio-rand-cat" title="בחר קטגוריה">
+              <option value="-1">All categories</option>
+            </select>
+            <button class="tbtn style-rand-btn studio-rand-btn" onclick="randomizeStudio()">🎲</button>
           </div>
 
           <!-- Chip library -->
@@ -4830,19 +4844,106 @@ function initStudioRandSelect() {
   });
 }
 
+// Genre-specific chip pools for focused randomization
+const STUDIO_GENRE_CHIPS = {
+  pop: [
+    'Bright synth pad layer', 'Clean piano chord backing', 'Pop guitar strum rhythm',
+    'Upbeat synth lead hook', 'Warm string pad swell', 'Catchy piano melody line',
+    'Pop bass guitar groove', 'Driving four-on-the-floor kick', 'Layered vocal harmony',
+    'Shimmering guitar arpeggio', 'Chorus synth swell', 'Punchy snare accent'
+  ],
+  hiphop: [
+    'Trap piano chord chops', '808 sub bass pulse', 'Lo-fi Rhodes comping',
+    'Sampled loop texture layer', 'Dark synth pad atmosphere', 'Trap hi-hat groove pattern',
+    'Vinyl crackle texture', 'Muted guitar stab rhythm', 'Boom bap snare crack',
+    'Deep bass note drops', 'Synth brass stab accent', 'Ominous string pad'
+  ],
+  rnb: [
+    'Smooth Rhodes chord layer', 'Warm bass guitar groove', 'Soulful organ chord stab',
+    'R&B guitar lick fill', 'Silky synth pad swell', 'Gospel choir harmony swell',
+    'Mellow laid-back drum groove', 'Soft piano chord comping', 'Vocal harmony stack',
+    'Funky wah guitar rhythm', 'Warm trumpet counter-melody', 'Soulful saxophone phrase'
+  ],
+  rock: [
+    'Distorted guitar power chord crunch', 'Driving bass guitar line', 'Live drum punch',
+    'Clean guitar arpeggio fill', 'Electric guitar lead lick', 'Heavy rhythm guitar stabs',
+    'Guitar fill burst break', 'Crash cymbal accent hit', 'Palm-muted guitar riff',
+    'Gritty synth texture layer', 'Bass guitar walking line', 'Hard snare backbeat'
+  ],
+  electronic: [
+    'Pulsing synth bass groove', 'Bright arpeggio synth sequence', 'Atmospheric pad wash',
+    'Four-on-the-floor kick pulse', 'Filtered synth chord hit', 'Rising sweep buildup',
+    'Sidechain pump texture', 'Plucky synth lead melody', 'Sub bass drop impact',
+    'Glitchy texture burst', 'Wobble bass growl', 'Reverb synth stab'
+  ],
+  jazz: [
+    'Jazz piano comping chords', 'Walking bass line groove', 'Brushed drum groove pattern',
+    'Muted trumpet melody phrase', 'Saxophone counter-melody line', 'Jazz guitar chord voicing',
+    'Double bass pizzicato pulse', 'Vibraphone melodic phrase', 'Trombone harmony line',
+    'Rim click rhythm accent', 'Improvised piano fill', 'Breathy flute solo phrase'
+  ],
+  latin: [
+    'Salsa piano montuno pattern', 'Latin bass tumbao groove', 'Conga rhythmic pattern',
+    'Brass horn section stab', 'Nylon guitar strum rhythm', 'Bongo groove texture',
+    'Maracas shaker rhythm', 'Timbales accent hit fill', 'Güiro scrape accent',
+    'Trumpet fanfare phrase', 'Accordion melody line', 'Son clave pattern'
+  ],
+  reggae: [
+    'Reggae guitar skank chord', 'One-drop drum pattern', 'Dub bass line groove',
+    'Organ bubble chord rhythm', 'Horn section stab accent', 'Roots rhythm guitar chop',
+    'Ska offbeat brass riff', 'Deep reverb bass drop', 'Flying cymbal pulse',
+    'Melodica melody phrase', 'Nyahbinghi drum rhythm', 'Dub echo effect wash'
+  ],
+  cinematic: [
+    'Sweeping string swell', 'Choir atmosphere pad', 'Dramatic brass fanfare hit',
+    'Delicate piano ostinato', 'Tension string tremolo', 'Epic percussion impact hit',
+    'Ambient texture wash', 'Emotional solo cello line', 'Timpani accent hit',
+    'Rising string crescendo', 'Haunting vocal drone', 'Low brass rumble pad'
+  ],
+  mediterranean: [
+    'Oud melodic phrase', 'Darbuka groove pattern', 'String pad accompaniment',
+    'Ney flute counter-melody', 'Violin ornamental line', 'Qanun plucked melody',
+    'Middle Eastern percussion groove', 'Buzuq riff phrase', 'Maqam vocal ornament',
+    'Riq tambourine rhythm', 'Ethnic string ensemble', 'Saz strummed rhythm'
+  ]
+};
+
 function randomizeStudio() {
   const pick = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
-  const sel = document.getElementById('studio-rand-cat');
-  const idx = sel ? parseInt(sel.value) : -1;
-  const cat = (idx >= 0 && idx < STUDIO_LIBRARY.length)
-    ? STUDIO_LIBRARY[idx]
-    : STUDIO_LIBRARY[Math.floor(Math.random() * STUDIO_LIBRARY.length)];
-  const chips = pick(cat.chips, 3);
+  const genreSel = document.getElementById('studio-rand-genre');
+  const catSel   = document.getElementById('studio-rand-cat');
+  const genre = genreSel ? genreSel.value : '';
+  const catIdx = catSel ? parseInt(catSel.value) : -1;
+
+  let chips = [];
+  const genrePool = genre ? STUDIO_GENRE_CHIPS[genre] : null;
+  const cat = (catIdx >= 0 && catIdx < STUDIO_LIBRARY.length) ? STUDIO_LIBRARY[catIdx] : null;
+
+  if (genrePool && cat) {
+    // Both genre + category: mix 2 genre chips + 2 category chips
+    chips = [...pick(genrePool, 2), ...pick(cat.chips, 2)];
+  } else if (genrePool) {
+    // Genre only: 4 genre-specific chips
+    chips = pick(genrePool, 4);
+  } else if (cat) {
+    // Category only: 3 from that category
+    chips = pick(cat.chips, 3);
+  } else {
+    // All random: random category + 3 chips
+    const randCat = STUDIO_LIBRARY[Math.floor(Math.random() * STUDIO_LIBRARY.length)];
+    chips = pick(randCat.chips, 3);
+  }
+
   const ta = document.getElementById('studio-style-ta');
   if (!ta) return;
   ta.value = chips.join(', ');
   ta.focus();
-  showToast('🎲 ' + cat.name.replace(/^[\p{Emoji}\s]+/u, '').trim(), 'success');
+
+  const label = [
+    genre ? genreSel.options[genreSel.selectedIndex].text : '',
+    cat ? cat.name.replace(/^[\p{Emoji}\s]+/u, '').trim() : ''
+  ].filter(Boolean).join(' · ');
+  showToast('🎲 ' + (label || 'Random'), 'success');
 }
 
 function renderStudioChips() {
