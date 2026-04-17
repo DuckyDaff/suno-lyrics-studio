@@ -3904,14 +3904,9 @@ function phoneticAll() {
 //  HELPER: focused textarea
 // ════════════════════════════════════════════
 let lastFocusedTa = null;
-let lastCursorPos = 0;
 
 document.addEventListener('focusin', e => {
   if (e.target.classList.contains('lyrics-ta')) lastFocusedTa = e.target;
-});
-document.addEventListener('selectionchange', () => {
-  const active = document.activeElement;
-  if (active && active.classList.contains('lyrics-ta')) lastCursorPos = active.selectionStart;
 });
 
 function getFocusedTextarea() {
@@ -3934,44 +3929,33 @@ function toggleNikudKbd() {
 }
 
 function insertNikudMark(mark) {
-  // Prefer the actively focused textarea; fall back to last focused
-  let ta = (document.activeElement && document.activeElement.classList.contains('lyrics-ta'))
+  // mousedown.preventDefault on the panel keeps the textarea focused,
+  // so document.activeElement is still the textarea when this fires.
+  const ta = (document.activeElement && document.activeElement.classList.contains('lyrics-ta'))
     ? document.activeElement : lastFocusedTa;
   if (!ta) { showToast(t('toastClickWord'), 'error'); return; }
 
-  // Use selectionStart if textarea is focused, otherwise last saved cursor position
-  const pos = (document.activeElement === ta) ? ta.selectionStart : lastCursorPos;
-  const val = ta.value;
-  ta.value = val.slice(0, pos) + mark + val.slice(pos);
-  const newPos = pos + mark.length;
-  ta.focus();
-  ta.setSelectionRange(newPos, newPos);
-  lastCursorPos = newPos;
-  commitTaChange(ta);
+  const pos = ta.selectionStart;
+  // setRangeText inserts without touching scroll position or causing layout jumps
+  ta.setRangeText(mark, pos, pos, 'end');
+  // Trigger the existing oninput pipeline (updateSectionText + autoResizeTa)
+  ta.dispatchEvent(new Event('input'));
 }
 
 function deleteNikudAtCursor() {
-  let ta = (document.activeElement && document.activeElement.classList.contains('lyrics-ta'))
+  const ta = (document.activeElement && document.activeElement.classList.contains('lyrics-ta'))
     ? document.activeElement : lastFocusedTa;
   if (!ta) return;
-  const pos = (document.activeElement === ta) ? ta.selectionStart : lastCursorPos;
+  const pos = ta.selectionStart;
   const val = ta.value;
-  // Look for nikud mark before cursor (or after cursor)
   const nikudRe = /[\u05B0-\u05C7]/;
-  let deleted = false;
   if (pos > 0 && nikudRe.test(val[pos - 1])) {
-    ta.value = val.slice(0, pos - 1) + val.slice(pos);
-    const newPos = pos - 1;
-    ta.focus(); ta.setSelectionRange(newPos, newPos);
-    lastCursorPos = newPos;
-    deleted = true;
+    ta.setRangeText('', pos - 1, pos, 'end');
+    ta.dispatchEvent(new Event('input'));
   } else if (pos < val.length && nikudRe.test(val[pos])) {
-    ta.value = val.slice(0, pos) + val.slice(pos + 1);
-    ta.focus(); ta.setSelectionRange(pos, pos);
-    lastCursorPos = pos;
-    deleted = true;
+    ta.setRangeText('', pos, pos + 1, 'start');
+    ta.dispatchEvent(new Event('input'));
   }
-  if (deleted) commitTaChange(ta);
 }
 
 // Returns {text, start, end} for the word under cursor, or the selection if one exists.
