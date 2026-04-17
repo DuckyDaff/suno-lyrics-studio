@@ -1396,10 +1396,6 @@ body {
 ::selection { background: rgba(74,158,255,.25); }
 
 /* ─── STUDIO REGION CARD ─── */
-.studio-target-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 10px 3px; font-size: 11px; color: var(--txt2); letter-spacing: 0.3px;
-}
 .studio-fields { display: flex; flex-direction: column; gap: 5px; padding: 3px 8px 6px; }
 .studio-field-hdr {
   display: flex; align-items: center; gap: 4px; padding: 0 1px 2px;
@@ -1429,16 +1425,12 @@ body {
 .studio-ta.ta-lyrics:focus { border-color: var(--purple); }
 .studio-ta::placeholder { color: var(--txt2); font-style: italic; }
 
-/* target toggle */
-.studio-target-pill { display: flex; gap: 2px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 7px; padding: 2px; }
-.stu-btn {
-  background: none; border: none; font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
-  padding: 3px 8px; border-radius: 5px; cursor: pointer; transition: all .15s; font-family: inherit;
+
+.studio-rand-row {
+  display: flex; align-items: center; gap: 4px;
+  padding: 2px 8px 6px;
 }
-.stu-btn.stu-style  { color: var(--txt2); }
-.stu-btn.stu-lyrics { color: var(--txt2); }
-.stu-btn.active.stu-style  { background: var(--bg3); color: var(--cyan); }
-.stu-btn.active.stu-lyrics { background: var(--bg3); color: var(--purple); }
+.studio-rand-select { max-width: 150px; }
 
 /* studio chip groups */
 .studio-cat { border-bottom: 1px solid var(--border); }
@@ -2379,16 +2371,7 @@ body {
         </div>
         <div class="sb-card-body" id="sb-body-studio">
 
-          <!-- Insert-to toggle -->
-          <div class="studio-target-row">
-            <span>Insert to →</span>
-            <div class="studio-target-pill">
-              <button class="stu-btn stu-style active" id="stu-style-btn" onclick="setStudioTarget('style')">STYLE</button>
-              <button class="stu-btn stu-lyrics" id="stu-lyrics-btn" onclick="setStudioTarget('lyrics')">LYRICS</button>
-            </div>
-          </div>
-
-          <!-- Output fields -->
+          <!-- STYLE output -->
           <div class="studio-fields">
             <div class="studio-field">
               <div class="studio-field-hdr">
@@ -2396,16 +2379,16 @@ body {
                 <button class="studio-copy-btn" onclick="copyStudioField('style')">COPY</button>
                 <button class="studio-clear-btn" onclick="clearStudioField('style')" title="נקה">✕</button>
               </div>
-              <textarea class="studio-ta ta-style" id="studio-style-ta" placeholder="e.g. Bright crash cymbals, driving rhythm..."></textarea>
+              <textarea class="studio-ta ta-style" id="studio-style-ta" placeholder="e.g. Synth chord accompaniment, warm pad..."></textarea>
             </div>
-            <div class="studio-field">
-              <div class="studio-field-hdr">
-                <span class="studio-field-lbl lbl-lyrics">LYRICS</span>
-                <button class="studio-copy-btn" onclick="copyStudioField('lyrics')">COPY</button>
-                <button class="studio-clear-btn" onclick="clearStudioField('lyrics')" title="נקה">✕</button>
-              </div>
-              <textarea class="studio-ta ta-lyrics" id="studio-lyrics-ta" placeholder="Lyrics for this region (optional)..."></textarea>
-            </div>
+          </div>
+
+          <!-- Randomize row -->
+          <div class="studio-rand-row">
+            <select class="rand-select studio-rand-select" id="studio-rand-cat" title="בחר קטגוריה לרנדומייז">
+              <option value="-1">🎲 All categories</option>
+            </select>
+            <button class="tbtn style-rand-btn studio-rand-btn" onclick="randomizeStudio()">🎲 Randomize</button>
           </div>
 
           <!-- Chip library -->
@@ -2745,6 +2728,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCommandPanel('style');
   renderCommandPanel('lyrics');
   renderStudioChips();
+  initStudioRandSelect();
   initAllDrag();
   renderQuickAddButtons();
   initRandSelect();
@@ -4814,17 +4798,8 @@ const STUDIO_LIBRARY = [
   ]}
 ];
 
-let studioTarget = 'style';
-
-function setStudioTarget(t) {
-  studioTarget = t;
-  document.getElementById('stu-style-btn')?.classList.toggle('active', t === 'style');
-  document.getElementById('stu-lyrics-btn')?.classList.toggle('active', t === 'lyrics');
-}
-
 function insertStudioChip(chip) {
-  const taId = studioTarget === 'style' ? 'studio-style-ta' : 'studio-lyrics-ta';
-  const ta = document.getElementById(taId);
+  const ta = document.getElementById('studio-style-ta');
   if (!ta) return;
   const cur = ta.value.trim();
   ta.value = cur ? cur + ', ' + chip : chip;
@@ -4835,12 +4810,39 @@ function copyStudioField(field) {
   const ta = document.getElementById('studio-' + field + '-ta');
   if (!ta || !ta.value.trim()) { showToast('Nothing to copy', 'error'); return; }
   navigator.clipboard.writeText(ta.value.trim()).then(() =>
-    showToast('Copied ' + field.toUpperCase() + '!', 'success'));
+    showToast('Copied!', 'success'));
 }
 
 function clearStudioField(field) {
   const ta = document.getElementById('studio-' + field + '-ta');
   if (ta) { ta.value = ''; ta.focus(); }
+}
+
+function initStudioRandSelect() {
+  const sel = document.getElementById('studio-rand-cat');
+  if (!sel || sel.children.length > 1) return;
+  STUDIO_LIBRARY.forEach((cat, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    // strip emoji prefix for cleaner dropdown label
+    opt.textContent = cat.name.replace(/^[\p{Emoji}\s]+/u, '').trim();
+    sel.appendChild(opt);
+  });
+}
+
+function randomizeStudio() {
+  const pick = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+  const sel = document.getElementById('studio-rand-cat');
+  const idx = sel ? parseInt(sel.value) : -1;
+  const cat = (idx >= 0 && idx < STUDIO_LIBRARY.length)
+    ? STUDIO_LIBRARY[idx]
+    : STUDIO_LIBRARY[Math.floor(Math.random() * STUDIO_LIBRARY.length)];
+  const chips = pick(cat.chips, 3);
+  const ta = document.getElementById('studio-style-ta');
+  if (!ta) return;
+  ta.value = chips.join(', ');
+  ta.focus();
+  showToast('🎲 ' + cat.name.replace(/^[\p{Emoji}\s]+/u, '').trim(), 'success');
 }
 
 function renderStudioChips() {
