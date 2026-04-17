@@ -1392,6 +1392,74 @@ body {
 /* ─── SELECTION highlight ─── */
 ::selection { background: rgba(74,158,255,.25); }
 
+/* ─── STUDIO REGION CARD ─── */
+.studio-target-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px 3px; font-size: 11px; color: var(--txt2); letter-spacing: 0.3px;
+}
+.studio-fields { display: flex; flex-direction: column; gap: 5px; padding: 3px 8px 6px; }
+.studio-field-hdr {
+  display: flex; align-items: center; gap: 4px; padding: 0 1px 2px;
+}
+.studio-field-lbl {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  color: var(--txt2); flex: 1; font-family: 'JetBrains Mono','Consolas',monospace;
+}
+.studio-field-lbl.lbl-style  { color: var(--cyan); }
+.studio-field-lbl.lbl-lyrics { color: var(--purple); }
+.studio-copy-btn, .studio-clear-btn {
+  font-size: 10px; padding: 2px 7px; border-radius: 4px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--txt2); cursor: pointer; font-family: inherit;
+  transition: all .12s; font-weight: 600; letter-spacing: 0.5px;
+}
+.studio-copy-btn:hover  { background: var(--cyan-bg); color: var(--cyan); border-color: rgba(0,212,255,0.3); }
+.studio-clear-btn:hover { background: rgba(201,64,64,0.1); color: var(--red); border-color: rgba(201,64,64,0.3); }
+.studio-ta {
+  width: 100%; min-height: 48px; max-height: 110px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 5px; padding: 6px 8px; color: var(--txt0);
+  font-size: 12px; line-height: 1.55; resize: vertical; outline: none;
+  font-family: inherit; transition: border-color .1s;
+}
+.studio-ta:focus { border-color: var(--cyan); }
+.studio-ta.ta-lyrics:focus { border-color: var(--purple); }
+.studio-ta::placeholder { color: var(--txt2); font-style: italic; }
+
+/* target toggle */
+.studio-target-pill { display: flex; gap: 2px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 7px; padding: 2px; }
+.stu-btn {
+  background: none; border: none; font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  padding: 3px 8px; border-radius: 5px; cursor: pointer; transition: all .15s; font-family: inherit;
+}
+.stu-btn.stu-style  { color: var(--txt2); }
+.stu-btn.stu-lyrics { color: var(--txt2); }
+.stu-btn.active.stu-style  { background: var(--bg3); color: var(--cyan); }
+.stu-btn.active.stu-lyrics { background: var(--bg3); color: var(--purple); }
+
+/* studio chip groups */
+.studio-cat { border-bottom: 1px solid var(--border); }
+.studio-cat-hdr {
+  padding: 6px 11px; display: flex; align-items: center; gap: 6px;
+  cursor: pointer; font-size: 12px; font-weight: 600; color: var(--txt1);
+  letter-spacing: 0.2px; user-select: none;
+}
+.studio-cat-hdr:hover { background: rgba(0,212,255,0.04); }
+.studio-cat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.studio-cat-chevron { color: var(--txt2); transition: transform .2s; margin-inline-start: auto; font-size: 14px; }
+.studio-cat-chevron.open { transform: rotate(90deg); }
+.studio-cat-chips { padding: 4px 8px 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+.studio-chip {
+  padding: 3px 9px; border-radius: 5px; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all .1s; border: 1px solid var(--border);
+  background: var(--bg2); color: var(--txt1); font-family: inherit; white-space: nowrap;
+}
+.studio-chip:hover { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.25); color: var(--cyan); }
+.studio-chip:active { transform: scale(0.95); }
+[data-theme="light"] .studio-ta { background: #fff; }
+[data-theme="light"] .studio-chip { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); color: var(--txt1); }
+[data-theme="light"] .studio-target-pill { background: rgba(0,0,0,0.04); }
+
 /* ─── NIKUD KEYBOARD PANEL ─── */
 #nikud-kbd-panel {
   display: none;
@@ -2299,6 +2367,50 @@ body {
         </div>
       </div>
 
+      <!-- ── Studio Region ── -->
+      <div class="sb-card sb-flex" id="sb-studio">
+        <div class="sb-card-hdr" onclick="toggleSbCard('studio')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h2v5H7zM11 6h2v7h-2zM15 10h2v3h-2z"/></svg>
+          <span class="sb-card-title">Studio Region</span>
+          <span class="pcard-chevron open" id="sb-chevron-studio">›</span>
+        </div>
+        <div class="sb-card-body" id="sb-body-studio">
+
+          <!-- Insert-to toggle -->
+          <div class="studio-target-row">
+            <span>Insert to →</span>
+            <div class="studio-target-pill">
+              <button class="stu-btn stu-style active" id="stu-style-btn" onclick="setStudioTarget('style')">STYLE</button>
+              <button class="stu-btn stu-lyrics" id="stu-lyrics-btn" onclick="setStudioTarget('lyrics')">LYRICS</button>
+            </div>
+          </div>
+
+          <!-- Output fields -->
+          <div class="studio-fields">
+            <div class="studio-field">
+              <div class="studio-field-hdr">
+                <span class="studio-field-lbl lbl-style">STYLE</span>
+                <button class="studio-copy-btn" onclick="copyStudioField('style')">COPY</button>
+                <button class="studio-clear-btn" onclick="clearStudioField('style')" title="נקה">✕</button>
+              </div>
+              <textarea class="studio-ta ta-style" id="studio-style-ta" placeholder="e.g. Bright crash cymbals, driving rhythm..."></textarea>
+            </div>
+            <div class="studio-field">
+              <div class="studio-field-hdr">
+                <span class="studio-field-lbl lbl-lyrics">LYRICS</span>
+                <button class="studio-copy-btn" onclick="copyStudioField('lyrics')">COPY</button>
+                <button class="studio-clear-btn" onclick="clearStudioField('lyrics')" title="נקה">✕</button>
+              </div>
+              <textarea class="studio-ta ta-lyrics" id="studio-lyrics-ta" placeholder="Lyrics for this region (optional)..."></textarea>
+            </div>
+          </div>
+
+          <!-- Chip library -->
+          <div id="studio-chips-wrap"></div>
+
+        </div>
+      </div>
+
     </div><!-- #sidebar -->
   </div><!-- .editor-main -->
 
@@ -2629,6 +2741,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTagLibrary();
   renderCommandPanel('style');
   renderCommandPanel('lyrics');
+  renderStudioChips();
   initAllDrag();
   renderQuickAddButtons();
   initRandSelect();
@@ -4488,6 +4601,143 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('lang-en')?.classList.remove('active');
   }
 });
+
+// ════════════════════════════════════════════
+//  STUDIO REGION — library + logic
+// ════════════════════════════════════════════
+const STUDIO_LIBRARY = [
+  { name: 'Percussion', color: '#e05050', open: true, chips: [
+    'Bright crash cymbal hit', 'Shimmering ride cymbal',
+    'Driving snare pattern', 'Sparse brushed snare',
+    'Heavy kick drum punch', 'Soft muted kick',
+    'Steady open hi-hat groove', 'Tight closed hi-hat pulse',
+    'Rolling snare fill', 'Deep floor tom rumble',
+    'Light tambourine shake', 'Syncopated conga groove',
+    'Sharp rimshot accent', 'Distant drum reverb wash'
+  ]},
+  { name: 'Strings', color: '#e8922a', open: false, chips: [
+    'Sweeping string swell', 'Lush string section pad',
+    'Soft pizzicato strings', 'Dramatic tremolo strings',
+    'Staccato string attack', 'Ascending string run',
+    'Tender cello melody', 'High-register violin solo',
+    'Rich viola harmony', 'Dark low string drone',
+    'Delicate string quartet passage', 'Emotional solo cello line'
+  ]},
+  { name: 'Brass & Winds', color: '#d4a017', open: false, chips: [
+    'Warm trumpet solo phrase', 'Crisp trumpet fanfare',
+    'Bold brass section stab', 'Full brass section hit',
+    'Muted trumpet melody', 'Deep trombone slide',
+    'Soft French horn swell', 'Punchy horn section riff',
+    'Breathy flute melody', 'Haunting alto flute phrase',
+    'Warm clarinet solo', 'Mellow oboe line',
+    'Deep bassoon accompaniment', 'Fluttering piccolo run'
+  ]},
+  { name: 'Guitar', color: '#1dd1a1', open: false, chips: [
+    'Distorted power chord crunch', 'Heavy palm-muted riff',
+    'Melodic lead guitar solo', 'Blues slide guitar lick',
+    'Clean fingerpicked arpeggio', 'Shimmering clean chorus guitar',
+    'Gentle acoustic strum', 'Twangy country picking',
+    'Funky wah-wah rhythm', 'Chunky rhythm guitar chords',
+    'Classical guitar fingerstyle', 'Aggressive thrash guitar riff'
+  ]},
+  { name: 'Keys & Piano', color: '#54a0ff', open: false, chips: [
+    'Delicate solo piano melody', 'Dramatic cinematic piano swell',
+    'Cinematic piano ostinato', 'Sparse piano accent notes',
+    'Honky-tonk piano riff', 'Deep bass piano notes',
+    'Warm Rhodes electric piano', 'Bright electric piano riff',
+    'Gospel organ stab', 'Lush organ pad swell',
+    'Bright harpsichord phrase', 'Dreamy Wurlitzer chord'
+  ]},
+  { name: 'Synth & Electronic', color: '#28c4af', open: false, chips: [
+    'Rising synth sweep build', 'Pulsing bass synth groove',
+    'Warm analog pad swell', 'Bright arpeggio sequence',
+    'Heavy sub bass drop', 'Tense synth stab',
+    'Spacey atmosphere pad', 'Filtered synth chord hit',
+    'Plucky synth lead melody', 'Dark ambient drone',
+    'Wobble bass growl', 'Glitchy digital texture burst'
+  ]},
+  { name: 'Vocals', color: '#b66dff', open: false, chips: [
+    'Soft background vocal harmony', 'Tight vocal stack layer',
+    'Powerful lead vocal hook', 'Falsetto high note hold',
+    'Whispering breathy phrase', 'Spoken word passage',
+    'Gospel choir swell', 'Call-and-response vocal echo',
+    'Wordless melismatic vocal run', 'Haunting vocal drone',
+    'Ad-lib vocal flourish', 'Group unison chant',
+    'Deep baritone anchor vocal', 'Ethereal soprano line'
+  ]},
+  { name: 'World & Ethnic', color: '#ffd060', open: false, chips: [
+    'Oud melodic phrase', 'Darbuka groove pattern',
+    'Haunting ney flute line', 'Qanun plucked melody',
+    'Steel drum bright melody', 'Sitar raga phrase',
+    'Tabla rhythmic pattern', 'Koto melodic sequence',
+    'African djembe rhythm break', 'Flamenco guitar rasgueado',
+    'Didgeridoo deep drone', 'Balalaika folk melody',
+    'Shamisen sharp phrase', 'Hurdy-gurdy drone layer'
+  ]},
+  { name: 'Ambient & FX', color: '#7bc8f0', open: false, chips: [
+    'Deep reverb wash', 'Reverse cymbal sweep build',
+    'Vinyl crackle texture', 'Natural room ambience',
+    'Rising tension drone', 'Eerie underwater effect',
+    'Radio static noise burst', 'Tape stop effect',
+    'Granular texture shimmer', 'Low frequency rumble',
+    'Wind and nature sounds', 'Distant crowd murmur',
+    'Ghostly pitch-shifted echo', 'Stuttering glitch burst'
+  ]}
+];
+
+let studioTarget = 'style';
+
+function setStudioTarget(t) {
+  studioTarget = t;
+  document.getElementById('stu-style-btn')?.classList.toggle('active', t === 'style');
+  document.getElementById('stu-lyrics-btn')?.classList.toggle('active', t === 'lyrics');
+}
+
+function insertStudioChip(chip) {
+  const taId = studioTarget === 'style' ? 'studio-style-ta' : 'studio-lyrics-ta';
+  const ta = document.getElementById(taId);
+  if (!ta) return;
+  const cur = ta.value.trim();
+  ta.value = cur ? cur + ', ' + chip : chip;
+  ta.focus();
+}
+
+function copyStudioField(field) {
+  const ta = document.getElementById('studio-' + field + '-ta');
+  if (!ta || !ta.value.trim()) { showToast('Nothing to copy', 'error'); return; }
+  navigator.clipboard.writeText(ta.value.trim()).then(() =>
+    showToast('Copied ' + field.toUpperCase() + '!', 'success'));
+}
+
+function clearStudioField(field) {
+  const ta = document.getElementById('studio-' + field + '-ta');
+  if (ta) { ta.value = ''; ta.focus(); }
+}
+
+function renderStudioChips() {
+  const wrap = document.getElementById('studio-chips-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = STUDIO_LIBRARY.map((cat, ci) => `
+    <div class="studio-cat" id="studiocat-${ci}">
+      <div class="studio-cat-hdr" onclick="toggleStudioCat(${ci})">
+        <span class="studio-cat-dot" style="background:${cat.color}"></span>
+        <span>${cat.name}</span>
+        <span class="studio-cat-chevron${cat.open ? ' open' : ''}">›</span>
+      </div>
+      <div class="studio-cat-chips"${cat.open ? '' : ' style="display:none"'}>
+        ${cat.chips.map(c => `<button class="studio-chip" onclick="insertStudioChip('${c.replace(/'/g,"\\'")}')">${c}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function toggleStudioCat(ci) {
+  STUDIO_LIBRARY[ci].open = !STUDIO_LIBRARY[ci].open;
+  const el = document.getElementById('studiocat-' + ci);
+  if (!el) return;
+  el.querySelector('.studio-cat-chevron').classList.toggle('open', STUDIO_LIBRARY[ci].open);
+  const chips = el.querySelector('.studio-cat-chips');
+  chips.style.display = STUDIO_LIBRARY[ci].open ? 'flex' : 'none';
+}
 
 // ════════════════════════════════════════════
 //  STYLE RANDOMIZER — coherent genre families
