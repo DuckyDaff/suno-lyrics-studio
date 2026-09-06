@@ -867,6 +867,21 @@ body {
   letter-spacing: 0.05em;
 }
 .full-preview-btn:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); color: var(--txt0); }
+.full-preview-btn.sb-copy-lyrics { color: var(--cyan); border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.06); }
+.full-preview-btn.sb-copy-lyrics:hover { background: rgba(0,212,255,0.14); }
+.full-preview-btn.sb-suno-link { text-decoration: none; color: var(--orange); border-color: rgba(196,118,46,0.35); }
+.full-preview-btn.sb-suno-link:hover { background: rgba(196,118,46,0.12); }
+.suno-ver-sel {
+  font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 5px;
+  border: 1px solid var(--border2); background: var(--bg2); color: var(--txt0);
+  font-family: inherit; cursor: pointer; outline: none;
+}
+.suno-ver-sel option { background: var(--bg2); color: var(--txt0); }
+@media (max-width: 640px) {
+  #status-bar { overflow-x: auto; scrollbar-width: none; }
+  #status-bar::-webkit-scrollbar { display: none; }
+  .sb-copy-all { display: none; }
+}
 
 /* ── Full Preview modal ── */
 #full-preview-overlay {
@@ -2163,6 +2178,10 @@ body {
     <button class="tbtn undo-btn" id="btn-redo" onclick="redo()" title="שחזר (Ctrl+Y)" data-i18n-title="redoTitle" disabled>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 7v6h-6"/><path d="M21 13c-2 5-6.5 8-12 8a9 9 0 0 1 0-18c3.4 0 6.4 1.5 8.5 4"/></svg>
     </button>
+    <button class="tbtn undo-btn" id="btn-new" onclick="newSong()" title="שיר חדש" data-i18n-title="newSongTitle">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      <span data-i18n="newSong">חדש</span>
+    </button>
     <button class="tbtn add-line" onclick="openModal()">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
       <span data-i18n="addTagLine">+ שורת תג</span>
@@ -2240,9 +2259,23 @@ body {
 
   <!-- TEXT TOOLS BAR (below top-bar) -->
   <div id="status-bar">
-    <div class="lyrics-char-counter" id="lyrics-counter">0 / 3000 תווים</div>
+    <select class="suno-ver-sel" id="suno-ver" onchange="setSunoVersion(this.value)" title="גרסת מודל Suno" data-i18n-title="sunoVerTitle">
+      <option value="v5">Suno v5</option>
+      <option value="v4.5">Suno v4.5</option>
+      <option value="v4">Suno v4</option>
+      <option value="v3.5">Suno v3.5</option>
+    </select>
+    <div class="lyrics-char-counter" id="lyrics-counter">0 / 5000 תווים</div>
     <div id="full-lyrics-out" style="display:none"></div>
     <div style="flex:1"></div>
+    <button class="full-preview-btn sb-copy-lyrics" onclick="copyLyrics()" title="העתק מילים להדבקה ב-Suno" data-i18n-title="copyLyricsTitle">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      <span data-i18n="copyLyrics">העתק Lyrics</span>
+    </button>
+    <button class="full-preview-btn sb-copy-all" onclick="copyAll()" title="העתק Style + Lyrics" data-i18n-title="copyAllTitle">
+      <span data-i18n="copyAll">העתק הכל</span>
+    </button>
+    <a class="full-preview-btn sb-suno-link" href="https://suno.com/create" target="_blank" rel="noopener" title="פתח את Suno בלשונית חדשה" data-i18n-title="openSunoTitle">Suno ↗</a>
     <button class="full-preview-btn" onclick="openFullPreview()">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12"/><circle cx="12" cy="12" r="3"/></svg>
       Full Preview ↗
@@ -2319,7 +2352,7 @@ body {
         <div class="sb-card-body" id="sb-body-style">
           <textarea id="style-prompt" data-i18n-ph="stylePlaceholder" placeholder="לחץ על שבבים לימין..." oninput="updateStyleCounter()"></textarea>
           <div class="style-footer">
-            <div class="char-counter" id="style-counter">0 / 120</div>
+            <div class="char-counter" id="style-counter">0 / 1000</div>
             <div class="rand-wrap">
               <select class="rand-select" id="rand-genre" title="בחר ז׳אנר לרנדומייז">
                 <option value="-1">🎲 All genres</option>
@@ -2435,7 +2468,7 @@ body {
   <div id="full-preview-modal">
     <div class="fpm-hdr">
       <span class="fpm-title">Full Preview</span>
-      <span class="fpm-counter" id="fpm-counter">0 / 3000 תווים</span>
+      <span class="fpm-counter" id="fpm-counter">0 / 5000 תווים</span>
       <button class="fpm-close" onclick="closeFullPreview()">×</button>
     </div>
     <div id="full-preview-body"></div>
@@ -2741,6 +2774,65 @@ function updateUndoBtn() {
 let sections = [];
 let sectionIdCounter = 0;
 
+// ── Suno model limits (chars) ──
+const SUNO_LIMITS = {
+  'v3.5': { style: 120,  lyrics: 3000 },
+  'v4':   { style: 200,  lyrics: 3000 },
+  'v4.5': { style: 1000, lyrics: 5000 },
+  'v5':   { style: 1000, lyrics: 5000 },
+};
+let sunoVersion = localStorage.getItem('melodraft_suno_ver') || 'v5';
+if (!SUNO_LIMITS[sunoVersion]) sunoVersion = 'v5';
+function sunoLimit(kind) { return SUNO_LIMITS[sunoVersion][kind]; }
+function setSunoVersion(v) {
+  if (!SUNO_LIMITS[v]) return;
+  sunoVersion = v;
+  localStorage.setItem('melodraft_suno_ver', v);
+  const sel = document.getElementById('suno-ver');
+  if (sel && sel.value !== v) sel.value = v;
+  updateOutput(); updateStyleCounter();
+}
+function counterClass(base, len, lim) {
+  return base + (len > lim ? ' over' : len > lim * 0.85 ? ' warn' : '');
+}
+
+// ── Autosave (localStorage) ──
+const AUTOSAVE_KEY = 'melodraft_autosave';
+let autosaveTimer;
+function scheduleAutosave() {
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(() => {
+    try {
+      const snap = snapshotState();
+      snap.title = document.getElementById('song-title')?.value ?? '';
+      snap.ts = Date.now();
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(snap));
+    } catch (e) {}
+  }, 400);
+}
+function loadAutosave() {
+  try {
+    const snap = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null');
+    if (!snap || !Array.isArray(snap.sections)) return null;
+    const hasContent = snap.sections.some(x => (x.text || '').trim()) || (snap.stylePrompt || '').trim();
+    return hasContent ? snap : null;
+  } catch (e) { return null; }
+}
+function newSong() {
+  const hasContent = sections.some(x => (x.text || '').trim()) ||
+    (document.getElementById('style-prompt')?.value || '').trim();
+  if (hasContent && !confirm(t('confirmNewSong'))) return;
+  clearAllAmbigStates();
+  pushUndo();
+  sections = []; sectionIdCounter = 0;
+  ['Verse 1', 'Chorus', 'Verse 2'].forEach(n => sections.push({ id: ++sectionIdCounter, name: n, text: '' }));
+  const sp = document.getElementById('style-prompt'); if (sp) sp.value = '';
+  const ti = document.getElementById('song-title');  if (ti) ti.value = '';
+  renderSections(); updateOutput(); updateStyleCounter();
+  localStorage.removeItem(AUTOSAVE_KEY);
+  showToast(t('toastNewSong'), 'success');
+}
+
 // ════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════
@@ -2761,13 +2853,22 @@ document.addEventListener('DOMContentLoaded', () => {
   initRandSelect();
   // Build initial sections without polluting undo stack
   undoPaused = true;
-  const id1 = ++sectionIdCounter; sections.push({ id: id1, name: 'Verse 1', text: '' });
-  const id2 = ++sectionIdCounter; sections.push({ id: id2, name: 'Chorus',  text: '' });
-  const id3 = ++sectionIdCounter; sections.push({ id: id3, name: 'Verse 2', text: '' });
-  renderSections(); updateOutput();
+  const sel = document.getElementById('suno-ver'); if (sel) sel.value = sunoVersion;
+  const saved = loadAutosave();
+  if (saved) {
+    sections = saved.sections.map(x => ({ ...x }));
+    sectionIdCounter = saved.sectionIdCounter || sections.reduce((m, x) => Math.max(m, x.id), 0);
+    const sp = document.getElementById('style-prompt'); if (sp) sp.value = saved.stylePrompt || '';
+    const ti = document.getElementById('song-title');  if (ti && saved.title) ti.value = saved.title;
+  } else {
+    ['Verse 1', 'Chorus', 'Verse 2'].forEach(n => sections.push({ id: ++sectionIdCounter, name: n, text: '' }));
+  }
+  renderSections(); updateOutput(); updateStyleCounter();
   undoPaused = false;
   pushUndo(); // initial snapshot
   updateUndoBtn();
+  document.getElementById('song-title')?.addEventListener('input', scheduleAutosave);
+  if (saved) setTimeout(() => showToast(t('toastRestored'), ''), 400);
   document.addEventListener('click', e => {
     if (!e.target.closest('#tpl-wrap')) {
       document.getElementById('tpl-dd').classList.remove('open');
@@ -4222,8 +4323,9 @@ function updateOutput() {
 
   const lyricsLen = rawText.trim().length;
   const counter = document.getElementById('lyrics-counter');
-  counter.textContent = `${lyricsLen} / 3000 ${t('charsUnit')}`;
-  counter.className = 'lyrics-char-counter' + (lyricsLen > 3000 ? ' over' : lyricsLen > 2500 ? ' warn' : '');
+  counter.textContent = `${lyricsLen} / ${sunoLimit('lyrics')} ${t('charsUnit')}`;
+  counter.className = counterClass('lyrics-char-counter', lyricsLen, sunoLimit('lyrics'));
+  scheduleAutosave();
 }
 
 // ── Full Preview modal ───────────────────────────────────────
@@ -4252,8 +4354,8 @@ function openFullPreview() {
 
   const len = rawText.trim().length;
   const ctr = document.getElementById('fpm-counter');
-  ctr.textContent = `${len} / 3000 ${t('charsUnit')}`;
-  ctr.className = 'fpm-counter' + (len > 3000 ? ' over' : len > 2500 ? ' warn' : '');
+  ctr.textContent = `${len} / ${sunoLimit('lyrics')} ${t('charsUnit')}`;
+  ctr.className = counterClass('fpm-counter', len, sunoLimit('lyrics'));
 
   document.getElementById('full-preview-overlay').classList.add('open');
 }
@@ -4285,8 +4387,9 @@ function updateStyleCounter() {
   const ta = document.getElementById('style-prompt');
   const len = ta.value.length;
   const counter = document.getElementById('style-counter');
-  counter.textContent = `${len} / 120`;
-  counter.className = 'char-counter' + (len > 120 ? ' over' : len > 100 ? ' warn' : '');
+  counter.textContent = `${len} / ${sunoLimit('style')}`;
+  counter.className = counterClass('char-counter', len, sunoLimit('style'));
+  scheduleAutosave();
 }
 
 function clearStylePrompt() {
@@ -4298,8 +4401,16 @@ function clearStylePrompt() {
 // ════════════════════════════════════════════
 //  COPY
 // ════════════════════════════════════════════
-function copyOutput() {
-  const style = document.getElementById('style-prompt').value.trim();
+function writeClipboard(text) {
+  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
+  return new Promise(res => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); res();
+  });
+}
+function buildLyricsText() {
   let lyrics = '';
   sections.forEach(sec => {
     const text = sec.text || '';
@@ -4307,14 +4418,32 @@ function copyOutput() {
       ? text + '\n\n'
       : `[${sec.name}]\n${text}\n\n`;
   });
-  const full = (style ? style + '\n\n' : '') + lyrics.trim();
-  navigator.clipboard.writeText(full).then(() => {
+  return lyrics.trim();
+}
+// Style card COPY → style prompt only (paste into Suno "Style of Music")
+function copyOutput() {
+  const style = document.getElementById('style-prompt').value.trim();
+  if (!style) { showToast(t('toastNothingToCopy'), 'error'); return; }
+  writeClipboard(style).then(() => {
     const btn = document.getElementById('copy-btn');
     btn.textContent = 'COPIED!';
     btn.classList.add('ok');
     setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('ok'); }, 2000);
-    showToast(t('toastCopied'), 'success');
+    showToast(t('toastStyleCopied'), 'success');
   });
+}
+// Status bar → lyrics only (paste into Suno "Lyrics")
+function copyLyrics() {
+  const lyrics = buildLyricsText();
+  if (!lyrics) { showToast(t('toastNothingToCopy'), 'error'); return; }
+  writeClipboard(lyrics).then(() => showToast(t('toastLyricsCopied'), 'success'));
+}
+// Status bar → style + lyrics together (for sharing / backup)
+function copyAll() {
+  const style = document.getElementById('style-prompt').value.trim();
+  const lyrics = buildLyricsText();
+  if (!style && !lyrics) { showToast(t('toastNothingToCopy'), 'error'); return; }
+  writeClipboard((style ? style + '\n\n' : '') + lyrics).then(() => showToast(t('toastAllCopied'), 'success'));
 }
 
 // ════════════════════════════════════════════
@@ -4433,6 +4562,21 @@ const I18N = {
     toastNoTextPhonetic: 'אין טקסט להמרה',
     toastCopied: 'הועתק!',
     toastFullCopied: 'הטקסט המלא הועתק!',
+    toastStyleCopied: 'ה-Style הועתק — הדבק ב-Style of Music',
+    toastLyricsCopied: 'המילים הועתקו — הדבק ב-Lyrics',
+    toastAllCopied: 'Style + מילים הועתקו!',
+    toastNothingToCopy: 'אין מה להעתיק',
+    toastRestored: 'השיר שוחזר מהשמירה האוטומטית',
+    toastNewSong: 'שיר חדש',
+    confirmNewSong: 'להתחיל שיר חדש? השיר הנוכחי יימחק (אפשר לבטל עם Undo).',
+    copyLyrics: 'העתק Lyrics',
+    copyLyricsTitle: 'העתק מילים להדבקה ב-Suno',
+    copyAll: 'העתק הכל',
+    copyAllTitle: 'העתק Style + Lyrics',
+    openSunoTitle: 'פתח את Suno בלשונית חדשה',
+    newSong: 'חדש',
+    newSongTitle: 'שיר חדש',
+    sunoVerTitle: 'גרסת מודל Suno — קובעת את מגבלת התווים',
     toastRandomStyle: 'Style Prompt רנדומלי נוצר!',
     toastTemplateLoaded: 'תבנית נטענה!',
     toastAdded: 'נוסף: ${cmd}',
@@ -4554,6 +4698,21 @@ const I18N = {
     toastNoTextPhonetic: 'No text to convert',
     toastCopied: 'Copied!',
     toastFullCopied: 'Full text copied!',
+    toastStyleCopied: 'Style copied — paste into Style of Music',
+    toastLyricsCopied: 'Lyrics copied — paste into Lyrics',
+    toastAllCopied: 'Style + lyrics copied!',
+    toastNothingToCopy: 'Nothing to copy',
+    toastRestored: 'Song restored from autosave',
+    toastNewSong: 'New song',
+    confirmNewSong: 'Start a new song? The current song will be cleared (Undo is available).',
+    copyLyrics: 'Copy Lyrics',
+    copyLyricsTitle: 'Copy lyrics to paste into Suno',
+    copyAll: 'Copy All',
+    copyAllTitle: 'Copy Style + Lyrics',
+    openSunoTitle: 'Open Suno in a new tab',
+    newSong: 'New',
+    newSongTitle: 'New song',
+    sunoVerTitle: 'Suno model version — sets the character limits',
     toastRandomStyle: 'Random Style Prompt created!',
     toastTemplateLoaded: 'Template loaded!',
     toastAdded: 'Added: ${cmd}',
@@ -6406,8 +6565,7 @@ function setAllTextareasInputMode(mode) {
 }
 
 function initMobileKeyboard() {
-  if (!isPhone()) return;
-  setAllTextareasInputMode('none');   // suppress auto-keyboard on phone
+  // Native keyboard behaviour — no inputmode suppression (removed in Phase 0)
   mobileKbdOpen = false;
 }
 
@@ -6423,20 +6581,15 @@ function toggleMobileKeyboard() {
 
   if (!isPhone()) return;
 
-  mobileKbdOpen = !mobileKbdOpen;
-  if (mobileKbdOpen) {
-    const ta = lastFocusedTa || document.querySelector('.lyrics-ta');
-    if (ta) {
-      ta.setAttribute('inputmode', 'text');
-      ta.focus();
-      mobileTab('editor');
-    }
-    btn?.classList.add('kbd-on');
-  } else {
-    setAllTextareasInputMode('none');
-    if (document.activeElement?.classList.contains('lyrics-ta')) document.activeElement.blur();
+  // Phone: focus the last textarea (opens native keyboard) or dismiss it
+  const active = document.activeElement?.classList.contains('lyrics-ta');
+  if (active) {
+    document.activeElement.blur();
     btn?.classList.remove('kbd-on');
-    mobileKbdOpen = false;
+  } else {
+    const ta = lastFocusedTa || document.querySelector('.lyrics-ta');
+    if (ta) { ta.focus(); mobileTab('editor'); }
+    btn?.classList.add('kbd-on');
   }
 }
 
@@ -6446,7 +6599,6 @@ document.addEventListener('blur', e => {
   if (e.target.classList?.contains('lyrics-ta')) {
     document.getElementById('btn-keyboard')?.classList.remove('kbd-on');
     mobileKbdOpen = false;
-    setAllTextareasInputMode('none');
   }
 }, true);
 
