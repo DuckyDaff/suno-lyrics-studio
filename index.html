@@ -879,6 +879,8 @@ body {
 .suno-ver-sel option { background: var(--bg2); color: var(--txt0); }
 @media (max-width: 640px) {
   #status-bar { overflow-x: auto; scrollbar-width: none; }
+  #status-bar > * { flex-shrink: 0; }
+  .lyrics-char-counter { white-space: nowrap; font-size: 12px; }
   #status-bar::-webkit-scrollbar { display: none; }
   .sb-copy-all { display: none; }
 }
