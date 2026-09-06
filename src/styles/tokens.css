@@ -1,0 +1,75 @@
+/* ─── MeloDraft v2 design tokens ─── */
+:root {
+  --font-ui: 'Heebo', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+
+  /* surfaces (dark-first) */
+  --bg0: #0b0c10;
+  --bg1: #111318;
+  --bg2: #171a21;
+  --bg3: #1e222b;
+  --bg4: #262b36;
+  --line:  rgba(255,255,255,0.06);
+  --line2: rgba(255,255,255,0.12);
+  --shadow: 0 8px 28px rgba(0,0,0,0.45);
+
+  /* text */
+  --tx0: #e9ebf1;
+  --tx1: #a2a8ba;
+  --tx2: #646b80;
+
+  /* accent */
+  --accent:    #22d3ee;
+  --accent-2:  #0ea5c4;
+  --accent-bg: rgba(34,211,238,0.12);
+  --accent-bd: rgba(34,211,238,0.35);
+  --on-accent: #06171b;
+
+  /* semantic */
+  --ok:   #22c55e;
+  --warn: #f59e0b;
+  --err:  #ef4444;
+  --suno: #f97316;
+
+  /* section colours */
+  --c-intro:   #1dd1a1;
+  --c-verse:   #4a9eff;
+  --c-pre:     #54c8ff;
+  --c-chorus:  #ff5c8a;
+  --c-hook:    #f5c542;
+  --c-bridge:  #ffb547;
+  --c-break:   #a78bfa;
+  --c-outro:   #b66dff;
+  --c-default: #9aa0b4;
+
+  /* radii / spacing / type */
+  --r1: 6px;  --r2: 10px; --r3: 14px; --r4: 20px;
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  --fs-xs: 12px; --fs-sm: 13px; --fs-md: 15px; --fs-lg: 18px; --fs-xl: 24px;
+
+  /* layout */
+  --rail-w: 60px;
+  --panel-w: 360px;
+  --top-h: 56px;
+  --export-h: 58px;
+  --tabs-h: 60px;
+}
+
+[data-theme="light"] {
+  --bg0: #f3f4f8;
+  --bg1: #ffffff;
+  --bg2: #f6f7fb;
+  --bg3: #eceef4;
+  --bg4: #e1e4ec;
+  --line:  rgba(15,23,42,0.08);
+  --line2: rgba(15,23,42,0.16);
+  --shadow: 0 8px 28px rgba(15,23,42,0.12);
+  --tx0: #14161c;
+  --tx1: #4b5163;
+  --tx2: #8b91a3;
+  --accent:    #0891b2;
+  --accent-2:  #0e7490;
+  --accent-bg: rgba(8,145,178,0.10);
+  --accent-bd: rgba(8,145,178,0.35);
+  --on-accent: #ffffff;
+}
