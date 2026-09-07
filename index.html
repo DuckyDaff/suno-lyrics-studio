@@ -2262,6 +2262,7 @@ body {
   <!-- TEXT TOOLS BAR (below top-bar) -->
   <div id="status-bar">
     <select class="suno-ver-sel" id="suno-ver" onchange="setSunoVersion(this.value)" title="גרסת מודל Suno" data-i18n-title="sunoVerTitle">
+      <option value="v5.5">Suno v5.5</option>
       <option value="v5">Suno v5</option>
       <option value="v4.5">Suno v4.5</option>
       <option value="v4">Suno v4</option>
@@ -2782,9 +2783,10 @@ const SUNO_LIMITS = {
   'v4':   { style: 200,  lyrics: 3000 },
   'v4.5': { style: 1000, lyrics: 5000 },
   'v5':   { style: 1000, lyrics: 5000 },
+  'v5.5': { style: 1000, lyrics: 5000 },
 };
-let sunoVersion = localStorage.getItem('melodraft_suno_ver') || 'v5';
-if (!SUNO_LIMITS[sunoVersion]) sunoVersion = 'v5';
+let sunoVersion = localStorage.getItem('melodraft_suno_ver') || 'v5.5';
+if (!SUNO_LIMITS[sunoVersion]) sunoVersion = 'v5.5';
 function sunoLimit(kind) { return SUNO_LIMITS[sunoVersion][kind]; }
 function setSunoVersion(v) {
   if (!SUNO_LIMITS[v]) return;
