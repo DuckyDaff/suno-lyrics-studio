@@ -19,10 +19,17 @@ function verifyToken(token) {
   return payload;
 }
 
+// Accepts either the Vercel Marketplace names (KV_REST_API_*) or the
+// manually-set ones (UPSTASH_REDIS_REST_*), whichever is present.
+function kvCreds() {
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const tok = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !tok) throw new Error('Redis is not configured (set KV_REST_API_URL / KV_REST_API_TOKEN)');
+  return { url: url.replace(/[/]+$/, ''), tok };
+}
+
 async function kv(cmd, ...args) {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const tok = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url) throw new Error('UPSTASH_REDIS_REST_URL is not set');
+  const { url, tok } = kvCreds();
   const path = [cmd, ...args].map(encodeURIComponent).join('/');
   const r = await fetch(`${url}/${path}`, { headers: { Authorization: `Bearer ${tok}` } });
   const j = await r.json();
