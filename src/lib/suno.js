@@ -1,5 +1,6 @@
 /** Suno model versions and their character limits. */
 export const SUNO_VERSIONS = [
+  { id: 'v5.5', label: 'Suno v5.5', style: 1000, lyrics: 5000 },
   { id: 'v5',   label: 'Suno v5',   style: 1000, lyrics: 5000 },
   { id: 'v4.5', label: 'Suno v4.5', style: 1000, lyrics: 5000 },
   { id: 'v4',   label: 'Suno v4',   style: 200,  lyrics: 3000 },
