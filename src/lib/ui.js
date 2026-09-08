@@ -8,6 +8,8 @@ export const panelTab = writable('style');
 export const mobileTab = writable('editor');
 /** section whose textarea currently has focus */
 export const activeSectionId = writable(null);
+/** Studio Region output (not part of the song) */
+export const studioText = writable('');
 /** export preview overlay (desktop) */
 export const previewOpen = writable(false);
 

@@ -23,8 +23,15 @@ export default {
   field_genre: 'ז׳אנר', field_mood: 'מצב רוח', field_instr: 'כלים', field_vox: 'ווקאל', field_prod: 'הפקה', field_bpm: 'BPM',
   clear: 'נקה',
   // library / studio placeholders
-  librarySearch: 'חפש תג, כלי, ז׳אנר...', libraryComing: 'הספרייה המאוחדת (תגים + פקודות + Studio) מגיעה בשלב 3',
-  studioComing: 'Studio Region — תפקידים וכלים לאזור נבחר ב-DAW — מגיע בשלב 3',
+  librarySearch: 'חפש תג, כלי, ז׳אנר...', noResults: 'לא נמצאו תגים',
+  kindStyle: 'Style', kindLyrics: 'Lyrics', kindTags: 'תגים',
+  hintStyle: 'לחיצה מוסיפה ל-Style (לחיצה נוספת מסירה)', hintLyrics: 'לחיצה מכניסה לתיבה הפעילה במיקום הסמן',
+  hintTags: 'Structure יוצר סקשן · [תגים] נכנסים למילים · השאר ל-Style',
+  toastAddedStyle: 'נוסף ל-Style: {x}', toastRemovedStyle: 'הוסר: {x}', toastInserted: 'הוכנס: {x}',
+  toastSection: 'סקשן נוסף: {x}', toastNoSection: 'אין סקשן להכניס אליו',
+  studioHint: 'בחר תיבות ב-DAW של Suno, הרכב כאן את ה-Style של האזור, והעתק לשדה Style שלו.',
+  studioPlaceholder: 'Synth chord accompaniment, warm pad...', allCategories: 'כל הקטגוריות', copy: 'העתק',
+  toastStudioCopied: 'ה-Style של האזור הועתק',
   // export
   exportTitle: 'ייצוא ל-Suno', lyrics: 'מילים', style: 'Style', status: 'סטטוס',
   statusOk: 'מוכן', statusWarn: 'קרוב למגבלה', statusOver: 'חורג מהמגבלה',
