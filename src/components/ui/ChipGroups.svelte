@@ -9,7 +9,7 @@
    * onpick:   (item, group) => void
    * mono:     render chips in monospace (bracket tags)
    */
-  let { groups = [], query = '', isActive = () => false, onpick, mono = false, openFirst = true } = $props();
+  let { groups = [], query = '', isActive = () => false, onpick, mono = false, openFirst = false } = $props();
 
   let open = $state(new Set());
   let initialised = $state(false);

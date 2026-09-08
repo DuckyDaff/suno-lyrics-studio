@@ -1,5 +1,5 @@
 <script>
-  import LIB from '../../lib/data/library.json';
+  import { LIB } from '../../lib/data/library.js';
   import { song } from '../../lib/song.js';
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';

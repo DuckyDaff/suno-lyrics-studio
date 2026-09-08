@@ -1,5 +1,5 @@
 <script>
-  import LIB from '../../lib/data/library.json';
+  import { LIB } from '../../lib/data/library.js';
   import { studioText } from '../../lib/ui.js';
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
@@ -8,10 +8,7 @@
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
 
-  const GENRE_LABELS = {
-    pop: 'Pop', hiphop: 'Hip-Hop', rnb: 'R&B / Soul', rock: 'Rock', electronic: 'Electronic',
-    jazz: 'Jazz', latin: 'Latin', reggae: 'Reggae', cinematic: 'Cinematic', mediterranean: 'Mediterranean',
-  };
+  const GENRE_LABELS = LIB.studioGenreLabels;
   let genre = $state('');
   let cat = $state('');
   let query = $state('');
