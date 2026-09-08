@@ -4,8 +4,10 @@
   import StyleTab from './StyleTab.svelte';
   import LibraryTab from './LibraryTab.svelte';
   import StudioTab from './StudioTab.svelte';
+  import GenerateTab from './GenerateTab.svelte';
 
   const tabs = $derived([
+    { id: 'ai',      label: '✨ ' + $t('tabAI') },
     { id: 'style',   label: $t('tabStyle') },
     { id: 'library', label: $t('tabLibrary') },
     { id: 'studio',  label: $t('navStudio') },
@@ -19,7 +21,8 @@
     {/each}
   </div>
   <div class="body">
-    {#if $panelTab === 'style'}<StyleTab />
+    {#if $panelTab === 'ai'}<GenerateTab />
+    {:else if $panelTab === 'style'}<StyleTab />
     {:else if $panelTab === 'library'}<LibraryTab />
     {:else}<StudioTab />{/if}
   </div>
@@ -29,7 +32,7 @@
   .panel { display: flex; flex-direction: column; height: 100%; min-height: 0; }
   .tabs { display: flex; padding: 8px 10px 0; gap: 4px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
   .tabs button {
-    padding: 8px 12px; font-size: var(--fs-sm); font-weight: 700; color: var(--tx2);
+    padding: 8px 10px; font-size: var(--fs-sm); font-weight: 700; color: var(--tx2);
     border-bottom: 2px solid transparent; margin-bottom: -1px; border-radius: var(--r1) var(--r1) 0 0;
   }
   .tabs button:hover { color: var(--tx0); background: var(--bg2); }

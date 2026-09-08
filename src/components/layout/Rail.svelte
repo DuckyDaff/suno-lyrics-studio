@@ -6,16 +6,17 @@
   const items = $derived([
     { id: 'songs',    icon: 'music',   label: $t('navSongs') },
     { id: 'editor',   icon: 'pen',     label: $t('navEditor') },
+    { id: 'ai',       icon: 'sparkles', label: $t('tabAI') },
     { id: 'library',  icon: 'library', label: $t('navLibrary') },
     { id: 'studio',   icon: 'sliders', label: $t('navStudio') },
   ]);
 
   function go(id) {
-    if (id === 'library' || id === 'studio') { view.set('editor'); panelTab.set(id); }
+    if (id === 'library' || id === 'studio' || id === 'ai') { view.set('editor'); panelTab.set(id); }
     else view.set(id);
   }
   const isActive = id =>
-    id === 'library' || id === 'studio' ? $view === 'editor' && $panelTab === id
+    id === 'library' || id === 'studio' || id === 'ai' ? $view === 'editor' && $panelTab === id
     : id === 'editor' ? $view === 'editor' && $panelTab === 'style'
     : $view === id;
 </script>
