@@ -7,16 +7,23 @@
   import { generate, busy } from '../../lib/ai.js';
   import { parseLyrics, parseWild, parseLines } from '../../lib/lyricsParse.js';
   import { copyText } from '../../lib/clipboard.js';
-  import { activeSectionId } from '../../lib/ui.js';
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
 
-  const FORMS = ['pop song', 'ballad', 'rap / hip-hop', 'trap', 'rock anthem', 'punk', 'metal', 'opera', 'musical theatre',
+  const FORMS = ['pop song', 'ballad', 'rap / hip-hop', 'trap', 'drill', 'rock anthem', 'punk', 'metal', 'opera', 'musical theatre',
     'mizrahi', 'israeli rock', 'piyyut / religious', 'hasidic', 'children\'s song', 'lullaby', 'folk', 'country', 'jazz', 'blues',
     'gospel', 'reggae', 'reggaeton', 'afrobeats', 'k-pop', 'synthwave', 'spoken word', 'poem', 'parody / comedy', 'wedding song',
     'birthday song', 'love song', 'breakup song', 'protest song', 'anthem', 'christmas / holiday', 'chanukah / jewish holiday'];
-  const LANGS = ['Hebrew', 'English', 'Hebrew and English mixed', 'Italian', 'Spanish', 'French', 'Arabic', 'Russian', 'Yiddish', 'Ladino'];
+  const LANGS = ['Hebrew', 'English', 'Hebrew and English mixed', 'Italian', 'Spanish', 'French', 'Arabic', 'Russian', 'Yiddish', 'Ladino', 'Aramaic'];
   const RHYMES = ['auto', 'AABB', 'ABAB', 'ABCB', 'AAAA', 'free verse'];
+  const VOICES = ['male rapper', 'female rapper', 'two rappers trading bars', 'male singer', 'female singer', 'male & female duet',
+    'male cantor (chazan)', 'female opera soprano', 'male opera tenor', 'children choir', 'gospel choir', 'kid singer',
+    'robotic vocoder voice', 'whispering narrator', 'elderly storyteller', 'crowd chant'];
+  const MIX_SLOTS = [['verse', 'aiSlotVerse'], ['chorus', 'aiSlotChorus'], ['bridge', 'aiSlotBridge'], ['intro', 'aiSlotIntro'], ['outro', 'aiSlotOutro']];
+  const RHYTHMIC = ['rap / hip-hop', 'trap', 'drill', 'spoken word', 'punk', 'reggaeton'];
+  const MELODIC  = ['hasidic', 'opera', 'gospel', 'mizrahi', 'piyyut / religious', 'children\'s song', 'synthwave', 'ballad', 'musical theatre', 'k-pop', 'country', 'metal'];
+  const RAP_V  = ['male rapper', 'female rapper', 'two rappers trading bars'];
+  const SING_V = ['female singer', 'male singer', 'male cantor (chazan)', 'female opera soprano', 'male opera tenor', 'children choir', 'gospel choir', 'kid singer'];
 
   let idea = $state('');
   let form = $state('pop song');
@@ -28,6 +35,10 @@
   let useStyle = $state(true);
   let extra = $state('');
 
+  let mixOn = $state(false);
+  let mix = $state({ verse: { form: '', voice: '' }, chorus: { form: '', voice: '' }, bridge: { form: '', voice: '' },
+                     intro: { form: '', voice: '' }, outro: { form: '', voice: '' }, notes: '' });
+
   let output = $state('');
   let outMode = $state('');       // song | wild | style | titles
   let error = $state('');
@@ -38,14 +49,33 @@
   const wild = $derived(outMode === 'wild' ? parseWild(output) : null);
   const titles = $derived(outMode === 'titles' ? parseLines(output) : []);
 
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  function shuffleMix() {
+    const flip = Math.random() < 0.25;                       // sometimes sung verses + rapped chorus
+    const third = Math.random() < 0.5;
+    mix = {
+      ...mix,
+      verse:  { form: pick(flip ? MELODIC : RHYTHMIC), voice: pick(flip ? SING_V : RAP_V) },
+      chorus: { form: pick(flip ? RHYTHMIC : MELODIC), voice: pick(flip ? RAP_V : SING_V) },
+      bridge: third ? { form: pick([...RHYTHMIC, ...MELODIC]), voice: pick([...RAP_V, ...SING_V, 'crowd chant', 'robotic vocoder voice']) } : { form: '', voice: '' },
+    };
+    mixOn = true;
+  }
+  function mixPayload() {
+    if (!mixOn) return {};
+    const cast = [...new Set(MIX_SLOTS.map(([k]) => mix[k].voice).filter(Boolean))];
+    return { mix: { ...mix, cast }, blend: true };
+  }
+
   async function run(mode) {
     if ($busy) { abort?.abort(); return; }
     error = ''; output = ''; outMode = mode; usage = null;
     abort = new AbortController();
     const fields = {
-      mode, idea, form: form, language, rhyme, persona, length, extra,
+      mode, idea, form, language, rhyme, persona, length, extra,
       style: useStyle ? $song.style : '',
       structure: useStructure ? $song.sections.map(s => s.name) : null,
+      ...mixPayload(),
     };
     if (mode === 'style') fields.limit = lim.style;
     try {
@@ -68,7 +98,7 @@
   function applyStyle() {
     const s = outMode === 'wild' ? wild.style : output.trim();
     if (!s) return;
-    actions.setStyle(s); toast($t('toastStyleCopied').split(' —')[0], 'success');
+    actions.setStyle(s); toast($t('aiApplyStyle'), 'success');
   }
   function applyTitle(tt) { actions.setTitle(tt); toast(tt, 'success'); }
   async function copyOut() { (await copyText(output)) ? toast($t('toastAllCopied'), 'success') : toast($t('toastCopyFail'), 'error'); }
@@ -95,6 +125,31 @@
     </div>
     <input class="field" bind:value={persona} placeholder={$t('aiPersonaPh')} />
     <input class="field" bind:value={extra} placeholder={$t('aiExtraPh')} />
+
+    <!-- style & voice blend -->
+    <div class="mix" class:on={mixOn}>
+      <div class="mixhd">
+        <label class="chk big"><input type="checkbox" bind:checked={mixOn} /> 🎭 {$t('aiMix')}</label>
+        <button class="linkBtn" onclick={shuffleMix}>🎲 {$t('aiMixShuffle')}</button>
+      </div>
+      {#if mixOn}
+        <p class="faint hint">{$t('aiMixHint')}</p>
+        {#each MIX_SLOTS as [k, lbl]}
+          <div class="mixrow">
+            <span class="slot">{$t(lbl)}</span>
+            <select class="field" bind:value={mix[k].form}>
+              <option value="">{$t('aiSameAsMain')}</option>
+              {#each FORMS as f}<option value={f}>{f}</option>{/each}
+            </select>
+            <select class="field" bind:value={mix[k].voice}>
+              <option value="">{$t('aiAutoVoice')}</option>
+              {#each VOICES as v}<option value={v}>{v}</option>{/each}
+            </select>
+          </div>
+        {/each}
+        <input class="field" bind:value={mix.notes} placeholder={$t('aiMixNotesPh')} />
+      {/if}
+    </div>
 
     <div class="opts">
       <label class="chk"><input type="checkbox" bind:checked={useStyle} /> {$t('aiUseStyle')} <span class="faint mono">{$song.style ? $song.style.slice(0, 40) + ($song.style.length > 40 ? '…' : '') : '—'}</span></label>
@@ -162,10 +217,18 @@
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .f { display: flex; flex-direction: column; gap: 3px; font-size: 11px; font-weight: 600; color: var(--tx2); }
   .f select { padding: 7px 8px; font-size: var(--fs-xs); }
-  .opts { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; background: var(--bg2); border-radius: var(--r2); border: 1px solid var(--line); }
+  .opts, .mix { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; background: var(--bg2); border-radius: var(--r2); border: 1px solid var(--line); }
+  .mix.on { border-color: var(--accent-bd); }
+  .mixhd { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .chk { display: flex; align-items: center; gap: 6px; font-size: var(--fs-xs); font-weight: 600; color: var(--tx1); cursor: pointer; min-width: 0; }
+  .chk.big { font-size: var(--fs-sm); color: var(--tx0); }
   .chk span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
   .chk input { accent-color: var(--accent); }
+  .linkBtn { font-size: var(--fs-xs); font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .hint { font-size: 11px; line-height: 1.45; }
+  .mixrow { display: grid; grid-template-columns: 52px 1fr 1fr; gap: 4px; align-items: center; }
+  .mixrow .field { padding: 6px 6px; font-size: 11px; min-width: 0; }
+  .slot { font-size: 11px; font-weight: 700; color: var(--tx1); }
   .model { display: flex; align-items: center; gap: 4px; font-size: var(--fs-xs); color: var(--tx2); font-weight: 600; }
   .model button { padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; color: var(--tx2); border: 1px solid var(--line); }
   .model button.on { color: var(--accent); background: var(--accent-bg); border-color: var(--accent-bd); }

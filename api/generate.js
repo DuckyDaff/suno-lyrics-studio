@@ -71,10 +71,30 @@ FORM GUIDES:
 - Spoken word / poem: no forced rhyme, rhythm from breath, strong images, mark [Spoken word].
 - Parody / comedy: real jokes with setups and punchlines, rhythm serves the punchline.
 
+GENRE / VOICE BLENDS: when a blend is requested, the song deliberately mixes styles and performers between sections (e.g. drill verses with a Hasidic chorus, a male rapper trading bars with a female opera singer). Then:
+- Write every section tag as [Section name: voice, style] — e.g. [Verse 1: male rapper, drill], [Chorus: female singer, hasidic pop], [Bridge: children choir, gospel] — so Suno switches voice and genre. Keep tags in English.
+- Make each part authentic to its own form (rap bars stay bars; an aria stays an aria), but make the transitions intentional: the chorus answers the verse, hook words echo across styles, the bridge collides or reconciles the two worlds.
+- For two or more performers: use call-and-response lines, (both) for shared lines, trading bars (alternate lines or couplets) for two rappers, harmonies on the hook, and a moment where the voices overlap.
+- The contrast should be the point of the song, not an accident — lean into it.
+
 When asked for a single section or an edit, return only the new text for that section — no section tag unless explicitly requested — and preserve the established characters, tense, imagery and rhyme scheme of the song.`;
 
 /* ── request → user message ────────────────────────────────────────────── */
 const clean = (s, max = 4000) => String(s ?? '').replace(/\s+$/, '').slice(0, max);
+
+const MIX_KEYS = [['intro', 'Intro'], ['verse', 'Verses'], ['prechorus', 'Pre-chorus'], ['chorus', 'Chorus'], ['bridge', 'Bridge'], ['outro', 'Outro']];
+function blendText(b) {
+  const m = b.mix;
+  if (!m || typeof m !== 'object') return '';
+  const rows = MIX_KEYS
+    .filter(([k]) => m[k] && (m[k].form || m[k].voice))
+    .map(([k, label]) => `- ${label}: ${clean(m[k].form, 80) || 'the main form'}${m[k].voice ? `, performed by ${clean(m[k].voice, 80)}` : ''}`);
+  const cast = Array.isArray(m.cast) && m.cast.length ? `- Cast: ${m.cast.map(c => clean(c, 80)).join(' / ')}` : '';
+  const notes = m.notes ? `- Notes: ${clean(m.notes, 600)}` : '';
+  if (!rows.length && !cast && !notes) return '';
+  return ['GENRE / VOICE BLEND requested — mix these styles and performers (see the blend rules):', ...rows, cast, notes]
+    .filter(Boolean).join('\n');
+}
 
 function songContext(b) {
   const lines = [];
@@ -102,6 +122,7 @@ function buildUser(b) {
         b.rhyme && b.rhyme !== 'auto' ? `Rhyme scheme: ${b.rhyme}.` : '',
         b.length === 'short' ? 'Length: short (about 12–20 lines).' : b.length === 'long' ? 'Length: long (a full 3-verse song).' : 'Length: normal (about 24–36 lines).',
         structure,
+        blendText(b),
         b.style ? `Match the lyrics to this Suno style prompt: ${clean(b.style, 1200)}` : '',
         b.extra ? `Additional instructions: ${clean(b.extra, 1000)}` : '',
         limit,
@@ -113,9 +134,10 @@ function buildUser(b) {
         b.idea ? `Seed (optional, riff on it freely): ${clean(b.idea, 1000)}` : 'No seed — surprise me.',
         `Language for lyrics: ${lang}.`,
         b.form && b.form !== 'auto' ? `Form: ${b.form}.` : 'Pick whichever form fits the concept best (pop, rap, opera, musical, ballad, mizrahi, punk, children…).',
+        blendText(b) || (b.blend ? 'Make it a GENRE / VOICE BLEND: choose two or three contrasting styles and performers for different sections (e.g. rap verses with an operatic chorus, a female rapper and a male cantor) and follow the blend rules.' : ''),
         `Output format, exactly:`,
         `TITLE: <song title in the lyrics language>`,
-        `STYLE: <Suno style prompt in English, comma-separated tags: genre, mood, instruments, vocals, production, BPM — max 900 characters>`,
+        `STYLE: <Suno style prompt in English, comma-separated tags: genre, mood, instruments, vocals, production, BPM — max 900 characters; for a blend, name both styles and both voices, e.g. "drill verses, hasidic pop chorus, male rap, female vocals">`,
         `(blank line)`,
         `<full lyrics with Suno section tags>`,
         limit,
@@ -126,6 +148,7 @@ function buildUser(b) {
         `Write a Suno "Style of Music" prompt for this song: comma-separated English tags only (genre, sub-genre, mood, 2–4 instruments, vocal description, production feel, BPM). No sentences, no lyrics.`,
         `Maximum ${b.limit || 900} characters.`,
         `Brief: ${clean(b.idea, 2000) || '(infer from the lyrics)'}`,
+        blendText(b) ? blendText(b) + '\nThe style prompt must name each blended style and each voice.' : '',
         songContext(b),
       ].filter(Boolean).join('\n');
     }
