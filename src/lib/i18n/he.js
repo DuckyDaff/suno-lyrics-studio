@@ -17,7 +17,10 @@ export default {
   // style panel
   styleTitle: 'Style of Music', stylePlaceholder: 'Pop, Upbeat, Female vocals, 120 BPM...',
   excludeTitle: 'Exclude styles', excludePlaceholder: 'Rap, Heavy metal...',
-  randomize: 'הגרל', allGenres: 'כל הז׳אנרים', lockHint: 'נעילת שדות ומשפחות ז׳אנר נוספות — שלב 3',
+  randomize: 'הגרל', allGenres: 'כל הז׳אנרים', pickGenre: 'בחר משפחת ז׳אנר',
+  fusion: 'Fusion', fusionHint: 'מערבב שתי משפחות ז׳אנר שונות',
+  lockHint: 'שדה נעול נשמר בהגרלה הבאה', unlockAll: 'שחרר הכל', history: 'היסטוריה',
+  field_genre: 'ז׳אנר', field_mood: 'מצב רוח', field_instr: 'כלים', field_vox: 'ווקאל', field_prod: 'הפקה', field_bpm: 'BPM',
   clear: 'נקה',
   // library / studio placeholders
   librarySearch: 'חפש תג, כלי, ז׳אנר...', libraryComing: 'הספרייה המאוחדת (תגים + פקודות + Studio) מגיעה בשלב 3',
