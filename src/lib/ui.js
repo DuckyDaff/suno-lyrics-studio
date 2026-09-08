@@ -8,6 +8,10 @@ export const panelTab = writable('style');
 export const mobileTab = writable('editor');
 /** section whose textarea currently has focus */
 export const activeSectionId = writable(null);
+/** homograph choices per section: Map<sectionId, [{word, masc, fem, current, gender}]> */
+export const homographs = writable(new Map());
+/** section id whose nikud keyboard is open */
+export const kbdFor = writable(null);
 /** Studio Region output (not part of the song) */
 export const studioText = writable('');
 /** export preview overlay (desktop) */

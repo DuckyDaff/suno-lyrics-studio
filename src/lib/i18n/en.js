@@ -10,7 +10,6 @@ export default {
   moveUp: 'Move up', moveDown: 'Move down', remove: 'Remove section', dir: 'Text direction',
   chars: 'chars', lines: 'lines',
   toolNikud: 'Nikud', toolLatin: 'Latin', toolPhonetic: 'Phonetic', toolKeyboard: 'Nikud keyboard', comingSoon: 'soon',
-  toolsHint: 'Word tools — arriving in phase 2',
   styleTitle: 'Style of Music', stylePlaceholder: 'Pop, Upbeat, Female vocals, 120 BPM...',
   excludeTitle: 'Exclude styles', excludePlaceholder: 'Rap, Heavy metal...',
   randomize: 'Randomize', allGenres: 'All genres', pickGenre: 'Pick a genre family',
@@ -35,6 +34,13 @@ export default {
   toastStyleCopied: 'Style copied', toastLyricsCopied: 'Lyrics copied', toastAllCopied: 'Style + lyrics copied',
   toastNothing: 'Nothing to copy', toastCopyFail: 'Copy failed', toastRestored: 'Song restored from autosave',
   toastNew: 'New song', toastUndo: 'Undone', toastRedo: 'Redone', toastSoon: 'Coming in the next phase',
+  // hebrew tools
+  nikudWordTitle: 'Nikud for the word at the caret (or selection)', latinWordTitle: 'Latin letters for the word at the caret', phoneticWordTitle: 'Phonetic spelling for the word at the caret',
+  menuSection: 'Whole section', menuSong: 'Hebrew tools — whole song', nikudAll: 'Nikud the whole song', latinAll: 'Latinize the whole song', phoneticAll: 'Phonetic for the whole song',
+  toastNoWord: 'Put the caret on a word or select text', toastEmpty: 'No text', toastNikudDone: 'Nikud done', toastNikudFail: 'Nikud failed — the Dicta server is unavailable',
+  toastLatinDone: 'Converted to Latin letters', toastPhoneticDone: 'Converted to phonetic spelling', toastToolFail: 'Conversion failed', toastAllDone: 'Done in {n} sections',
+  toastHomographs: 'Nikud done — {n} homographs, pick the gender below', homographs: 'Masc / fem:', masc: '♂ masc', fem: '♀ fem',
+  kbdDelete: 'Delete mark', kbdHint: 'Put the caret after a letter and press a mark — pressing again replaces it',
   // AI
   tabAI: 'Create', aiIdea: 'What is the song about?', aiIdeaPh: 'Any idea — "an opera about a penguin who runs a bank", "a rap about my mom", "a ballad about rain in Haifa"...',
   aiForm: 'Form', aiLang: 'Language', aiRhyme: 'Rhyme', aiLength: 'Length', aiShort: 'Short', aiNormal: 'Normal', aiLong: 'Long',

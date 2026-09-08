@@ -5,6 +5,9 @@
   import { t } from '../../lib/i18n.js';
   import Button from '../ui/Button.svelte';
   import WordTools from './WordTools.svelte';
+  import NikudKeyboard from './NikudKeyboard.svelte';
+  import HomographBar from './HomographBar.svelte';
+  import { kbdFor } from '../../lib/ui.js';
 
   let { sec, index, total } = $props();
   let ta = $state(null);
@@ -48,7 +51,9 @@
             oninput={e => { actions.setText(sec.id, e.target.value); resize(); }}
             onfocus={() => activeSectionId.set(sec.id)}></textarea>
 
+  <HomographBar {sec} />
   {#if active}<WordTools {sec} />{/if}
+  {#if $kbdFor === sec.id}<NikudKeyboard getTa={() => ta} onclose={() => kbdFor.set(null)} />{/if}
 </article>
 
 <style>

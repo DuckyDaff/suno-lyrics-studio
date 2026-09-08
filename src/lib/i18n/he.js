@@ -13,7 +13,6 @@ export default {
   moveUp: 'הזז למעלה', moveDown: 'הזז למטה', remove: 'הסר סקשן', dir: 'כיוון טקסט',
   chars: 'תווים', lines: 'שורות',
   toolNikud: 'ניקוד', toolLatin: 'לטיני', toolPhonetic: 'פונטי', toolKeyboard: 'מקלדת ניקוד', comingSoon: 'בקרוב',
-  toolsHint: 'כלי מילה — מגיעים בשלב 2',
   // style panel
   styleTitle: 'Style of Music', stylePlaceholder: 'Pop, Upbeat, Female vocals, 120 BPM...',
   excludeTitle: 'Exclude styles', excludePlaceholder: 'Rap, Heavy metal...',
@@ -41,6 +40,13 @@ export default {
   toastStyleCopied: 'ה-Style הועתק', toastLyricsCopied: 'המילים הועתקו', toastAllCopied: 'Style + מילים הועתקו',
   toastNothing: 'אין מה להעתיק', toastCopyFail: 'ההעתקה נכשלה', toastRestored: 'השיר שוחזר מהשמירה האוטומטית',
   toastNew: 'שיר חדש', toastUndo: 'בוטל', toastRedo: 'שוחזר', toastSoon: 'מגיע בשלב הבא',
+  // hebrew tools
+  nikudWordTitle: 'ניקוד המילה שבסמן (או הטקסט המסומן)', latinWordTitle: 'אותיות לטיניות למילה שבסמן', phoneticWordTitle: 'כתיב פונטי למילה שבסמן',
+  menuSection: 'לכל הסקשן', menuSong: 'כלי עברית — לכל השיר', nikudAll: 'נקד את כל השיר', latinAll: 'לטיני לכל השיר', phoneticAll: 'פונטי לכל השיר',
+  toastNoWord: 'שים את הסמן על מילה או סמן טקסט', toastEmpty: 'אין טקסט', toastNikudDone: 'ניקוד בוצע', toastNikudFail: 'הניקוד נכשל — שרת Dicta לא זמין כרגע',
+  toastLatinDone: 'הומר לאותיות לטיניות', toastPhoneticDone: 'הומר לכתיב פונטי', toastToolFail: 'ההמרה נכשלה', toastAllDone: 'בוצע ב-{n} סקשנים',
+  toastHomographs: 'ניקוד בוצע — {n} מילים הומוגרפיות, בחר מין למטה', homographs: 'זכר / נקבה:', masc: '♂ זכר', fem: '♀ נקבה',
+  kbdDelete: 'מחק ניקוד', kbdHint: 'שים את הסמן אחרי אות ולחץ על ניקוד — לחיצה נוספת מחליפה',
   // AI
   tabAI: 'יצירה', aiIdea: 'על מה השיר?', aiIdeaPh: 'כל רעיון — "אופרה על פינגווין שמנהל בנק בתל אביב", "ראפ על אמא שלי", "בלדה על גשם בחיפה"...',
   aiForm: 'צורה', aiLang: 'שפה', aiRhyme: 'חריזה', aiLength: 'אורך', aiShort: 'קצר', aiNormal: 'רגיל', aiLong: 'ארוך',

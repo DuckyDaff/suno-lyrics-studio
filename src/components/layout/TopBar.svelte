@@ -5,7 +5,9 @@
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
   import { logout } from '../../lib/auth.js';
-  import { isPhone, view } from '../../lib/ui.js';
+  import { isPhone, view, homographs } from '../../lib/ui.js';
+  import { nikudWithHomographs, nakdan } from '../../lib/hebrew/nikud.js';
+  import { latinize, phonetic } from '../../lib/hebrew/translit.js';
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
 
@@ -14,6 +16,7 @@
   function newSong() {
     if ($hasContent && !confirm($t('confirmNew'))) return;
     actions.newSong();
+    homographs.set(new Map());
     toast($t('toastNew'), 'success');
   }
   function doUndo() { undo(); toast($t('toastUndo')); }
@@ -21,6 +24,27 @@
   function soon() { toast($t('toastSoon')); menuOpen = false; }
   function toggleTheme() { setSetting('theme', $settings.theme === 'light' ? 'dark' : 'light'); }
   function toggleLang() { setSetting('lang', $settings.lang === 'he' ? 'en' : 'he'); }
+
+  let allBusy = $state(false);
+  async function applyAll(kind) {
+    menuOpen = false;
+    const secs = $song.sections.filter(s => (s.text || '').trim());
+    if (!secs.length) return toast($t('toastEmpty'), 'error');
+    allBusy = true;
+    try {
+      for (const s of secs) {
+        let out;
+        if (kind === 'nikud') {
+          const r = await nikudWithHomographs(s.text); out = r.text;
+          homographs.update(m => { const nm = new Map(m); r.ambiguous.length ? nm.set(s.id, r.ambiguous.map(a => ({ ...a, current: a.masc, gender: 'masc' }))) : nm.delete(s.id); return nm; });
+        } else if (kind === 'latin') { let src = s.text; try { src = await nakdan(s.text); } catch {} out = latinize(src); }
+        else out = phonetic(s.text);
+        actions.setText(s.id, out);
+      }
+      toast($t('toastAllDone', { n: secs.length }), 'success');
+    } catch { toast($t('toastNikudFail'), 'error'); }
+    finally { allBusy = false; }
+  }
 
   function clickOutside(node) {
     const h = e => { if (!node.contains(e.target)) menuOpen = false; };
@@ -54,6 +78,11 @@
         <button onclick={soon}><Icon name="upload" size={15} /> {$t('import')}</button>
         <button onclick={soon}><Icon name="grid" size={15} /> {$t('templates')}</button>
         <button onclick={() => { actions.toggleAllDir(); menuOpen = false; }}><Icon name="align" size={15} /> {$t('toggleDir')}</button>
+        <hr />
+        <div class="mh">{$t('menuSong')}</div>
+        <button onclick={() => applyAll('nikud')} disabled={allBusy}><span class="mono">נ׳</span> {$t('nikudAll')}</button>
+        <button onclick={() => applyAll('latin')} disabled={allBusy}><span class="mono">Aa</span> {$t('latinAll')}</button>
+        <button onclick={() => applyAll('phonetic')} disabled={allBusy}><span class="mono">/ˈ/</span> {$t('phoneticAll')}</button>
         <hr />
         <button onclick={toggleLang}><Icon name="globe" size={15} /> {$t('language')} <span class="tag">{$settings.lang === 'he' ? 'HEB' : 'ENG'}</span></button>
         <button onclick={toggleTheme}><Icon name={$settings.theme === 'light' ? 'moon' : 'sun'} size={15} /> {$t('theme')}</button>
@@ -97,6 +126,7 @@
   .menu button:hover { background: var(--bg3); }
   .menu .danger { color: var(--err); }
   .menu hr { border: none; border-top: 1px solid var(--line); margin: 4px 0; }
+  .mh { font-size: 10px; font-weight: 700; color: var(--tx2); padding: 4px 10px 0; letter-spacing: .05em; }
   .tag { margin-inline-start: auto; font-family: var(--font-mono); font-size: 10px; color: var(--accent); }
   @media (max-width: 768px) {
     .bar { padding: 0 10px; gap: 4px; }
