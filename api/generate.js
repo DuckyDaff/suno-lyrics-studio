@@ -299,7 +299,9 @@ module.exports = async function handler(req, res) {
     return { final, got };
   };
   try {
-    const effort = ['titles', 'style'].includes(body.mode) ? 'low' : body.model === 'fast' ? 'medium' : 'low';
+    // Low effort everywhere: with this system prompt the models otherwise plan for a minute
+    // before the first line; low keeps a short plan and starts writing within seconds.
+    const effort = 'low';
     const { final, got } = await attempt(effort);
     if (!got && final.stop_reason === 'max_tokens') {
       console.warn('generate: thinking overflow', model, final.usage && final.usage.output_tokens);
