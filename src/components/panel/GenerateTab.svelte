@@ -4,7 +4,7 @@
   import { limits } from '../../lib/suno.js';
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
-  import { generate, busy } from '../../lib/ai.js';
+  import { generate, busy, phase } from '../../lib/ai.js';
   import { genState as g, setGen, blankMix, genAbort } from '../../lib/genState.js';
   import { parseLyrics, parseWild, parseLines } from '../../lib/lyricsParse.js';
   import { copyText } from '../../lib/clipboard.js';
@@ -237,7 +237,7 @@
   {#if $g.output || $busy}
     <section class="out">
       <div class="hd">
-        <span class="lbl">{$t('aiResult')} {#if $busy}<span class="dots">●●●</span>{/if}</span>
+        <span class="lbl">{$t('aiResult')} {#if $busy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $phase === 'retry' ? $t('aiRetry') : $t('aiThinking')}</span><span class="dots">●●●</span>{/if}</span>
         {#if $g.usage}<span class="counter">{$g.usage.out} tok</span>{/if}
         <Button size="sm" variant="ghost" icon="copy" title={$t('copy')} onclick={copyOut} />
         <Button size="sm" variant="ghost" icon="x" title={$t('clear')} onclick={clearOut} disabled={$busy} />
@@ -312,6 +312,7 @@
   .out { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
   .hd { display: flex; align-items: center; gap: 8px; }
   .lbl { flex: 1; font-size: var(--fs-sm); font-weight: 700; color: var(--tx1); }
+  .ph { font-weight: 500; color: var(--accent); margin-inline-start: 6px; font-size: var(--fs-xs); }
   .dots { color: var(--accent); font-size: 8px; letter-spacing: 2px; animation: pulse 1s infinite; }
   @keyframes pulse { 50% { opacity: .3; } }
   .box { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--r2); padding: 12px 14px; font-family: var(--font-ui); font-size: var(--fs-md); line-height: 1.7; white-space: pre-wrap; word-break: break-word; max-height: 50vh; overflow: auto; min-height: 60px; }

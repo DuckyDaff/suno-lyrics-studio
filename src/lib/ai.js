@@ -6,6 +6,8 @@ import { limits, buildLyrics } from './suno.js';
 
 /** true while a generation is streaming (any mode) */
 export const busy = writable(false);
+/** '' | 'thinking' | 'writing' | 'retry' — what the model is doing right now */
+export const phase = writable('');
 
 /**
  * Stream a generation. `fields` is the mode payload (see api/generate.js).
@@ -27,7 +29,7 @@ export async function generate(fields, onDelta, { signal } = {}) {
     ...fields,
   };
 
-  busy.set(true);
+  busy.set(true); phase.set('thinking');
   try {
     const r = await fetch('/api/generate', {
       method: 'POST',
@@ -52,6 +54,7 @@ export async function generate(fields, onDelta, { signal } = {}) {
         const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1);
         if (!line) continue;
         let ev; try { ev = JSON.parse(line); } catch { continue; }
+        if (ev.status) phase.set(ev.status);
         if (ev.t) { full += ev.t; onDelta?.(ev.t, full); }
         else if (ev.error) throw Object.assign(new Error(ev.error), { code: ev.error, message: ev.message });
         else if (ev.done) meta = ev;
@@ -62,7 +65,7 @@ export async function generate(fields, onDelta, { signal } = {}) {
     if (e.name === 'AbortError') throw Object.assign(new Error('aborted'), { code: 'aborted' });
     throw e;
   } finally {
-    busy.set(false);
+    busy.set(false); phase.set('');
   }
 }
 

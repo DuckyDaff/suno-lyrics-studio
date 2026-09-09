@@ -279,18 +279,33 @@ module.exports = async function handler(req, res) {
   if (typeof res.flushHeaders === 'function') res.flushHeaders();
   const send = obj => res.write(JSON.stringify(obj) + '\n');
 
-  try {
+  // Adaptive thinking shares max_tokens with the answer, so leave plenty of room;
+  // if a run still burns the whole budget on planning, retry once with less effort.
+  const attempt = async (effort) => {
+    let got = 0;
     const stream = client.messages.stream({
       model,
-      max_tokens: 8000,
+      max_tokens: 24000,
       thinking: { type: 'adaptive' },
-      // deep planning pays off on the quality model; keep the fast model snappy
-      output_config: { effort: ['titles', 'style'].includes(body.mode) || body.model === 'fast' ? 'medium' : 'high' },
+      output_config: { effort },
       system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: userMsg }],
     });
-    stream.on('text', delta => send({ t: delta }));
+    stream.on('streamEvent', ev => {
+      if (ev.type === 'content_block_start' && ev.content_block && ev.content_block.type === 'thinking') send({ status: 'thinking' });
+    });
+    stream.on('text', delta => { if (!got) send({ status: 'writing' }); got += delta.length; send({ t: delta }); });
     const final = await stream.finalMessage();
+    return { final, got };
+  };
+  try {
+    const effort = ['titles', 'style'].includes(body.mode) ? 'low' : 'medium';
+    let { final, got } = await attempt(effort);
+    if (!got && final.stop_reason === 'max_tokens') {
+      console.warn('generate: thinking overflow, retrying with low effort');
+      send({ status: 'retry' });
+      ({ final, got } = await attempt('low'));
+    }
     send({ done: true, model, stop: final.stop_reason, usage: {
       in: final.usage.input_tokens, out: final.usage.output_tokens,
       cacheRead: final.usage.cache_read_input_tokens || 0, cacheWrite: final.usage.cache_creation_input_tokens || 0,
