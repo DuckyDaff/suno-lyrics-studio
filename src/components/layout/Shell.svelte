@@ -60,8 +60,14 @@
     grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--panel-w);
     grid-template-rows: var(--top-h) minmax(0, 1fr) var(--export-h);
     height: 100dvh; background: var(--bg0);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
   .rail   { grid-column: 1; grid-row: 1 / -1; border-inline-end: 1px solid var(--line); background: var(--bg1); }
+  .top    { position: relative; }
+  /* paint the status-bar strip above the top bar in the same colour */
+  .top::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: env(safe-area-inset-top, 0px); background: var(--bg1); }
   .top    { grid-column: 2 / -1; grid-row: 1; border-bottom: 1px solid var(--line); background: var(--bg1); }
   .main   { grid-column: 2; grid-row: 2; overflow: auto; min-height: 0; }
   .panel  { grid-column: 3; grid-row: 2; min-height: 0; border-inline-start: 1px solid var(--line); background: var(--bg1); }

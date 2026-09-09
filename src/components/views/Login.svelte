@@ -43,7 +43,7 @@
 </div>
 
 <style>
-  .wrap { min-height: 100dvh; display: grid; place-items: center; padding: 24px; }
+  .wrap { min-height: 100dvh; display: grid; place-items: center; padding: calc(24px + env(safe-area-inset-top, 0px)) 24px calc(24px + env(safe-area-inset-bottom, 0px)); }
   .card {
     width: min(380px, 100%); display: flex; flex-direction: column; gap: 12px; align-items: stretch;
     background: var(--bg1); border: 1px solid var(--line); border-radius: var(--r4); padding: 32px 28px;
