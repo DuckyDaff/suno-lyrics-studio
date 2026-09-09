@@ -280,7 +280,10 @@
 
 <style>
   .tab { padding: 14px 14px 28px; display: flex; flex-direction: column; gap: 14px; }
-  .tab.wide { display: grid; grid-template-columns: minmax(340px, 470px) minmax(0, 1fr); gap: 22px; align-items: start; padding: 18px 22px 32px; max-width: 1400px; margin: 0 auto; }
+  .tab.wide { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: 22px; align-items: start; padding: 18px 22px 32px; max-width: 1500px; margin: 0 auto; }
+  .tab.wide .grid { grid-template-columns: repeat(4, 1fr); }
+  .tab.wide textarea.field { min-height: 120px; font-size: var(--fs-lg); }
+  .tab.wide .box { font-size: var(--fs-sm); }
   .tab.wide .result { position: sticky; top: 14px; display: flex; flex-direction: column; gap: 10px; }
   .tab.wide .out { border-top: none; padding-top: 0; }
   .tab.wide .box { max-height: calc(100dvh - var(--top-h) - var(--export-h) - 150px); }
