@@ -277,7 +277,8 @@ module.exports = async function handler(req, res) {
       model,
       max_tokens: 8000,
       thinking: { type: 'adaptive' },
-      output_config: { effort: ['titles', 'style'].includes(body.mode) ? 'medium' : 'high' },
+      // deep planning pays off on the quality model; keep the fast model snappy
+      output_config: { effort: ['titles', 'style'].includes(body.mode) || body.model === 'fast' ? 'medium' : 'high' },
       system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: userMsg }],
     });
