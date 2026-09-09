@@ -7,6 +7,9 @@
   import { copyText } from '../../lib/clipboard.js';
   import { previewOpen } from '../../lib/ui.js';
   import { sectionColor } from '../../lib/sections.js';
+  import { launchSuno } from '../../lib/launch.js';
+  import { view } from '../../lib/ui.js';
+  import { setSetting } from '../../lib/settings.js';
   import Button from '../ui/Button.svelte';
 
   let { modal = false } = $props();
@@ -15,6 +18,11 @@
   const lyrics = $derived(buildLyrics($song));
   const styleLen = $derived($song.style.trim().length);
 
+  function launch() {
+    if (!launchSuno()) return toast($t('toastNothing'), 'error');
+    if (!$settings.bookmarkletSeen) { toast($t('launchFirst'), '', 6000); setSetting('bookmarkletSeen', true); previewOpen.set(false); view.set('settings'); }
+    else toast($t('launchHint'), 'success', 5000);
+  }
   async function copy(kind) {
     const text = kind === 'style' ? $song.style.trim() : lyrics;
     if (!text) return toast($t('toastNothing'), 'error');
@@ -57,7 +65,9 @@
 
   <section class="block">
     <span class="lbl">{$t('step3')}</span>
-    <Button variant="suno" icon="external" size="lg" href={SUNO_CREATE_URL} target="_blank">{$t('openSuno')}</Button>
+    <Button variant="suno" icon="send" size="lg" onclick={launch}>⚡ {$t('launch')}</Button>
+    <p class="faint small">{$t('launchExplain')} <button class="link" onclick={() => { previewOpen.set(false); view.set('settings'); }}>{$t('launchSetup')}</button></p>
+    <Button variant="ghost" icon="external" size="sm" href={SUNO_CREATE_URL} target="_blank">{$t('openSuno')}</Button>
   </section>
 </div>
 
@@ -78,4 +88,6 @@
   .tag { font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 700; margin-top: 8px; direction: ltr; }
   .tag:first-child { margin-top: 0; }
   .txt { white-space: pre-wrap; }
+  .small { font-size: var(--fs-xs); line-height: 1.5; }
+  .link { color: var(--accent); font-weight: 700; font-size: var(--fs-xs); text-decoration: underline; }
 </style>

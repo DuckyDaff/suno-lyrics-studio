@@ -5,7 +5,9 @@
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
   import { copyText } from '../../lib/clipboard.js';
-  import { previewOpen } from '../../lib/ui.js';
+  import { previewOpen, view } from '../../lib/ui.js';
+  import { launchSuno } from '../../lib/launch.js';
+  import { setSetting } from '../../lib/settings.js';
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
 
@@ -16,6 +18,11 @@
   const styLevel = $derived(levelFor(styleLen, lim.style));
   const status = $derived(lyrLevel === 'over' || styLevel === 'over' ? 'over' : lyrLevel === 'warn' || styLevel === 'warn' ? 'warn' : 'ok');
 
+  function launch() {
+    if (!launchSuno()) return toast($t('toastNothing'), 'error');
+    if (!$settings.bookmarkletSeen) { toast($t('launchFirst'), '', 6000); setSetting('bookmarkletSeen', true); view.set('settings'); }
+    else toast($t('launchHint'), 'success', 5000);
+  }
   async function copy(kind) {
     const text = kind === 'style' ? $song.style.trim()
       : kind === 'lyrics' ? lyrics
@@ -42,7 +49,8 @@
     <Button icon="copy" size="sm" onclick={() => copy('style')}>{$t('copyStyle')}</Button>
     <Button icon="copy" size="sm" onclick={() => copy('lyrics')}>{$t('copyLyrics')}</Button>
     <Button variant="ghost" size="sm" onclick={() => copy('all')}>{$t('copyAll')}</Button>
-    <Button variant="suno" icon="external" size="sm" href={SUNO_CREATE_URL} target="_blank">{$t('openSuno')}</Button>
+    <Button variant="ghost" icon="external" size="sm" href={SUNO_CREATE_URL} target="_blank" title={$t('openSuno')} />
+    <Button variant="suno" icon="send" size="sm" onclick={launch} title={$t('launchTitle')}>⚡ {$t('launch')}</Button>
   </div>
 </div>
 

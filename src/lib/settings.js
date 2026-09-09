@@ -7,6 +7,7 @@ export const settings = persisted('melodraft_v2_settings', {
   aiModel: 'fast',      // fast | quality
   editorW: 440,         // desktop editor panel width (px)
   editorCollapsed: true, // desktop editor panel starts collapsed
+  bookmarkletSeen: false, // shown the Suno bookmarklet setup once
 }, {
   // carry over v1 preferences
   migrate: () => ({

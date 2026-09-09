@@ -42,6 +42,13 @@ export default {
   toastHomographs: 'Nikud done — {n} homographs, pick the gender below', homographs: 'Masc / fem:', masc: '♂ masc', fem: '♀ fem',
   kbdDelete: 'Delete mark', kbdHint: 'Put the caret after a letter and press a mark — pressing again replaces it',
   editorOpen: 'Open editor', editorClose: 'Collapse editor', wsCreate: 'Create', wsStyle: 'Style', editorTitle: 'Editor', editorFocus: 'Expand editor', editorUnfocus: 'Shrink editor', resultHere: 'The result will appear here — describe the song and press "Write song"',
+  launch: 'Send to Suno', launchTitle: 'Opens Suno with lyrics, style and title ready to fill', launchHint: 'Suno opened — click the ⚡ MeloDraft bookmark there and everything fills in',
+  launchFirst: 'Suno opened in a new tab. First time? Add one bookmark — instructions in Settings', launchExplain: 'Opens Suno with everything ready; click the ⚡ MeloDraft bookmark there and the fields fill in.', launchSetup: 'Bookmark setup',
+  bmTitle: 'Send to Suno — one-time setup', bmWhy: 'A browser will not let one site fill a form on another, so "Send to Suno" opens Suno with the text in the address and a tiny bookmark running inside Suno fills Lyrics, Style and Title. No servers, nothing sent anywhere.',
+  bmStep1: 'Desktop: drag this button to your bookmarks bar —', bmStep1b: '(clicking it here does nothing; drag only)',
+  bmStep2: 'iPhone/iPad: copy the code, bookmark any page in Safari, edit the bookmark, delete its address and paste the code instead. Name it "MeloDraft".',
+  bmStep3: 'After "Send to Suno": in Suno click the bookmark (desktop: from the bar; iPhone: tap the address bar, type MeloDraft and pick the bookmark) — the form fills, you just press Create.',
+  bmCopy: 'Copy code', bmCopied: 'Bookmarklet code copied', bmDragHint: 'Drag the button to the bookmarks bar (do not click)', bmNote: 'If Suno changes its form I will update the bookmark — you will need to add it again.',
   // AI
   tabAI: 'Create', aiIdea: 'What is the song about?', aiIdeaPh: 'Any idea — "an opera about a penguin who runs a bank", "a rap about my mom", "a ballad about rain in Haifa"...',
   aiForm: 'Form', aiLang: 'Language', aiRhyme: 'Rhyme', aiLength: 'Length', aiShort: 'Short', aiNormal: 'Normal', aiLong: 'Long',

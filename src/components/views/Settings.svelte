@@ -4,6 +4,10 @@
   import { user, logout } from '../../lib/auth.js';
   import { t } from '../../lib/i18n.js';
   import Button from '../ui/Button.svelte';
+  import { BOOKMARKLET } from '../../lib/launch.js';
+  import { copyText } from '../../lib/clipboard.js';
+  import { toast } from '../../lib/toast.js';
+  async function copyBm() { (await copyText(BOOKMARKLET)) ? toast($t('bmCopied'), 'success') : toast($t('toastCopyFail'), 'error'); }
 
   const themes = $derived([
     { id: 'dark', label: $t('dark') }, { id: 'light', label: $t('light') }, { id: 'system', label: $t('system') },
@@ -25,6 +29,20 @@
       <button class:active={$settings.lang === 'he'} onclick={() => setSetting('lang', 'he')}>עברית</button>
       <button class:active={$settings.lang === 'en'} onclick={() => setSetting('lang', 'en')}>English</button>
     </div>
+  </section>
+
+  <section class="card bm" id="suno-launch">
+    <h3>⚡ {$t('bmTitle')}</h3>
+    <p class="faint">{$t('bmWhy')}</p>
+    <ol class="steps">
+      <li>{$t('bmStep1')}
+        <a class="bmlink" href={BOOKMARKLET} onclick={e => { e.preventDefault(); toast($t('bmDragHint')); }} draggable="true">⚡ MeloDraft → Suno</a>
+        <span class="faint">{$t('bmStep1b')}</span>
+      </li>
+      <li>{$t('bmStep2')} <Button size="sm" icon="copy" onclick={copyBm}>{$t('bmCopy')}</Button></li>
+      <li>{$t('bmStep3')}</li>
+    </ol>
+    <p class="faint small">{$t('bmNote')}</p>
   </section>
 
   <section class="card">
@@ -62,4 +80,7 @@
   .seg button.active { background: var(--accent-bg); border-color: var(--accent-bd); color: var(--accent); }
   .adm { font-size: 10px; font-weight: 700; color: var(--warn); margin-inline-start: 6px; }
   .ver { font-size: var(--fs-xs); text-align: center; }
+  .steps { padding-inline-start: 20px; display: flex; flex-direction: column; gap: 10px; font-size: var(--fs-sm); line-height: 1.6; }
+  .bmlink { display: inline-block; margin: 4px 6px; padding: 8px 14px; border-radius: var(--r2); background: var(--suno); color: #fff; font-weight: 700; text-decoration: none; cursor: grab; }
+  .small { font-size: var(--fs-xs); line-height: 1.5; }
 </style>
