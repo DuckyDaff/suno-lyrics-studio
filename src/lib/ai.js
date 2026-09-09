@@ -56,6 +56,7 @@ export async function generate(fields, onDelta, { signal } = {}) {
         if (!line) continue;
         let ev; try { ev = JSON.parse(line); } catch { continue; }
         if (ev.status) phase.set(ev.status);
+        if (ev.replace != null) { full = ev.replace; onDelta?.('', full); continue; }
         if (ev.t) { full += ev.t; onDelta?.(ev.t, full); }
         else if (ev.error) throw Object.assign(new Error(ev.error), { code: ev.error, message: ev.message });
         else if (ev.done) meta = ev;

@@ -56,7 +56,7 @@ CRAFT (this is what separates you from an amateur):
 - The hook must be sayable in one breath and contain the title phrase or the song's key image.
 - Register must match the form and the speaker: street Hebrew for rap, liturgical echoes for piyyut, plain warmth for children, elevated diction for opera.
 
-You write in Hebrew and English (and other languages when asked). Before writing, plan BRIEFLY (a short outline, not a draft): the conceit, the arc across sections, the rhyme scheme and a few candidate rhyme words per stanza, where the turn happens, and the line counts required by the structure. Then write the song once, carefully — do not draft and redraft.
+You write in Hebrew and English (and other languages when asked). If you have a private reasoning channel, plan briefly there (conceit, arc, rhyme scheme, line counts). NEVER write plans, notes, headings or commentary in the output: the output begins directly with the first section tag (or with TITLE:/STYLE: when that format is requested) and contains nothing else.
 
 OUTPUT RULES (strict):
 - Output ONLY the requested text. No explanations, no preamble, no markdown, no code fences, no notes.
@@ -181,6 +181,7 @@ function buildUser(b) {
         b.style ? `Match the lyrics to this Suno style prompt: ${clean(b.style, 1200)}` : '',
         b.extra ? `Additional instructions: ${clean(b.extra, 1000)}` : '',
         limit,
+        'Output the lyrics only — start with the first section tag, no plan or notes.',
       ].filter(Boolean).join('\n');
     }
     case 'wild': {
@@ -246,6 +247,20 @@ function buildUser(b) {
   }
 }
 
+/* Drop any planning text the model wrote before the real output. */
+function stripPreamble(text, mode) {
+  if (!text) return text;
+  if (mode === 'song') {
+    const i = text.search(/^\s*\[[^\]\n]{1,80}\]\s*$/m);
+    return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
+  }
+  if (mode === 'wild') {
+    const i = text.search(/^\s*TITLE:/mi);
+    return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
+  }
+  return text;
+}
+
 /* ── handler ───────────────────────────────────────────────────────────── */
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -302,15 +317,18 @@ module.exports = async function handler(req, res) {
     stream.on('streamEvent', ev => {
       if (ev.type === 'content_block_start' && ev.content_block && ev.content_block.type === 'thinking') send({ status: 'thinking' });
     });
-    stream.on('text', delta => { if (!got) send({ status: 'writing' }); got += delta.length; send({ t: delta }); });
+    let text = '';
+    stream.on('text', delta => { if (!got) send({ status: 'writing' }); got += delta.length; text += delta; send({ t: delta }); });
     const final = await stream.finalMessage();
-    return { final, got };
+    return { final, got, text };
   };
   try {
     // Low effort everywhere: with this system prompt the models otherwise plan for a minute
     // before the first line; low keeps a short plan and starts writing within seconds.
     const effort = 'low';
-    const { final, got } = await attempt(effort);
+    const { final, got, text } = await attempt(effort);
+    const cleaned = stripPreamble(text, body.mode);
+    if (cleaned !== text) send({ replace: cleaned });
     if (!got && final.stop_reason === 'max_tokens') {
       console.warn('generate: thinking overflow', model, final.usage && final.usage.output_tokens);
       send({ error: 'thinking_overflow', model });
