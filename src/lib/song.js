@@ -68,6 +68,7 @@ function restore(i) {
   syncFlags();
 }
 export function undo() { if (ptr > 0) restore(ptr - 1); }
+export function resetHistory() { history = [JSON.stringify(get(song))]; ptr = 0; syncFlags(); }
 export function redo() { if (ptr < history.length - 1) restore(ptr + 1); }
 
 /* ── mutations ── */

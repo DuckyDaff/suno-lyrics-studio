@@ -7,7 +7,7 @@ export default {
   songTitle: 'שם השיר...', undo: 'בטל', redo: 'שחזר', newSong: 'שיר חדש',
   more: 'עוד', import: 'ייבוא שיר', templates: 'תבניות', toggleDir: 'הפוך כיוון לכל התיבות',
   language: 'שפה', theme: 'ערכת נושא', logout: 'יציאה',
-  confirmNew: 'להתחיל שיר חדש? השיר הנוכחי יימחק (Undo זמין).',
+  confirmNew: 'להתחיל שיר חדש? השיר הנוכחי נשמר בספריית השירים.',
   // editor
   lyricsPlaceholder: 'הקלד מילים...', addSection: 'הוסף סקשן', custom: 'אחר...', customName: 'שם הסקשן',
   moveUp: 'הזז למעלה', moveDown: 'הזז למטה', remove: 'הסר סקשן', dir: 'כיוון טקסט',
@@ -85,7 +85,34 @@ export default {
   sunoVersion: 'גרסת Suno', sunoVersionHint: 'קובעת את מגבלת התווים ל-Style ולמילים',
   account: 'חשבון', signedInAs: 'מחובר כ־', version: 'גרסה',
   // songs
-  songsTitle: 'השירים שלי', songsComing: 'ספריית שירים, גרסאות וסנכרון ענן בין מחשב לטלפון — מגיע בשלב 4',
+  songsTitle: 'השירים שלי',
+  // songs library (phase 4)
+  songsEmpty: 'עדיין אין שירים. כתוב משהו בעורך או צור שיר חדש — הכל נשמר כאן אוטומטית ומסונכרן לענן.',
+  noMatch: 'לא נמצא שיר מתאים', searchSongs: 'חיפוש בשירים…', sectionsN: 'תיבות', wordsN: 'מילים', versionsN: 'גרסאות',
+  justNow: 'עכשיו', minAgo: 'דק׳', hrAgo: 'שע׳',
+  duplicate: 'שכפל', delete: 'מחק', confirmDelete: 'למחוק את "{t}"? (אפשר לשחזר מגרסאות רק אם נשמרו קודם)',
+  toastDeleted: 'השיר נמחק', toastDuplicated: 'השיר שוכפל',
+  saveVersion: 'שמור גרסה', saveVersionTitle: 'צלם את המצב הנוכחי של השיר כדי לחזור אליו אחר כך', toastVersionSaved: 'הגרסה נשמרה',
+  versions: 'גרסאות', restore: 'שחזר', toastRestoredVersion: 'הגרסה שוחזרה',
+  sync_idle: 'ענן', sync_syncing: 'מסנכרן…', sync_ok: 'מסונכרן לענן', sync_error: 'סנכרון נכשל', sync_off: 'ללא סנכרון', syncRetry: 'נסה שוב',
+  // templates / import (phase 5)
+  templatesTitle: 'תבניות שיר', templatesHint: 'בחר ז׳אנר — תקבל Style מוכן ושלד תיבות ריק. אחר כך כתוב בעצמך או שלח לסוכן ב"יצירה" עם "מבנה קיים".',
+  templateAsNew: 'כשיר חדש (השיר הנוכחי נשמר בספרייה)', templateKeepStyle: 'שמור על ה-Style הנוכחי', useTemplate: 'השתמש בתבנית',
+  confirmTemplate: 'להחליף את התיבות של השיר הנוכחי בתבנית? (Undo זמין)', toastTemplate: 'תבנית {t} נטענה',
+  importTitle: 'ייבוא שיר', importHint: 'הדבק מילים בפורמט Suno ([Verse], [Chorus]…) או טקסט חופשי. שורות TITLE: ו-STYLE: בראש ייקלטו אוטומטית. אפשר גם קובץ txt/json.',
+  pasteClipboard: 'הדבק מהלוח', pasteFail: 'אין גישה ללוח — הדבק ידנית', importFile: 'קובץ', importPh: '[Verse 1]\n…\n\n[Chorus]\n…',
+  importPreview: 'תצוגה מקדימה', importNew: 'כשיר חדש', importReplace: 'החלף את השיר הנוכחי', importAppend: 'הוסף לסוף השיר',
+  importBtn: 'ייבא', importEmpty: 'לא נמצאו תיבות לייבוא', confirmImport: 'להחליף את התיבות הקיימות? (Undo זמין)', toastImported: '{n} תיבות יובאו',
+  // validator
+  statusErrs: 'יש שגיאות', statusWarns: 'יש הערות',
+  checkTitle: 'בדיקה לפני שיגור', checkOk: 'הכל תקין', checkOkHint: 'לא נמצאו בעיות — אפשר לשגר לסונו.', checkErrs: 'שגיאות', checkWarns: 'אזהרות',
+  v_noSections: 'אין תיבות בשיר', v_noLyrics: 'אין מילים — השיר ריק', v_noStyle: 'ה-Style ריק — סונו יבחר סגנון אקראי',
+  v_lyricsOver: 'המילים חורגות מהמגבלה ({d})', v_styleOver: 'ה-Style חורג מהמגבלה ({d})', v_styleHasTags: 'ב-Style יש תגי [סוגריים] — הם שייכים למילים, לא לסגנון',
+  v_emptySection: 'תיבה ריקה: {s}', v_unknownTag: 'תג לא מוכר לסונו: [{s}] — עלול להיות מושר כמילים',
+  v_brackets: 'סוגריים [ ] לא מאוזנים בתיבה {s}', v_parens: 'סוגריים ( ) לא מאוזנים בתיבה {s}',
+  v_longLines: '{d} שורות ארוכות מדי בתיבה {s} — סונו ימהר או יחתוך', v_longSection: 'תיבה {s} ארוכה מאוד ({d} שורות) — כדאי לפצל',
+  v_dupName: 'שם תיבה כפול: {s}', v_noChorus: 'אין פזמון / Hook — לרוב השירים כדאי שיהיה',
+
   currentSong: 'השיר הנוכחי', untitled: 'ללא שם', edited: 'נערך',
   // login
   loginTitle: 'התחברות', registerTitle: 'הרשמה', username: 'שם משתמש', password: 'סיסמה', email: 'אימייל',

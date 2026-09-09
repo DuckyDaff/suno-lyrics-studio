@@ -21,6 +21,7 @@ export const kbdFor = writable(null);
 /** Studio Region output (not part of the song) */
 export const studioText = writable('');
 /** export preview overlay (desktop) */
+export const modal = writable('');   // '' | 'templates' | 'import'
 export const previewOpen = writable(false);
 
 function mq(query) {

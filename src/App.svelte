@@ -5,12 +5,14 @@
   import { lang, dir, t } from './lib/i18n.js';
   import { restoredFromSave } from './lib/song.js';
   import { toast } from './lib/toast.js';
+  import { startSync } from './lib/sync.js';
   import Shell from './components/layout/Shell.svelte';
   import Login from './components/views/Login.svelte';
   import Toast from './components/ui/Toast.svelte';
 
   onMount(() => {
     verify();
+    startSync();
     if ($user && restoredFromSave) setTimeout(() => toast($t('toastRestored')), 500);
   });
 

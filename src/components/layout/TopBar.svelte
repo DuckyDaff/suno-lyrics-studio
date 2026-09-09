@@ -5,7 +5,8 @@
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
   import { logout } from '../../lib/auth.js';
-  import { isPhone, view, homographs } from '../../lib/ui.js';
+  import { isPhone, view, homographs, modal } from '../../lib/ui.js';
+  import { saveVersion } from '../../lib/songs.js';
   import { nikudWithHomographs, nakdan } from '../../lib/hebrew/nikud.js';
   import { latinize, phonetic } from '../../lib/hebrew/translit.js';
   import Button from '../ui/Button.svelte';
@@ -21,7 +22,8 @@
   }
   function doUndo() { undo(); toast($t('toastUndo')); }
   function doRedo() { redo(); toast($t('toastRedo')); }
-  function soon() { toast($t('toastSoon')); menuOpen = false; }
+  function openModal(m) { modal.set(m); menuOpen = false; }
+  function snap() { saveVersion(); toast($t('toastVersionSaved'), 'success'); menuOpen = false; }
   function toggleTheme() { setSetting('theme', $settings.theme === 'light' ? 'dark' : 'light'); }
   function toggleLang() { setSetting('lang', $settings.lang === 'he' ? 'en' : 'he'); }
 
@@ -75,8 +77,9 @@
     <Button variant="ghost" icon="more" title={$t('more')} onclick={() => (menuOpen = !menuOpen)} active={menuOpen} />
     {#if menuOpen}
       <div class="menu">
-        <button onclick={soon}><Icon name="upload" size={15} /> {$t('import')}</button>
-        <button onclick={soon}><Icon name="grid" size={15} /> {$t('templates')}</button>
+        <button onclick={() => openModal('import')}><Icon name="upload" size={15} /> {$t('import')}</button>
+        <button onclick={() => openModal('templates')}><Icon name="grid" size={15} /> {$t('templates')}</button>
+        <button onclick={snap} disabled={!$hasContent}><span class="mono">📌</span> {$t('saveVersion')}</button>
         <button onclick={() => { actions.toggleAllDir(); menuOpen = false; }}><Icon name="align" size={15} /> {$t('toggleDir')}</button>
         <hr />
         <div class="mh">{$t('menuSong')}</div>

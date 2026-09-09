@@ -1,5 +1,7 @@
 <script>
-  import { view, panelTab, mobileTab, isPhone, previewOpen, editorFocus } from '../../lib/ui.js';
+  import { view, panelTab, mobileTab, isPhone, previewOpen, editorFocus, modal } from '../../lib/ui.js';
+  import TemplatesModal from '../modals/TemplatesModal.svelte';
+  import ImportModal from '../modals/ImportModal.svelte';
   import { settings } from '../../lib/settings.js';
   import Rail from './Rail.svelte';
   import TopBar from './TopBar.svelte';
@@ -54,6 +56,15 @@
   <div class="overlay" role="presentation" onclick={e => { if (e.target === e.currentTarget) previewOpen.set(false); }}
        onkeydown={e => { if (e.key === 'Escape') previewOpen.set(false); }}>
     <div class="sheet"><ExportView modal /></div>
+  </div>
+{/if}
+
+{#if $modal}
+  <div class="overlay" role="presentation" onclick={e => { if (e.target === e.currentTarget) modal.set(''); }}
+       onkeydown={e => { if (e.key === 'Escape') modal.set(''); }}>
+    <div class="sheet">
+      {#if $modal === 'templates'}<TemplatesModal />{:else if $modal === 'import'}<ImportModal />{/if}
+    </div>
   </div>
 {/if}
 

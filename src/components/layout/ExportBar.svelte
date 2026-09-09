@@ -7,6 +7,7 @@
   import { copyText } from '../../lib/clipboard.js';
   import { previewOpen, view } from '../../lib/ui.js';
   import { launchSuno } from '../../lib/launch.js';
+  import { validateSong } from '../../lib/validate.js';
   import { setSetting } from '../../lib/settings.js';
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
@@ -16,7 +17,9 @@
   const styleLen = $derived($song.style.trim().length);
   const lyrLevel = $derived(levelFor(lyrics.length, lim.lyrics));
   const styLevel = $derived(levelFor(styleLen, lim.style));
-  const status = $derived(lyrLevel === 'over' || styLevel === 'over' ? 'over' : lyrLevel === 'warn' || styLevel === 'warn' ? 'warn' : 'ok');
+  const check = $derived(validateSong($song, lim));
+  const status = $derived(check.status === 'over' || lyrLevel === 'over' || styLevel === 'over' ? 'over' : check.status === 'warn' || lyrLevel === 'warn' || styLevel === 'warn' ? 'warn' : 'ok');
+  const issueTitle = $derived(check.issues.map(i => (i.level === 'err' ? '✖ ' : '⚠ ') + $t('v_' + i.code).replace('{s}', i.section || '').replace('{d}', i.detail || '')).join('\n'));
 
   function launch() {
     if (!launchSuno()) return toast($t('toastNothing'), 'error');
@@ -39,10 +42,11 @@
     <span class="lbl">{$t('lyrics')}</span><span class="counter {lyrLevel === 'ok' ? '' : lyrLevel}">{lyrics.length} / {lim.lyrics}</span>
     <span class="sep">·</span>
     <span class="lbl">{$t('style')}</span><span class="counter {styLevel === 'ok' ? '' : styLevel}">{styleLen} / {lim.style}</span>
-    <span class="status {status}">
+    <button class="status {status}" title={issueTitle} onclick={() => previewOpen.set(true)}>
       <Icon name={status === 'ok' ? 'check' : 'alert'} size={13} />
-      {$t(status === 'ok' ? 'statusOk' : status === 'warn' ? 'statusWarn' : 'statusOver')}
-    </span>
+      {$t(status === 'ok' ? 'statusOk' : lyrLevel === 'over' || styLevel === 'over' ? 'statusOver' : check.errs ? 'statusErrs' : check.warns ? 'statusWarns' : 'statusWarn')}
+      {#if check.issues.length}<span class="n">{check.issues.length}</span>{/if}
+    </button>
   </div>
   <div class="actions">
     <Button variant="ghost" icon="eye" size="sm" onclick={() => previewOpen.set(true)}>{$t('preview')}</Button>
@@ -63,5 +67,6 @@
   .status.ok   { color: var(--ok);   background: color-mix(in srgb, var(--ok) 12%, transparent); }
   .status.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); }
   .status.over { color: var(--err);  background: color-mix(in srgb, var(--err) 12%, transparent); }
+  .status .n { font-size: 10px; padding: 0 5px; border-radius: 999px; background: currentColor; color: var(--bg0); line-height: 15px; }
   .actions { display: flex; gap: 6px; flex-shrink: 0; }
 </style>
