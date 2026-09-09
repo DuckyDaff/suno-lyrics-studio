@@ -73,6 +73,8 @@ export default {
   aiPreset: 'תבנית מבנה', aiPresetPick: 'בחר תבנית…', aiFromSections: 'מהסקשנים הקיימים', aiAddRow: 'הוסף חלק', aiBars: 'תיבות',
   aiKindLyrics: 'טקסט', aiKindInstr: 'אינסטרומנטלי', aiKindBacking: 'קולות רקע', aiTotal: 'סה״כ', aiApprox: 'כ־',
   aiIdeas: 'תן לי רעיונות', aiIdeasMore: 'עוד רעיונות', aiIdeasBusy: 'חושב…', aiIdeasTitle: '3 רעיונות לשיר לפי ה-Style והצורה שנבחרו', aiIdeaSet: 'הרעיון נכנס — עכשיו "כתוב שיר"',
+  aiAutoNikud: 'ניקוד אוטומטי לעברית (לחיצה על אות בעורך משנה את הניקוד שלה)', aiNikud: 'מנקד…',
+  nikudPopTitle: 'לחץ על ניקוד כדי להחליף · Esc לסגירה',
   aiTag: 'חתימה באינטרו (אד-ליב):',
   aiFixing: 'מתקן ספירת שורות…',
   aiThinking: 'מתכנן את השיר…', aiWriting: 'כותב…', aiRetry: 'מנסה שוב בקצרה…',

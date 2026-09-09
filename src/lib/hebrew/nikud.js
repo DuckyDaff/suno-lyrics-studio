@@ -154,12 +154,33 @@ export function buildNikudText(rawData, choices) {
     if (chosen) { parts.push(chosen); continue; }
     const dict = HOMOGRAPH_DICT[item.word ?? ''];
     if (dict) { parts.push(dict.masc); continue; }
-    if (item.options?.length) parts.push(item.options[0]);
+    if (item.options?.length) parts.push(String(item.options[0]).replace(/\|/g, ''));
     else if (item.nakdan)      parts.push(item.nakdan);
     else if (item.withNikud)   parts.push(item.withNikud);
     else                       parts.push(item.word ?? '');
   }
   return parts.join('').trim();
+}
+
+/**
+ * Vocalize a whole Suno-formatted lyrics text. Section tags, TITLE:/STYLE: lines and
+ * lines without Hebrew are left untouched; everything else goes to Dicta in one request.
+ */
+export async function nikudLyrics(text) {
+  const lines = String(text || '').replace(/\r/g, '').split('\n');
+  const keep = l => /^\s*\[/.test(l) || /^\s*(TITLE|STYLE):/i.test(l) || !HEBREW_RE.test(l);
+  const idx = [];
+  lines.forEach((l, i) => { if (!keep(l)) idx.push(i); });
+  if (!idx.length) return text;
+  const raw = await nakdanRaw(idx.map(i => lines[i]).join('\n'));
+  const out = buildNikudText(raw, null).split('\n');
+  if (out.length !== idx.length) {           // separator mismatch — fall back to per-line
+    const res = await Promise.all(idx.map(i => nakdan(lines[i]).catch(() => lines[i])));
+    idx.forEach((i, k) => { lines[i] = res[k]; });
+    return lines.join('\n');
+  }
+  idx.forEach((i, k) => { lines[i] = out[k]; });
+  return lines.join('\n');
 }
 
 /** Nikud a text; returns { text, ambiguous } */

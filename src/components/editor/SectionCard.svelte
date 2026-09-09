@@ -8,10 +8,31 @@
   import NikudKeyboard from './NikudKeyboard.svelte';
   import HomographBar from './HomographBar.svelte';
   import { kbdFor } from '../../lib/ui.js';
+  import NikudPop from './NikudPop.svelte';
+  import { letterAtCaret } from '../../lib/hebrew/letterNikud.js';
+  import { NIKUD_RE } from '../../lib/hebrew/nikud.js';
 
   let { sec, index, total } = $props();
   let ta = $state(null);
   let editingName = $state(false);
+  let pop = $state(null);        // letter hit for the nikud popover
+  let popNode = $state(null);
+
+  /* click on a Hebrew letter in a vocalized word (or with the nikud keyboard open / Alt) → popover */
+  function onTaClick(e) {
+    if (!ta) return;
+    const v = ta.value, i = ta.selectionStart;
+    if (ta.selectionStart !== ta.selectionEnd) { pop = null; return; }
+    const hit = letterAtCaret(v, i);
+    if (!hit) { pop = null; return; }
+    let a = hit.index, b = hit.end;
+    while (a > 0 && /[א-תְ-ׇֽֿׁׂ]/.test(v[a - 1])) a--;
+    while (b < v.length && /[א-תְ-ׇֽֿׁׂ]/.test(v[b])) b++;
+    const wordHasNikud = NIKUD_RE.test(v.slice(a, b));
+    if (wordHasNikud || $kbdFor === sec.id || e.altKey) pop = hit; else pop = null;
+  }
+  function onDocDown(e) { if (pop && popNode && !popNode.contains(e.target) && e.target !== ta) pop = null; }
+  $effect(() => { document.addEventListener('mousedown', onDocDown); return () => document.removeEventListener('mousedown', onDocDown); });
   const focus = node => { node.focus(); node.select(); };
 
   const color = $derived(sectionColor(sec.name));
@@ -49,7 +70,10 @@
   <textarea bind:this={ta} data-sec={sec.id} rows="3" dir={sec.dir} value={sec.text}
             placeholder={$t('lyricsPlaceholder')}
             oninput={e => { actions.setText(sec.id, e.target.value); resize(); }}
+            onclick={onTaClick}
+            onkeydown={e => { if (pop && (e.key === 'Escape' || e.key.length === 1 || e.key === 'Backspace')) pop = null; }}
             onfocus={() => activeSectionId.set(sec.id)}></textarea>
+  {#if pop}<div bind:this={popNode}><NikudPop {ta} hit={pop} onclose={() => (pop = null)} /></div>{/if}
 
   <HomographBar {sec} />
   {#if active}<WordTools {sec} />{/if}
@@ -58,6 +82,7 @@
 
 <style>
   .card {
+    position: relative;
     background: var(--bg1); border: 1px solid var(--line); border-radius: var(--r3);
     border-inline-start: 3px solid var(--c); padding: 10px 14px 12px;
     transition: border-color .12s, box-shadow .12s;

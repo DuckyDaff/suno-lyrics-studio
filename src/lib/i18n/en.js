@@ -67,6 +67,8 @@ export default {
   aiPreset: 'Structure preset', aiPresetPick: 'Pick a preset…', aiFromSections: 'From existing sections', aiAddRow: 'Add part', aiBars: 'bars',
   aiKindLyrics: 'lyrics', aiKindInstr: 'instrumental', aiKindBacking: 'backing vocals', aiTotal: 'Total', aiApprox: '~',
   aiIdeas: 'Give me ideas', aiIdeasMore: 'More ideas', aiIdeasBusy: 'Thinking…', aiIdeasTitle: '3 song ideas based on the chosen Style and form', aiIdeaSet: 'Idea set — now press "Write song"',
+  aiAutoNikud: 'Auto-vocalize Hebrew (click a letter in the editor to change its nikud)', aiNikud: 'Adding nikud…',
+  nikudPopTitle: 'Pick a mark to replace · Esc to close',
   aiTag: 'Intro signature (ad-lib):',
   aiFixing: 'Fixing line counts…',
   aiThinking: 'Planning the song…', aiWriting: 'Writing…', aiRetry: 'Retrying briefly…',

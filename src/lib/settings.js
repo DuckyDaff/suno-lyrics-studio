@@ -10,6 +10,7 @@ export const settings = persisted('melodraft_v2_settings', {
   bookmarkletSeen: false, // shown the Suno bookmarklet setup once
   producerTag: "It's a Denver Production", // signature ad-lib in every intro
   producerTagOn: true,
+  autoNikud: true,     // vocalize Hebrew AI output automatically
 }, {
   // carry over v1 preferences
   migrate: () => ({

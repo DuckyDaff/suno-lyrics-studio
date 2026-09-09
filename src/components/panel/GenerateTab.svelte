@@ -5,6 +5,7 @@
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
   import { generate, busy, phase } from '../../lib/ai.js';
+  import { nikudLyrics, HEBREW_RE } from '../../lib/hebrew/nikud.js';
   import { genState as g, setGen, blankMix, genAbort } from '../../lib/genState.js';
   import { parseLyrics, parseWild, parseLines } from '../../lib/lyricsParse.js';
   import { copyText } from '../../lib/clipboard.js';
@@ -30,6 +31,7 @@
   let { wide = false } = $props();
   let error = $state('');
   let presetId = $state('');
+  let nikudBusy = $state(false);
 
   /* ── idea generator ─────────────────────────────────────────── */
   let ideas = $state([]);
@@ -113,7 +115,14 @@
     if (mode === 'style') fields.limit = lim.style;
     try {
       const r = await generate(fields, (_, full) => setGen({ output: full }), { signal: ctrl.signal });
-      setGen({ output: r.text, usage: r.meta?.usage || null });
+      let text = r.text;
+      if ((mode === 'song' || mode === 'wild') && $settings.autoNikud && HEBREW_RE.test(text)) {
+        nikudBusy = true;
+        try { text = await nikudLyrics(text); } catch { toast($t('toastNikudFail'), 'error'); }
+        finally { nikudBusy = false; }
+      }
+      if (ctrl.signal.aborted) return;
+      setGen({ output: text, usage: r.meta?.usage || null });
     } catch (e) {
       if (e.code !== 'aborted') error = e.code || 'api_error';
     } finally { if (genAbort.current === ctrl) genAbort.current = null; }
@@ -243,6 +252,7 @@
     <div class="opts">
       <label class="chk"><input type="checkbox" bind:checked={$g.useStyle} /> {$t('aiUseStyle')} <span class="faint mono">{$song.style ? $song.style.slice(0, 40) + ($song.style.length > 40 ? '…' : '') : '—'}</span></label>
       <label class="chk"><input type="checkbox" bind:checked={$g.useStructure} /> {$t('aiUseStructure')} <span class="faint mono">{$song.sections.map(x => x.name).join(' · ')}</span></label>
+      <label class="chk"><input type="checkbox" checked={$settings.autoNikud} onchange={e => setSetting('autoNikud', e.target.checked)} /> {$t('aiAutoNikud')}</label>
       <label class="chk"><input type="checkbox" checked={$settings.producerTagOn} onchange={e => setSetting('producerTagOn', e.target.checked)} /> {$t('aiTag')}
         <input class="field tagIn" value={$settings.producerTag} oninput={e => setSetting('producerTag', e.target.value)} placeholder="It's a Denver Production" dir="ltr" /></label>
       <div class="model">
@@ -272,7 +282,7 @@
   {#if $g.output || $busy}
     <section class="out">
       <div class="hd">
-        <span class="lbl">{$t('aiResult')} {#if $busy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $phase === 'fixing' ? $t('aiFixing') : $phase === 'retry' ? $t('aiRetry') : $t('aiThinking')}</span><span class="dots">●●●</span>{/if}</span>
+        <span class="lbl">{$t('aiResult')} {#if nikudBusy}<span class="ph">{$t('aiNikud')}</span><span class="dots">●●●</span>{:else if $busy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $phase === 'fixing' ? $t('aiFixing') : $phase === 'retry' ? $t('aiRetry') : $t('aiThinking')}</span><span class="dots">●●●</span>{/if}</span>
         {#if $g.usage}<span class="counter">{$g.usage.out} tok</span>{/if}
         <Button size="sm" variant="ghost" icon="copy" title={$t('copy')} onclick={copyOut} />
         <Button size="sm" variant="ghost" icon="x" title={$t('clear')} onclick={clearOut} disabled={$busy} />
