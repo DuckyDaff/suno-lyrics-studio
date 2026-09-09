@@ -5,6 +5,7 @@
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
   import { generate, busy } from '../../lib/ai.js';
+  import { genState as g, setGen, blankMix, genAbort } from '../../lib/genState.js';
   import { parseLyrics, parseWild, parseLines } from '../../lib/lyricsParse.js';
   import { copyText } from '../../lib/clipboard.js';
   import Button from '../ui/Button.svelte';
@@ -25,83 +26,68 @@
   const RAP_V  = ['male rapper', 'female rapper', 'two rappers trading bars'];
   const SING_V = ['female singer', 'male singer', 'male cantor (chazan)', 'female opera soprano', 'male opera tenor', 'children choir', 'gospel choir', 'kid singer'];
 
-  let idea = $state('');
-  let form = $state('pop song');
-  let language = $state('Hebrew');
-  let rhyme = $state('auto');
-  let persona = $state('');
-  let length = $state('normal');
-  let useStructure = $state(false);
-  let useStyle = $state(true);
-  let extra = $state('');
-
-  let mixOn = $state(false);
-  let mix = $state({ verse: { form: '', voice: '' }, chorus: { form: '', voice: '' }, bridge: { form: '', voice: '' },
-                     intro: { form: '', voice: '' }, outro: { form: '', voice: '' }, notes: '' });
-
-  let output = $state('');
-  let outMode = $state('');       // song | wild | style | titles
   let error = $state('');
-  let abort = null;
-  let usage = $state(null);
 
   const lim = $derived(limits($settings.sunoVersion));
-  const wild = $derived(outMode === 'wild' ? parseWild(output) : null);
-  const titles = $derived(outMode === 'titles' ? parseLines(output) : []);
+  const wild = $derived($g.outMode === 'wild' ? parseWild($g.output) : null);
+  const titles = $derived($g.outMode === 'titles' ? parseLines($g.output) : []);
+  const shown = $derived($g.outMode === 'wild' ? (wild?.lyrics ?? '') : $g.output);
 
   const pick = a => a[Math.floor(Math.random() * a.length)];
   function shuffleMix() {
-    const flip = Math.random() < 0.25;                       // sometimes sung verses + rapped chorus
+    const flip = Math.random() < 0.25;
     const third = Math.random() < 0.5;
-    mix = {
-      ...mix,
+    setGen({ mixOn: true, mix: {
+      ...$g.mix,
       verse:  { form: pick(flip ? MELODIC : RHYTHMIC), voice: pick(flip ? SING_V : RAP_V) },
       chorus: { form: pick(flip ? RHYTHMIC : MELODIC), voice: pick(flip ? RAP_V : SING_V) },
       bridge: third ? { form: pick([...RHYTHMIC, ...MELODIC]), voice: pick([...RAP_V, ...SING_V, 'crowd chant', 'robotic vocoder voice']) } : { form: '', voice: '' },
-    };
-    mixOn = true;
+    } });
   }
+  function clearMix() { setGen({ mix: blankMix() }); }
   function mixPayload() {
-    if (!mixOn) return {};
-    const cast = [...new Set(MIX_SLOTS.map(([k]) => mix[k].voice).filter(Boolean))];
-    return { mix: { ...mix, cast }, blend: true };
+    if (!$g.mixOn) return {};
+    const cast = [...new Set(MIX_SLOTS.map(([k]) => $g.mix[k].voice).filter(Boolean))];
+    return { mix: { ...$g.mix, cast }, blend: true };
   }
 
   async function run(mode) {
-    if ($busy) { abort?.abort(); return; }
-    error = ''; output = ''; outMode = mode; usage = null;
-    abort = new AbortController();
+    if ($busy) { genAbort.current?.abort(); return; }
+    error = '';
+    setGen({ output: '', outMode: mode, usage: null });
+    const ctrl = new AbortController(); genAbort.current = ctrl;
+    const s = $g;
     const fields = {
-      mode, idea, form, language, rhyme, persona, length, extra,
-      style: useStyle ? $song.style : '',
-      structure: useStructure ? $song.sections.map(s => s.name) : null,
+      mode, idea: s.idea, form: s.form, language: s.language, rhyme: s.rhyme, persona: s.persona, length: s.length, extra: s.extra,
+      style: s.useStyle ? $song.style : '',
+      structure: s.useStructure ? $song.sections.map(x => x.name) : null,
       ...mixPayload(),
     };
     if (mode === 'style') fields.limit = lim.style;
     try {
-      const r = await generate(fields, (_, full) => { output = full; }, { signal: abort.signal });
-      output = r.text; usage = r.meta?.usage || null;
+      const r = await generate(fields, (_, full) => setGen({ output: full }), { signal: ctrl.signal });
+      setGen({ output: r.text, usage: r.meta?.usage || null });
     } catch (e) {
       if (e.code !== 'aborted') error = e.code || 'api_error';
-    }
+    } finally { if (genAbort.current === ctrl) genAbort.current = null; }
   }
 
   function applyLyrics(replace) {
-    const text = outMode === 'wild' ? wild.lyrics : output;
-    const secs = parseLyrics(text);
+    const secs = parseLyrics(shown);
     if (!secs.length) return toast($t('toastNothing'), 'error');
-    if (replace) actions.replaceAll(secs, outMode === 'wild' && wild.style ? wild.style : null);
-    else secs.forEach(s => actions.add(s.name, s.text));
-    if (outMode === 'wild' && wild.title) actions.setTitle(wild.title);
+    if (replace) actions.replaceAll(secs, $g.outMode === 'wild' && wild.style ? wild.style : null);
+    else secs.forEach(x => actions.add(x.name, x.text));
+    if ($g.outMode === 'wild' && wild.title) actions.setTitle(wild.title);
     toast($t('toastAppliedLyrics', { n: secs.length }), 'success');
   }
   function applyStyle() {
-    const s = outMode === 'wild' ? wild.style : output.trim();
-    if (!s) return;
-    actions.setStyle(s); toast($t('aiApplyStyle'), 'success');
+    const st = $g.outMode === 'wild' ? wild.style : $g.output.trim();
+    if (!st) return;
+    actions.setStyle(st); toast($t('aiApplyStyle'), 'success');
   }
   function applyTitle(tt) { actions.setTitle(tt); toast(tt, 'success'); }
-  async function copyOut() { (await copyText(output)) ? toast($t('toastAllCopied'), 'success') : toast($t('toastCopyFail'), 'error'); }
+  async function copyOut() { (await copyText($g.output)) ? toast($t('toastAllCopied'), 'success') : toast($t('toastCopyFail'), 'error'); }
+  function clearOut() { setGen({ output: '', outMode: '', usage: null }); }
 
   const errText = $derived(error ? ($t('aiErr_' + error) !== 'aiErr_' + error ? $t('aiErr_' + error) : $t('aiErr_api_error')) : '');
 </script>
@@ -109,51 +95,53 @@
 <div class="tab">
   <section class="brief">
     <label for="ai-idea">{$t('aiIdea')}</label>
-    <textarea id="ai-idea" class="field" rows="4" bind:value={idea} placeholder={$t('aiIdeaPh')}></textarea>
+    <textarea id="ai-idea" class="field" rows="4" bind:value={$g.idea} placeholder={$t('aiIdeaPh')}></textarea>
 
     <div class="grid">
       <label class="f"><span>{$t('aiForm')}</span>
-        <select class="field" bind:value={form}>{#each FORMS as f}<option value={f}>{f}</option>{/each}</select></label>
+        <select class="field" bind:value={$g.form}>{#each FORMS as f}<option value={f}>{f}</option>{/each}</select></label>
       <label class="f"><span>{$t('aiLang')}</span>
-        <select class="field" bind:value={language}>{#each LANGS as l}<option value={l}>{l}</option>{/each}</select></label>
+        <select class="field" bind:value={$g.language}>{#each LANGS as l}<option value={l}>{l}</option>{/each}</select></label>
       <label class="f"><span>{$t('aiRhyme')}</span>
-        <select class="field" bind:value={rhyme}>{#each RHYMES as r}<option value={r}>{r}</option>{/each}</select></label>
+        <select class="field" bind:value={$g.rhyme}>{#each RHYMES as r}<option value={r}>{r}</option>{/each}</select></label>
       <label class="f"><span>{$t('aiLength')}</span>
-        <select class="field" bind:value={length}>
+        <select class="field" bind:value={$g.length}>
           <option value="short">{$t('aiShort')}</option><option value="normal">{$t('aiNormal')}</option><option value="long">{$t('aiLong')}</option>
         </select></label>
     </div>
-    <input class="field" bind:value={persona} placeholder={$t('aiPersonaPh')} />
-    <input class="field" bind:value={extra} placeholder={$t('aiExtraPh')} />
+    <input class="field" bind:value={$g.persona} placeholder={$t('aiPersonaPh')} />
+    <input class="field" bind:value={$g.extra} placeholder={$t('aiExtraPh')} />
 
-    <!-- style & voice blend -->
-    <div class="mix" class:on={mixOn}>
+    <div class="mix" class:on={$g.mixOn}>
       <div class="mixhd">
-        <label class="chk big"><input type="checkbox" bind:checked={mixOn} /> 🎭 {$t('aiMix')}</label>
-        <button class="linkBtn" onclick={shuffleMix}>🎲 {$t('aiMixShuffle')}</button>
+        <label class="chk big"><input type="checkbox" bind:checked={$g.mixOn} /> 🎭 {$t('aiMix')}</label>
+        <span class="mixbtns">
+          <button class="linkBtn" onclick={shuffleMix}>🎲 {$t('aiMixShuffle')}</button>
+          {#if $g.mixOn}<button class="linkBtn dim" onclick={clearMix}>{$t('clear')}</button>{/if}
+        </span>
       </div>
-      {#if mixOn}
+      {#if $g.mixOn}
         <p class="faint hint">{$t('aiMixHint')}</p>
         {#each MIX_SLOTS as [k, lbl]}
           <div class="mixrow">
             <span class="slot">{$t(lbl)}</span>
-            <select class="field" bind:value={mix[k].form}>
+            <select class="field" bind:value={$g.mix[k].form}>
               <option value="">{$t('aiSameAsMain')}</option>
               {#each FORMS as f}<option value={f}>{f}</option>{/each}
             </select>
-            <select class="field" bind:value={mix[k].voice}>
+            <select class="field" bind:value={$g.mix[k].voice}>
               <option value="">{$t('aiAutoVoice')}</option>
               {#each VOICES as v}<option value={v}>{v}</option>{/each}
             </select>
           </div>
         {/each}
-        <input class="field" bind:value={mix.notes} placeholder={$t('aiMixNotesPh')} />
+        <input class="field" bind:value={$g.mix.notes} placeholder={$t('aiMixNotesPh')} />
       {/if}
     </div>
 
     <div class="opts">
-      <label class="chk"><input type="checkbox" bind:checked={useStyle} /> {$t('aiUseStyle')} <span class="faint mono">{$song.style ? $song.style.slice(0, 40) + ($song.style.length > 40 ? '…' : '') : '—'}</span></label>
-      <label class="chk"><input type="checkbox" bind:checked={useStructure} /> {$t('aiUseStructure')} <span class="faint mono">{$song.sections.map(s => s.name).join(' · ')}</span></label>
+      <label class="chk"><input type="checkbox" bind:checked={$g.useStyle} /> {$t('aiUseStyle')} <span class="faint mono">{$song.style ? $song.style.slice(0, 40) + ($song.style.length > 40 ? '…' : '') : '—'}</span></label>
+      <label class="chk"><input type="checkbox" bind:checked={$g.useStructure} /> {$t('aiUseStructure')} <span class="faint mono">{$song.sections.map(x => x.name).join(' · ')}</span></label>
       <div class="model">
         <span>{$t('aiModel')}</span>
         <button class:on={$settings.aiModel !== 'fast'} onclick={() => setSetting('aiModel', 'quality')}>{$t('aiQuality')}</button>
@@ -173,36 +161,37 @@
     <div class="err"><Icon name="alert" size={14} /> {errText}</div>
   {/if}
 
-  {#if output || $busy}
+  {#if $g.output || $busy}
     <section class="out">
       <div class="hd">
         <span class="lbl">{$t('aiResult')} {#if $busy}<span class="dots">●●●</span>{/if}</span>
-        {#if usage}<span class="counter">{usage.out} tok</span>{/if}
+        {#if $g.usage}<span class="counter">{$g.usage.out} tok</span>{/if}
         <Button size="sm" variant="ghost" icon="copy" title={$t('copy')} onclick={copyOut} />
+        <Button size="sm" variant="ghost" icon="x" title={$t('clear')} onclick={clearOut} disabled={$busy} />
       </div>
 
-      {#if outMode === 'titles'}
+      {#if $g.outMode === 'titles'}
         <ul class="titles">{#each titles as tt}<li><button onclick={() => applyTitle(tt)}>{tt}</button></li>{/each}</ul>
       {:else}
-        {#if outMode === 'wild' && (wild.title || wild.style)}
+        {#if $g.outMode === 'wild' && (wild.title || wild.style)}
           <div class="wildhd">
             {#if wild.title}<div class="wt">{wild.title}</div>{/if}
             {#if wild.style}<div class="ws mono">{wild.style}</div>{/if}
           </div>
         {/if}
-        <pre class="box" dir="auto">{outMode === 'wild' ? wild.lyrics : output}</pre>
+        <pre class="box" dir="auto">{shown}</pre>
       {/if}
 
-      {#if !$busy && output}
+      {#if !$busy && $g.output}
         <div class="apply">
-          {#if outMode === 'song' || outMode === 'wild'}
+          {#if $g.outMode === 'song' || $g.outMode === 'wild'}
             <Button variant="primary" icon="check" onclick={() => applyLyrics(true)}>{$t('aiReplace')}</Button>
             <Button icon="plus" onclick={() => applyLyrics(false)}>{$t('aiAppend')}</Button>
-            {#if outMode === 'wild' && wild.style}<Button variant="ghost" onclick={applyStyle}>{$t('aiApplyStyle')}</Button>{/if}
-          {:else if outMode === 'style'}
+            {#if $g.outMode === 'wild' && wild.style}<Button variant="ghost" onclick={applyStyle}>{$t('aiApplyStyle')}</Button>{/if}
+          {:else if $g.outMode === 'style'}
             <Button variant="primary" icon="check" onclick={applyStyle}>{$t('aiApplyStyle')}</Button>
           {/if}
-          <Button variant="ghost" icon="undo" onclick={() => run(outMode)}>{$t('aiAgain')}</Button>
+          <Button variant="ghost" icon="undo" onclick={() => run($g.outMode)}>{$t('aiAgain')}</Button>
         </div>
       {/if}
     </section>
@@ -220,11 +209,13 @@
   .opts, .mix { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; background: var(--bg2); border-radius: var(--r2); border: 1px solid var(--line); }
   .mix.on { border-color: var(--accent-bd); }
   .mixhd { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .mixbtns { display: flex; gap: 10px; }
   .chk { display: flex; align-items: center; gap: 6px; font-size: var(--fs-xs); font-weight: 600; color: var(--tx1); cursor: pointer; min-width: 0; }
   .chk.big { font-size: var(--fs-sm); color: var(--tx0); }
   .chk span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
   .chk input { accent-color: var(--accent); }
   .linkBtn { font-size: var(--fs-xs); font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .linkBtn.dim { color: var(--tx2); }
   .hint { font-size: 11px; line-height: 1.45; }
   .mixrow { display: grid; grid-template-columns: 52px 1fr 1fr; gap: 4px; align-items: center; }
   .mixrow .field { padding: 6px 6px; font-size: 11px; min-width: 0; }

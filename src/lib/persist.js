@@ -9,7 +9,8 @@ export function persisted(key, initial, { migrate } = {}) {
     else if (migrate) value = { ...initial, ...(migrate() || {}) };
   } catch {}
   const store = writable(value);
-  store.subscribe(v => { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} });
+  let t;
+  store.subscribe(v => { clearTimeout(t); t = setTimeout(() => { try { localStorage.setItem(key, JSON.stringify(v)); } catch {} }, 150); });
   return store;
 }
 
