@@ -245,7 +245,7 @@
   {#if $g.output || $busy}
     <section class="out">
       <div class="hd">
-        <span class="lbl">{$t('aiResult')} {#if $busy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $phase === 'retry' ? $t('aiRetry') : $t('aiThinking')}</span><span class="dots">●●●</span>{/if}</span>
+        <span class="lbl">{$t('aiResult')} {#if $busy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $phase === 'fixing' ? $t('aiFixing') : $phase === 'retry' ? $t('aiRetry') : $t('aiThinking')}</span><span class="dots">●●●</span>{/if}</span>
         {#if $g.usage}<span class="counter">{$g.usage.out} tok</span>{/if}
         <Button size="sm" variant="ghost" icon="copy" title={$t('copy')} onclick={copyOut} />
         <Button size="sm" variant="ghost" icon="x" title={$t('clear')} onclick={clearOut} disabled={$busy} />

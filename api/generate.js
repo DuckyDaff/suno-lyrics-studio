@@ -172,7 +172,7 @@ function buildUser(b) {
         b.mood ? `Mood: ${clean(b.mood, 200)}.` : '',
         b.rhyme === 'free verse' ? 'Rhyme: free verse — no end rhymes required, rhythm from breath and image.'
           : b.rhyme && b.rhyme !== 'auto' ? `Rhyme scheme: ${b.rhyme} in every stanza, stressed-syllable rhymes, no two rhymed lines ending on the same word.`
-          : 'Rhyme scheme: choose AABB or ABAB per section (you may vary between verse and chorus) and keep it strictly — every stanza must rhyme on stressed syllables.',
+          : `Rhyme scheme: verses ${/rap|trap|drill|hip/i.test(b.form || '') ? 'AABB' : (Math.random() < 0.5 ? 'AABB' : 'ABAB')}, chorus AABB — keep it strictly in every stanza, rhymes on stressed syllables, no two rhymed lines ending on the same word.`,
         b.length === 'short' ? 'Length: short (about 12–20 lines).' : b.length === 'long' ? 'Length: long (a full 3-verse song).' : 'Length: normal (about 24–36 lines).',
         structure,
         producerTag(b),
@@ -261,6 +261,30 @@ function stripPreamble(text, mode) {
   return text;
 }
 
+/* Compare line counts per section with the requested bars; returns [{name, want, got}] */
+function lineIssues(text, b) {
+  const m = b.music;
+  if (b.mode !== 'song' || !m || !Array.isArray(m.bars) || !m.bars.length) return [];
+  const lpb = parseFloat(m.linesPerBar) || 1;
+  const want = {};
+  for (const r of m.bars) {
+    if (!r || !r.name || r.kind === 'instrumental') continue;
+    const n = Math.round((parseInt(r.bars, 10) || 0) * lpb);
+    if (n > 0) want[String(r.name).toLowerCase().trim()] = n;
+  }
+  const issues = [];
+  let cur = null, count = 0;
+  const flush = () => { if (cur && want[cur] != null && count !== want[cur]) issues.push({ name: cur, want: want[cur], got: count }); };
+  for (const raw of text.split('\n')) {
+    const l = raw.trim();
+    const tag = l.match(/^\[([^\]]{1,80})\]$/);
+    if (tag) { flush(); cur = tag[1].split(/[-–:]/)[0].trim().toLowerCase(); count = 0; continue; }
+    if (l && cur) count++;
+  }
+  flush();
+  return issues;
+}
+
 /* ── handler ───────────────────────────────────────────────────────────── */
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -327,8 +351,23 @@ module.exports = async function handler(req, res) {
     // before the first line; low keeps a short plan and starts writing within seconds.
     const effort = 'low';
     const { final, got, text } = await attempt(effort);
-    const cleaned = stripPreamble(text, body.mode);
+    let cleaned = stripPreamble(text, body.mode);
     if (cleaned !== text) send({ replace: cleaned });
+    const issues = got ? lineIssues(cleaned, body) : [];
+    if (issues.length) {
+      send({ status: 'fixing' });
+      const fixMsg = 'Fix ONLY the line counts of these sections, keeping the same story, rhyme scheme and everything else unchanged. Return the COMPLETE song again, starting with the first section tag, nothing else.\n' +
+        issues.map(i => `- [${i.name}]: must have exactly ${i.want} lyric lines (it has ${i.got})`).join('\n');
+      try {
+        const fix = await client.messages.create({
+          model, max_tokens: 6000, thinking: { type: 'disabled' },
+          system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
+          messages: [{ role: 'user', content: userMsg }, { role: 'assistant', content: cleaned }, { role: 'user', content: fixMsg }],
+        });
+        const fixed = stripPreamble((fix.content || []).filter(c => c.type === 'text').map(c => c.text).join(''), body.mode);
+        if (fixed && lineIssues(fixed, body).length < issues.length) { cleaned = fixed; send({ replace: cleaned }); }
+      } catch (e) { console.warn('fix pass failed', e && e.message); }
+    }
     if (!got && final.stop_reason === 'max_tokens') {
       console.warn('generate: thinking overflow', model, final.usage && final.usage.output_tokens);
       send({ error: 'thinking_overflow', model });

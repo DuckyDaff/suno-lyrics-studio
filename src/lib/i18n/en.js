@@ -67,6 +67,7 @@ export default {
   aiPreset: 'Structure preset', aiPresetPick: 'Pick a preset…', aiFromSections: 'From existing sections', aiAddRow: 'Add part', aiBars: 'bars',
   aiKindLyrics: 'lyrics', aiKindInstr: 'instrumental', aiKindBacking: 'backing vocals', aiTotal: 'Total', aiApprox: '~',
   aiTag: 'Intro signature (ad-lib):',
+  aiFixing: 'Fixing line counts…',
   aiThinking: 'Planning the song…', aiWriting: 'Writing…', aiRetry: 'Retrying briefly…',
   aiErr_thinking_overflow: 'The model spent its budget planning and wrote nothing — try again or switch to Fast',
   aiErr_unauthorized: 'Please sign in again', aiErr_no_api_key: 'No Anthropic key configured on the server (ANTHROPIC_API_KEY)', aiErr_bad_api_key: 'The Anthropic API key is invalid',
