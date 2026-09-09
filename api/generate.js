@@ -294,8 +294,8 @@ module.exports = async function handler(req, res) {
     const stream = client.messages.stream({
       model,
       max_tokens: 12000,
-      thinking: { type: 'adaptive' },
-      output_config: { effort },
+      // fast model: no thinking at all → first line in ~3s, every time; quality model: short adaptive plan
+      ...(body.model === 'fast' ? { thinking: { type: 'disabled' } } : { thinking: { type: 'adaptive' }, output_config: { effort } }),
       system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: userMsg }],
     });
