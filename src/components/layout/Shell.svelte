@@ -81,16 +81,16 @@
   .full   { grid-column: 2 / -1; grid-row: 2 / -1; overflow: auto; min-height: 0; }
 
   @media (max-width: 1400px) { .shell { --panel-w: 300px; } }
-  @media (max-width: 1180px) { .shell { --panel-w: 270px; } .shell:not(.focus) { grid-template-columns: var(--rail-w) min(var(--editor-w), 360px) minmax(0, 1fr) var(--panel-w); } }
+  @media (max-width: 1180px) { .shell { --panel-w: 270px; } .shell:not(.focus):not(.phone) { grid-template-columns: var(--rail-w) min(var(--editor-w), 360px) minmax(0, 1fr) var(--panel-w); } }
 
-  .phone {
-    grid-template-columns: minmax(0, 1fr);
+  .shell.phone {
+    grid-template-columns: minmax(0, 1fr) !important;
     grid-template-rows: 52px minmax(0, 1fr) var(--tabs-h);
     padding-bottom: env(safe-area-inset-bottom);
   }
-  .phone .top  { grid-column: 1; }
-  .phone .main { grid-column: 1; grid-row: 2; overflow: auto; min-height: 0; }
-  .phone .tabs { grid-column: 1; grid-row: 3; border-top: 1px solid var(--line); background: var(--bg1); }
+  .shell.phone .top  { grid-column: 1; }
+  .shell.phone .main { grid-column: 1; grid-row: 2; overflow: auto; min-height: 0; min-width: 0; }
+  .shell.phone .tabs { grid-column: 1; grid-row: 3; border-top: 1px solid var(--line); background: var(--bg1); }
 
   .overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,.55); backdrop-filter: blur(3px);
