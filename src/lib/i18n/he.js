@@ -72,6 +72,7 @@ export default {
   aiBpm: 'BPM', aiBpmPh: 'מה-Style', aiSig: 'משקל', aiLpb: 'שורות/תיבה', aiLpbAuto: 'אוטומטי', aiLpb1: 'שורה = תיבה', aiLpbHalf: 'שורה = 2 תיבות', aiLpb2: '2 שורות = תיבה',
   aiPreset: 'תבנית מבנה', aiPresetPick: 'בחר תבנית…', aiFromSections: 'מהסקשנים הקיימים', aiAddRow: 'הוסף חלק', aiBars: 'תיבות',
   aiKindLyrics: 'טקסט', aiKindInstr: 'אינסטרומנטלי', aiKindBacking: 'קולות רקע', aiTotal: 'סה״כ', aiApprox: 'כ־',
+  aiTag: 'חתימה באינטרו (אד-ליב):',
   aiThinking: 'מתכנן את השיר…', aiWriting: 'כותב…', aiRetry: 'מנסה שוב בקצרה…',
   aiErr_thinking_overflow: 'המודל בזבז את התקציב על תכנון ולא כתב — נסה שוב, או עבור למצב מהיר',
   aiErr_unauthorized: 'צריך להתחבר מחדש', aiErr_no_api_key: 'לא הוגדר מפתח Anthropic בשרת (ANTHROPIC_API_KEY)', aiErr_bad_api_key: 'מפתח ה-API של Anthropic לא תקין',

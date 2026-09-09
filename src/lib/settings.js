@@ -8,6 +8,8 @@ export const settings = persisted('melodraft_v2_settings', {
   editorW: 440,         // desktop editor panel width (px)
   editorCollapsed: true, // desktop editor panel starts collapsed
   bookmarkletSeen: false, // shown the Suno bookmarklet setup once
+  producerTag: "It's a Denver Production", // signature ad-lib in every intro
+  producerTagOn: true,
 }, {
   // carry over v1 preferences
   migrate: () => ({

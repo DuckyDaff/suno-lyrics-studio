@@ -139,6 +139,12 @@ function musicText(b) {
   return ['MUSICAL STRUCTURE (binding):', ...lines].join('\n');
 }
 
+function producerTag(b) {
+  const tag = clean(b.producerTag, 80);
+  if (!tag) return '';
+  return `PRODUCER TAG (mandatory, every time): the song must open with an [Intro] whose FIRST line is the spoken ad-lib "(${tag})" — exactly this text, in parentheses, as its own line. Keep it even when the intro is instrumental (then it is the only line under the [Intro] tag). If the structure has no intro, add a short [Intro] just for it.`;
+}
+
 function songContext(b) {
   const lines = [];
   if (b.title) lines.push(`Song title: ${clean(b.title, 200)}`);
@@ -169,6 +175,7 @@ function buildUser(b) {
           : 'Rhyme scheme: choose AABB or ABAB per section (you may vary between verse and chorus) and keep it strictly — every stanza must rhyme on stressed syllables.',
         b.length === 'short' ? 'Length: short (about 12–20 lines).' : b.length === 'long' ? 'Length: long (a full 3-verse song).' : 'Length: normal (about 24–36 lines).',
         structure,
+        producerTag(b),
         musicText(b),
         blendText(b),
         b.style ? `Match the lyrics to this Suno style prompt: ${clean(b.style, 1200)}` : '',
@@ -182,6 +189,7 @@ function buildUser(b) {
         b.idea ? `Seed (optional, riff on it freely): ${clean(b.idea, 1000)}` : 'No seed — surprise me.',
         `Language for lyrics: ${lang}.`,
         b.form && b.form !== 'auto' ? `Form: ${b.form}.` : 'Pick whichever form fits the concept best (pop, rap, opera, musical, ballad, mizrahi, punk, children…).',
+        producerTag(b),
         musicText(b),
         blendText(b) || (b.blend ? 'Make it a GENRE / VOICE BLEND: choose two or three contrasting styles and performers for different sections (e.g. rap verses with an operatic chorus, a female rapper and a male cantor) and follow the blend rules.' : ''),
         `Output format, exactly:`,

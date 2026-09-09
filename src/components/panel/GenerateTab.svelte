@@ -216,6 +216,8 @@
     <div class="opts">
       <label class="chk"><input type="checkbox" bind:checked={$g.useStyle} /> {$t('aiUseStyle')} <span class="faint mono">{$song.style ? $song.style.slice(0, 40) + ($song.style.length > 40 ? '…' : '') : '—'}</span></label>
       <label class="chk"><input type="checkbox" bind:checked={$g.useStructure} /> {$t('aiUseStructure')} <span class="faint mono">{$song.sections.map(x => x.name).join(' · ')}</span></label>
+      <label class="chk"><input type="checkbox" checked={$settings.producerTagOn} onchange={e => setSetting('producerTagOn', e.target.checked)} /> {$t('aiTag')}
+        <input class="field tagIn" value={$settings.producerTag} oninput={e => setSetting('producerTag', e.target.value)} placeholder="It's a Denver Production" dir="ltr" /></label>
       <div class="model">
         <span>{$t('aiModel')}</span>
         <button class:on={$settings.aiModel !== 'fast'} onclick={() => setSetting('aiModel', 'quality')}>{$t('aiQuality')}</button>
@@ -303,6 +305,7 @@
   .chk.big { font-size: var(--fs-sm); color: var(--tx0); }
   .chk span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
   .chk input { accent-color: var(--accent); }
+  .tagIn { flex: 1; padding: 4px 8px; font-size: 11px; font-family: var(--font-mono); min-width: 0; }
   .linkBtn { font-size: var(--fs-xs); font-weight: 700; color: var(--accent); white-space: nowrap; }
   .linkBtn.dim { color: var(--tx2); }
   .hint { font-size: 11px; line-height: 1.45; }

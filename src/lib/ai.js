@@ -26,6 +26,7 @@ export async function generate(fields, onDelta, { signal } = {}) {
     title: cur.title,
     style: fields.style ?? cur.style,
     lyrics: fields.lyrics ?? buildLyrics(cur),
+    producerTag: s.producerTagOn && s.producerTag && s.producerTag.trim() ? s.producerTag.trim() : '',
     ...fields,
   };
 
