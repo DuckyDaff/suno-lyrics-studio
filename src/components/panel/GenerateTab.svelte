@@ -27,6 +27,7 @@
   const RAP_V  = ['male rapper', 'female rapper', 'two rappers trading bars'];
   const SING_V = ['female singer', 'male singer', 'male cantor (chazan)', 'female opera soprano', 'male opera tenor', 'children choir', 'gospel choir', 'kid singer'];
 
+  let { wide = false } = $props();
   let error = $state('');
   let presetId = $state('');
 
@@ -123,7 +124,7 @@
   const errText = $derived(error ? ($t('aiErr_' + error) !== 'aiErr_' + error ? $t('aiErr_' + error) : $t('aiErr_api_error')) : '');
 </script>
 
-<div class="tab">
+<div class="tab" class:wide={wide}>
   <section class="brief">
     <label for="ai-idea">{$t('aiIdea')}</label>
     <textarea id="ai-idea" class="field" rows="4" bind:value={$g.idea} placeholder={$t('aiIdeaPh')}></textarea>
@@ -230,8 +231,13 @@
     </div>
   </section>
 
+  <div class="result">
   {#if error}
     <div class="err"><Icon name="alert" size={14} /> {errText}</div>
+  {/if}
+
+  {#if !$g.output && !$busy && wide}
+    <div class="placeholder"><Icon name="sparkles" size={26} /><p>{$t('resultHere')}</p></div>
   {/if}
 
   {#if $g.output || $busy}
@@ -269,10 +275,17 @@
       {/if}
     </section>
   {/if}
+  </div>
 </div>
 
 <style>
   .tab { padding: 14px 14px 28px; display: flex; flex-direction: column; gap: 14px; }
+  .tab.wide { display: grid; grid-template-columns: minmax(340px, 470px) minmax(0, 1fr); gap: 22px; align-items: start; padding: 18px 22px 32px; max-width: 1400px; margin: 0 auto; }
+  .tab.wide .result { position: sticky; top: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .tab.wide .out { border-top: none; padding-top: 0; }
+  .tab.wide .box { max-height: calc(100dvh - var(--top-h) - var(--export-h) - 150px); }
+  .placeholder { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 60px 20px; color: var(--tx2); text-align: center; font-size: var(--fs-sm); line-height: 1.6; border: 1px dashed var(--line2); border-radius: var(--r3); }
+  .result:empty { display: none; }
   .brief { display: flex; flex-direction: column; gap: 8px; }
   label { font-size: var(--fs-sm); font-weight: 700; color: var(--tx1); }
   textarea.field { font-size: var(--fs-md); line-height: 1.55; }

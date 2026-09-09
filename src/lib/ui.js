@@ -2,10 +2,16 @@ import { writable, readable } from 'svelte/store';
 
 /** desktop views: editor | songs | settings */
 export const view = writable('editor');
-/** right-panel tab: style | library | studio */
-export const panelTab = writable('style');
+/** phone panel tab: ai | style | library | studio */
+export const panelTab = writable('ai');
+/** desktop centre workspace tab: ai | style */
+export const wsTab = writable('ai');
+/** desktop left panel tab: library | studio */
+export const leftTab = writable('library');
+/** desktop: editor takes the wide column, workspace shrinks */
+export const editorFocus = writable(false);
 /** phone tabs: editor | style | library | export */
-export const mobileTab = writable('editor');
+export const mobileTab = writable('ai');
 /** section whose textarea currently has focus */
 export const activeSectionId = writable(null);
 /** homograph choices per section: Map<sectionId, [{word, masc, fem, current, gender}]> */

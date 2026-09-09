@@ -1,24 +1,30 @@
 <script>
-  import { view, panelTab } from '../../lib/ui.js';
+  import { view, wsTab, leftTab, editorFocus } from '../../lib/ui.js';
   import { t } from '../../lib/i18n.js';
   import Icon from '../ui/Icon.svelte';
 
   const items = $derived([
-    { id: 'songs',    icon: 'music',   label: $t('navSongs') },
-    { id: 'editor',   icon: 'pen',     label: $t('navEditor') },
-    { id: 'ai',       icon: 'sparkles', label: $t('tabAI') },
-    { id: 'library',  icon: 'library', label: $t('navLibrary') },
-    { id: 'studio',   icon: 'sliders', label: $t('navStudio') },
+    { id: 'songs',   icon: 'music',    label: $t('navSongs') },
+    { id: 'ai',      icon: 'sparkles', label: $t('wsCreate') },
+    { id: 'style',   icon: 'sliders',  label: $t('wsStyle') },
+    { id: 'editor',  icon: 'pen',      label: $t('navEditor') },
+    { id: 'library', icon: 'library',  label: $t('navLibrary') },
+    { id: 'studio',  icon: 'grid',     label: $t('navStudio') },
   ]);
 
   function go(id) {
-    if (id === 'library' || id === 'studio' || id === 'ai') { view.set('editor'); panelTab.set(id); }
-    else view.set(id);
+    if (id === 'songs') { view.set('songs'); return; }
+    view.set('editor');
+    if (id === 'ai' || id === 'style') { wsTab.set(id); editorFocus.set(false); }
+    else if (id === 'editor') editorFocus.update(v => !v);
+    else leftTab.set(id);
   }
   const isActive = id =>
-    id === 'library' || id === 'studio' || id === 'ai' ? $view === 'editor' && $panelTab === id
-    : id === 'editor' ? $view === 'editor' && $panelTab === 'style'
-    : $view === id;
+    id === 'songs' ? $view === 'songs'
+    : $view !== 'editor' ? false
+    : id === 'editor' ? $editorFocus
+    : id === 'ai' || id === 'style' ? $wsTab === id && !$editorFocus
+    : $leftTab === id;
 </script>
 
 <nav class="rail">

@@ -5,6 +5,7 @@ export const settings = persisted('melodraft_v2_settings', {
   lang: 'he',           // he | en
   sunoVersion: 'v5.5',  // see suno.js
   aiModel: 'fast',      // fast | quality
+  editorW: 440,         // desktop editor panel width (px)
 }, {
   // carry over v1 preferences
   migrate: () => ({

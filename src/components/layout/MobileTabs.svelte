@@ -4,9 +4,9 @@
   import Icon from '../ui/Icon.svelte';
 
   const tabs = $derived([
-    { id: 'editor',  icon: 'pen',     label: $t('tabEditor') },
     { id: 'ai',      icon: 'sparkles', label: $t('tabAI') },
-    { id: 'style',   icon: 'sparkles', label: $t('tabStyle') },
+    { id: 'style',   icon: 'sliders',  label: $t('tabStyle') },
+    { id: 'editor',  icon: 'pen',      label: $t('tabEditor') },
     { id: 'library', icon: 'library', label: $t('tabLibrary') },
     { id: 'export',  icon: 'send',    label: $t('tabExport') },
   ]);
