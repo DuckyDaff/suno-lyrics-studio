@@ -52,7 +52,13 @@ export function startSync() {
   if (started) return;
   started = true;
   songs.subscribe(() => pushDirty());
-  user.subscribe(u => { if (u) pullAll(); else syncState.set('off'); });
+  let lastUser = null;
+  user.subscribe(u => {
+    const name = u?.username || null;
+    if (name === lastUser) return;
+    lastUser = name;
+    if (u) pullAll(); else syncState.set('off');
+  });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pullAll(); });
   setInterval(() => { if (document.visibilityState === 'visible') pullAll(); }, 90000);
 }
