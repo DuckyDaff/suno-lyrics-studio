@@ -4,6 +4,7 @@
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
   import { generate, busy } from '../../lib/ai.js';
+  import { genState } from '../../lib/genState.js';
   import { nikudWithHomographs, nakdan } from '../../lib/hebrew/nikud.js';
   import { latinize, phonetic } from '../../lib/hebrew/translit.js';
   import { wordAtCursor } from '../../lib/hebrew/marks.js';
@@ -69,7 +70,8 @@
     const lang = /[א-ת]/.test(sec.text || $song.sections.map(s => s.text).join('')) ? 'Hebrew' : 'English';
     try {
       await generate(
-        { mode: 'section', op, section: sec.name, section_text: sec.text, language: lang },
+        { mode: 'section', op, section: sec.name, section_text: sec.text, language: lang,
+          ...($genState.musicOn ? { music: { ...$genState.music, bars: [] }, bars: $genState.music.bars.find(r => r.name.toLowerCase() === sec.name.split(':')[0].trim().toLowerCase())?.bars } : {}) },
         (_, full) => actions.setText(sec.id, base ? `${base}\n${full}` : full),
         { signal: abort.signal }
       );

@@ -10,6 +10,7 @@ export const genState = persisted('melodraft_v2_gen', {
   idea: '', form: 'pop song', language: 'Hebrew', rhyme: 'auto', persona: '', length: 'normal',
   useStructure: false, useStyle: true, extra: '',
   mixOn: false, mix: blankMix(),
+  musicOn: false, music: { bpm: '', sig: '4/4', linesPerBar: 'auto', bars: [] },
   output: '', outMode: '', usage: null,
 });
 

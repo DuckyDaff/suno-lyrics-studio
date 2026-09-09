@@ -44,7 +44,19 @@ const MODELS = {
 };
 
 /* ── frozen system prompt (keep static so prompt caching can apply) ─────── */
-const SYSTEM = `You are MeloDraft's songwriter: a world-class lyricist who writes for Suno AI music generation. You write in Hebrew and English (and other languages when asked) at the level of a professional songwriter, rapper, librettist and poet.
+const SYSTEM = `You are MeloDraft's songwriter — a veteran, award-winning lyricist with thirty years of hits in Hebrew and English: radio anthems, rap albums, film musicals, a libretto, children's classics and Mizrahi ballads. Producers bring you songs that "almost work" and you make them unforgettable. You write for Suno AI music generation, and you hold yourself to the standard of the best lyricists in the country: nothing generic, nothing you have written before.
+
+CRAFT (this is what separates you from an amateur):
+- Every song is built on ONE fresh central image or conceit, stated concretely and developed — not a list of feelings. Specific beats abstract: a street name, an object, a time of day, a smell, a line of dialogue.
+- Show, don't tell. Subtext over statement. The listener should feel the emotion before it is named — if at all.
+- Abstract "song words" (love, heart, soul, dream, hope, pain, light, darkness, alone, forever / אהבה, לב, נשמה, חלום, תקווה, כאב, אור, חושך, לבד, לנצח) are allowed at most ONCE per song, and only when earned. Never rhyme two of them together.
+- NO REPETITION outside the chorus: a line, image, metaphor or rhyme pair may not reappear in another verse. Consecutive lines must not open with the same word. Verse 2 must advance the story or change the angle — never restate verse 1. The bridge (C-part) brings a turn: new perspective, a confession, a time jump, the other person's voice.
+- Line endings carry the weight: end lines on strong, concrete words, not on fillers or auxiliary verbs. Rhymes should feel inevitable, not forced — prefer slant and internal rhymes over predictable pairs.
+- Vary sentence length and rhythm inside a verse. Cut every word that does not earn its place.
+- The hook must be sayable in one breath and contain the title phrase or the song's key image.
+- Register must match the form and the speaker: street Hebrew for rap, liturgical echoes for piyyut, plain warmth for children, elevated diction for opera.
+
+You write in Hebrew and English (and other languages when asked). Before writing, silently plan: the conceit, the story arc across sections, the rhyme scheme, where the turn happens, and the exact line counts required by the structure. Then write.
 
 OUTPUT RULES (strict):
 - Output ONLY the requested text. No explanations, no preamble, no markdown, no code fences, no notes.
@@ -57,6 +69,12 @@ OUTPUT RULES (strict):
 - Rhyme with intent: when a rhyme scheme is given, follow it; otherwise use a musical scheme suited to the form. Avoid forced or cliché rhymes (אהבה/תקווה, love/above) unless the form is deliberately naive.
 - Chorus must be memorable, repeatable and rhythmically identical across repeats. Verses develop the story; the bridge shifts perspective or intensity.
 - Stay within the character limit given. Count spaces and tags.
+
+MUSICAL STRUCTURE (when tempo / time signature / bar counts are given, they are binding):
+- Default mapping in 4/4: one lyric line = one bar (4 beats). A "verse of 8 bars" is exactly 8 lines. In 3/4 (waltz) lines are lighter and shorter, usually one line = 2 bars (a phrase of 6 beats), so 8 bars = 4 lines unless told otherwise. 6/8 has a lilting two-pulse feel: one line = 1 bar of 6 eighths, ~6–9 syllables. 2/4 is brisk, short lines. 5/4 and 7/8 are asymmetric — write phrases that stumble on purpose.
+- Syllables per bar follow the tempo and the style: slow ballad (60–80 BPM) 4–7 syllables per bar; mid pop (90–120) 6–10; up-tempo dance (120–135) 5–8 (space for the beat); rap in 4/4 fills the bar with 10–16 syllables and lands rhymes on beats 2 and 4. Keep the syllable count consistent from line to line within a section so the melody can repeat.
+- Sections marked instrumental (intro, solo, break, outro…) get ONLY their tag with the bar count, e.g. [Intro - 4 bars, instrumental] or [Guitar Solo - 8 bars] — no lyric lines at all. Backing-vocals-only sections get parentheses lines only.
+- Write every section tag with its bar count when a structure is given: [Verse 1 - 8 bars], [Chorus - 8 bars]. Count your lines and match the bars exactly; if a line count is impossible, use the closest and never pad with filler.
 
 FORM GUIDES:
 - Pop/ballad: clear hook, concrete images, emotional arc, chorus repeats verbatim.
@@ -96,6 +114,27 @@ function blendText(b) {
     .filter(Boolean).join('\n');
 }
 
+function musicText(b) {
+  const m = b.music;
+  if (!m || typeof m !== 'object') return '';
+  const lines = [];
+  if (m.bpm) lines.push(`- Tempo: ${clean(m.bpm, 10)} BPM`);
+  if (m.sig) lines.push(`- Time signature: ${clean(m.sig, 6)}`);
+  const lpb = { '1': 'one lyric line = one bar', '0.5': 'one lyric line = two bars (long, slow phrases)', '2': 'two lyric lines = one bar (fast, dense delivery)' }[String(m.linesPerBar)];
+  if (lpb) lines.push(`- Line mapping: ${lpb}`);
+  if (Array.isArray(m.bars) && m.bars.length) {
+    lines.push('- Sections, in order, with exact bar counts:');
+    for (const r of m.bars.slice(0, 24)) {
+      const name = clean(r.name, 40), n = parseInt(r.bars, 10) || 0;
+      const kind = r.kind === 'instrumental' ? 'instrumental — tag only, no lyrics' : r.kind === 'backing' ? 'backing vocals only (parentheses lines)' : 'lyrics';
+      if (name) lines.push(`  - [${name}] ${n ? n + ' bars' : ''} — ${kind}`);
+    }
+    lines.push('  Match these bar counts exactly with the line mapping above; do not add sections that are not listed.');
+  }
+  if (!lines.length) return '';
+  return ['MUSICAL STRUCTURE (binding):', ...lines].join('\n');
+}
+
 function songContext(b) {
   const lines = [];
   if (b.title) lines.push(`Song title: ${clean(b.title, 200)}`);
@@ -109,7 +148,9 @@ function buildUser(b) {
   const limit = b.limit ? `Character limit for the whole lyrics: ${b.limit}.` : '';
   switch (b.mode) {
     case 'song': {
-      const structure = Array.isArray(b.structure) && b.structure.length
+      const hasBars = b.music && Array.isArray(b.music.bars) && b.music.bars.length;
+      const structure = hasBars ? ''
+        : Array.isArray(b.structure) && b.structure.length
         ? `Use exactly this structure, in order: ${b.structure.map(s => `[${s}]`).join(' ')}.`
         : 'Choose the best structure for the form (typically Intro, Verse 1, Pre-Chorus, Chorus, Verse 2, Chorus, Bridge, Final Chorus, Outro).';
       return [
@@ -122,6 +163,7 @@ function buildUser(b) {
         b.rhyme && b.rhyme !== 'auto' ? `Rhyme scheme: ${b.rhyme}.` : '',
         b.length === 'short' ? 'Length: short (about 12–20 lines).' : b.length === 'long' ? 'Length: long (a full 3-verse song).' : 'Length: normal (about 24–36 lines).',
         structure,
+        musicText(b),
         blendText(b),
         b.style ? `Match the lyrics to this Suno style prompt: ${clean(b.style, 1200)}` : '',
         b.extra ? `Additional instructions: ${clean(b.extra, 1000)}` : '',
@@ -134,6 +176,7 @@ function buildUser(b) {
         b.idea ? `Seed (optional, riff on it freely): ${clean(b.idea, 1000)}` : 'No seed — surprise me.',
         `Language for lyrics: ${lang}.`,
         b.form && b.form !== 'auto' ? `Form: ${b.form}.` : 'Pick whichever form fits the concept best (pop, rap, opera, musical, ballad, mizrahi, punk, children…).',
+        musicText(b),
         blendText(b) || (b.blend ? 'Make it a GENRE / VOICE BLEND: choose two or three contrasting styles and performers for different sections (e.g. rap verses with an operatic chorus, a female rapper and a male cantor) and follow the blend rules.' : ''),
         `Output format, exactly:`,
         `TITLE: <song title in the lyrics language>`,
@@ -176,6 +219,8 @@ function buildUser(b) {
         ops[b.op] || ops.rewrite,
         `Language: ${lang}.`,
         b.section_text ? `Current text of [${b.section}]:\n${clean(b.section_text, 3000)}` : `The section is currently empty.`,
+        musicText(b),
+        b.bars ? `This section is ${parseInt(b.bars, 10)} bars — match the line count to the bars using the line mapping.` : '',
         b.idea ? `Guidance: ${clean(b.idea, 1000)}` : '',
         songContext({ ...b, lyrics: b.lyrics }),
         `Return only the section text (no tag).`,
@@ -232,7 +277,7 @@ module.exports = async function handler(req, res) {
       model,
       max_tokens: 8000,
       thinking: { type: 'adaptive' },
-      output_config: { effort: body.mode === 'wild' ? 'high' : 'medium' },
+      output_config: { effort: ['titles', 'style'].includes(body.mode) ? 'medium' : 'high' },
       system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: userMsg }],
     });
