@@ -210,6 +210,16 @@ function buildUser(b) {
         songContext(b),
       ].filter(Boolean).join('\n');
     }
+    case 'ideas': {
+      return [
+        `Suggest 3 song ideas, one per line, no numbering, no titles, no quotes. Language: ${lang}.`,
+        `Each idea is 1–2 sentences: a concrete premise (who, where, what happens), the emotional angle, and one striking image or twist. The three must be clearly different from each other (different settings, different stakes). Surprising but coherent — no clichés, no generic "a song about love".`,
+        b.style ? `Take direction and mood from this Suno style prompt — the ideas must feel native to this music: ${clean(b.style, 1200)}` : 'Pick a genre yourself and make the ideas fit it.',
+        b.form && b.form !== 'auto' ? `Form: ${b.form} — shape the ideas for it (a rap idea has attitude and a scene; a lullaby is gentle; a parody has a joke).` : '',
+        b.idea ? `Optional seed from the writer (riff on it, or go elsewhere if it is empty): ${clean(b.idea, 400)}` : '',
+        b.persona ? `Speaker / persona: ${clean(b.persona, 200)}.` : '',
+      ].filter(Boolean).join('\n');
+    }
     case 'titles': {
       return [
         `Suggest 8 song titles, one per line, no numbering, no quotes. Language: ${lang}. Mix literal, poetic and hook-based titles.`,

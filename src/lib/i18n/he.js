@@ -72,6 +72,7 @@ export default {
   aiBpm: 'BPM', aiBpmPh: 'מה-Style', aiSig: 'משקל', aiLpb: 'שורות/תיבה', aiLpbAuto: 'אוטומטי', aiLpb1: 'שורה = תיבה', aiLpbHalf: 'שורה = 2 תיבות', aiLpb2: '2 שורות = תיבה',
   aiPreset: 'תבנית מבנה', aiPresetPick: 'בחר תבנית…', aiFromSections: 'מהסקשנים הקיימים', aiAddRow: 'הוסף חלק', aiBars: 'תיבות',
   aiKindLyrics: 'טקסט', aiKindInstr: 'אינסטרומנטלי', aiKindBacking: 'קולות רקע', aiTotal: 'סה״כ', aiApprox: 'כ־',
+  aiIdeas: 'תן לי רעיונות', aiIdeasMore: 'עוד רעיונות', aiIdeasBusy: 'חושב…', aiIdeasTitle: '3 רעיונות לשיר לפי ה-Style והצורה שנבחרו', aiIdeaSet: 'הרעיון נכנס — עכשיו "כתוב שיר"',
   aiTag: 'חתימה באינטרו (אד-ליב):',
   aiFixing: 'מתקן ספירת שורות…',
   aiThinking: 'מתכנן את השיר…', aiWriting: 'כותב…', aiRetry: 'מנסה שוב בקצרה…',

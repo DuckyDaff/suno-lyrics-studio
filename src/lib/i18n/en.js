@@ -66,6 +66,7 @@ export default {
   aiBpm: 'BPM', aiBpmPh: 'from Style', aiSig: 'Time sig', aiLpb: 'Lines/bar', aiLpbAuto: 'Auto', aiLpb1: 'Line = bar', aiLpbHalf: 'Line = 2 bars', aiLpb2: '2 lines = bar',
   aiPreset: 'Structure preset', aiPresetPick: 'Pick a preset…', aiFromSections: 'From existing sections', aiAddRow: 'Add part', aiBars: 'bars',
   aiKindLyrics: 'lyrics', aiKindInstr: 'instrumental', aiKindBacking: 'backing vocals', aiTotal: 'Total', aiApprox: '~',
+  aiIdeas: 'Give me ideas', aiIdeasMore: 'More ideas', aiIdeasBusy: 'Thinking…', aiIdeasTitle: '3 song ideas based on the chosen Style and form', aiIdeaSet: 'Idea set — now press "Write song"',
   aiTag: 'Intro signature (ad-lib):',
   aiFixing: 'Fixing line counts…',
   aiThinking: 'Planning the song…', aiWriting: 'Writing…', aiRetry: 'Retrying briefly…',

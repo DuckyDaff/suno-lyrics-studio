@@ -31,6 +31,21 @@
   let error = $state('');
   let presetId = $state('');
 
+  /* ── idea generator ─────────────────────────────────────────── */
+  let ideas = $state([]);
+  let ideasBusy = $state(false);
+  async function suggestIdeas() {
+    if (ideasBusy) return;
+    ideasBusy = true; ideas = [];
+    try {
+      const r = await generate({ mode: 'ideas', model: 'fast', idea: $g.idea, form: $g.form, language: $g.language, persona: $g.persona, style: $g.useStyle ? $song.style : '' },
+        (_, full) => { ideas = parseLines(full); });
+      ideas = parseLines(r.text).slice(0, 3);
+    } catch (e) { if (e.code !== 'aborted') toast($t('aiErr_' + e.code) !== 'aiErr_' + e.code ? $t('aiErr_' + e.code) : $t('aiErr_api_error'), 'error'); }
+    finally { ideasBusy = false; }
+  }
+  function useIdea(txt) { setGen({ idea: txt }); ideas = []; toast($t('aiIdeaSet'), 'success'); }
+
   /* ── musical structure ───────────────────────────────────────── */
   const styleBpm = $derived(($song.style.match(/(\d{2,3})\s*BPM/i) || [])[1] || '');
   const music = $derived($g.music);
@@ -126,8 +141,20 @@
 
 <div class="tab" class:wide={wide}>
   <section class="brief">
-    <label for="ai-idea">{$t('aiIdea')}</label>
+    <div class="ideaHd">
+      <label for="ai-idea">{$t('aiIdea')}</label>
+      <button class="ideaBtn" onclick={suggestIdeas} disabled={ideasBusy || $busy} title={$t('aiIdeasTitle')}>
+        💡 {ideasBusy ? $t('aiIdeasBusy') : ideas.length ? $t('aiIdeasMore') : $t('aiIdeas')}
+      </button>
+    </div>
     <textarea id="ai-idea" class="field" rows="4" bind:value={$g.idea} placeholder={$t('aiIdeaPh')}></textarea>
+    {#if ideas.length}
+      <ul class="ideas">
+        {#each ideas as it, i (i)}
+          <li><button onclick={() => useIdea(it)}><span class="n">{i + 1}</span>{it}</button></li>
+        {/each}
+      </ul>
+    {/if}
 
     <div class="grid">
       <label class="f"><span>{$t('aiForm')}</span>
@@ -292,6 +319,13 @@
   .placeholder { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 60px 20px; color: var(--tx2); text-align: center; font-size: var(--fs-sm); line-height: 1.6; border: 1px dashed var(--line2); border-radius: var(--r3); }
   .result:empty { display: none; }
   .brief { display: flex; flex-direction: column; gap: 8px; }
+  .ideaHd { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ideaBtn { padding: 5px 11px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 700; color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); white-space: nowrap; }
+  .ideaBtn:hover:not(:disabled) { background: color-mix(in srgb, var(--warn) 22%, transparent); }
+  .ideas { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .ideas button { width: 100%; display: flex; gap: 10px; align-items: flex-start; text-align: start; padding: 9px 12px; border-radius: var(--r2); background: var(--bg2); border: 1px solid var(--line); font-size: var(--fs-sm); line-height: 1.5; color: var(--tx0); }
+  .ideas button:hover { border-color: var(--warn); background: color-mix(in srgb, var(--warn) 8%, var(--bg2)); }
+  .ideas .n { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; background: var(--bg3); color: var(--tx1); }
   label { font-size: var(--fs-sm); font-weight: 700; color: var(--tx1); }
   textarea.field { font-size: var(--fs-md); line-height: 1.55; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
