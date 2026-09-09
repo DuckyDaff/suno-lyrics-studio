@@ -4,7 +4,7 @@ export const settings = persisted('melodraft_v2_settings', {
   theme: 'dark',        // dark | light | system
   lang: 'he',           // he | en
   sunoVersion: 'v5.5',  // see suno.js
-  aiModel: 'quality',   // quality | fast
+  aiModel: 'fast',      // fast | quality
 }, {
   // carry over v1 preferences
   migrate: () => ({

@@ -56,7 +56,7 @@ CRAFT (this is what separates you from an amateur):
 - The hook must be sayable in one breath and contain the title phrase or the song's key image.
 - Register must match the form and the speaker: street Hebrew for rap, liturgical echoes for piyyut, plain warmth for children, elevated diction for opera.
 
-You write in Hebrew and English (and other languages when asked). Before writing, silently plan: the conceit, the story arc across sections, the rhyme scheme and the actual rhyme words for each stanza, where the turn happens, and the exact line counts required by the structure. Then write, and before answering re-read every stanza's line endings and fix any that break the scheme.
+You write in Hebrew and English (and other languages when asked). Before writing, plan BRIEFLY (a short outline, not a draft): the conceit, the arc across sections, the rhyme scheme and a few candidate rhyme words per stanza, where the turn happens, and the line counts required by the structure. Then write the song once, carefully — do not draft and redraft.
 
 OUTPUT RULES (strict):
 - Output ONLY the requested text. No explanations, no preamble, no markdown, no code fences, no notes.
@@ -66,7 +66,7 @@ OUTPUT RULES (strict):
 - Never write a title line unless a title is explicitly requested.
 - Respect the requested language exactly. Hebrew must be natural, modern and singable — not translated-sounding. Gender agreement must be consistent with the persona/speaker.
 - Keep lines singable: roughly 5–12 syllables, natural stress. Prefer open vowels at line ends in Hebrew (ah/oh/ee) when the style is melodic.
-- RHYME IS MANDATORY (unless the brief says free verse). Every stanza follows a scheme — AABB, ABAB or ABCB — and keeps it for the whole section; the chorus rhymes tightly. A stanza whose line endings do not rhyme is a failed stanza: rewrite it before answering.
+- RHYME IS MANDATORY (unless the brief says free verse). Every stanza follows a scheme — AABB, ABAB or ABCB — and keeps it for the whole section; the chorus rhymes tightly. Get the line endings right as you write each line.
 - Rhyme quality: rhyme on the STRESSED final syllable. In Hebrew that means milra (stress on the last syllable) rhymes with milra and mil'el with mil'el — קָפֶה/יָפֶה works, שָׁלוֹם/חָלוֹם works, but דֶּלֶת/לָאַט does not. Match the stressed vowel and the consonant after it (rich rhyme), not just the last letter.
 - Grammatical rhymes — rhyming identical suffixes only (־ים/־ים, ־ות/־ות, ־תי/־תי, ־נו/־נו, -ing/-ing, -tion/-tion) — count as weak; use at most one per stanza. Prefer rhyming a noun with a verb, a name with an object.
 - Slant rhymes (matching vowel, near consonant) are welcome for variety, but they must be audible when sung. Never end two rhymed lines on the same word. Never rhyme the abstract "song words" listed above with each other.
@@ -279,13 +279,13 @@ module.exports = async function handler(req, res) {
   if (typeof res.flushHeaders === 'function') res.flushHeaders();
   const send = obj => res.write(JSON.stringify(obj) + '\n');
 
-  // Adaptive thinking shares max_tokens with the answer, so leave plenty of room;
-  // if a run still burns the whole budget on planning, retry once with less effort.
+  // Adaptive thinking shares max_tokens with the answer. The budget is bounded on purpose
+  // (worst case ≈ 12K tokens) so a run that over-plans cannot burn money in a loop.
   const attempt = async (effort) => {
     let got = 0;
     const stream = client.messages.stream({
       model,
-      max_tokens: 24000,
+      max_tokens: 12000,
       thinking: { type: 'adaptive' },
       output_config: { effort },
       system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
@@ -299,12 +299,12 @@ module.exports = async function handler(req, res) {
     return { final, got };
   };
   try {
-    const effort = ['titles', 'style'].includes(body.mode) ? 'low' : 'medium';
-    let { final, got } = await attempt(effort);
+    const effort = ['titles', 'style'].includes(body.mode) ? 'low' : body.model === 'fast' ? 'medium' : 'low';
+    const { final, got } = await attempt(effort);
     if (!got && final.stop_reason === 'max_tokens') {
-      console.warn('generate: thinking overflow, retrying with low effort');
-      send({ status: 'retry' });
-      ({ final, got } = await attempt('low'));
+      console.warn('generate: thinking overflow', model, final.usage && final.usage.output_tokens);
+      send({ error: 'thinking_overflow', model });
+      return res.end();
     }
     send({ done: true, model, stop: final.stop_reason, usage: {
       in: final.usage.input_tokens, out: final.usage.output_tokens,

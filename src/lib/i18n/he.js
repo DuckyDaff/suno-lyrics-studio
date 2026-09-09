@@ -65,6 +65,7 @@ export default {
   aiPreset: 'תבנית מבנה', aiPresetPick: 'בחר תבנית…', aiFromSections: 'מהסקשנים הקיימים', aiAddRow: 'הוסף חלק', aiBars: 'תיבות',
   aiKindLyrics: 'טקסט', aiKindInstr: 'אינסטרומנטלי', aiKindBacking: 'קולות רקע', aiTotal: 'סה״כ', aiApprox: 'כ־',
   aiThinking: 'מתכנן את השיר…', aiWriting: 'כותב…', aiRetry: 'מנסה שוב בקצרה…',
+  aiErr_thinking_overflow: 'המודל בזבז את התקציב על תכנון ולא כתב — נסה שוב, או עבור למצב מהיר',
   aiErr_unauthorized: 'צריך להתחבר מחדש', aiErr_no_api_key: 'לא הוגדר מפתח Anthropic בשרת (ANTHROPIC_API_KEY)', aiErr_bad_api_key: 'מפתח ה-API של Anthropic לא תקין',
   aiErr_daily_limit: 'הגעת למכסה היומית של יצירות', aiErr_anthropic_rate_limit: 'Anthropic עמוס — נסה שוב בעוד רגע', aiErr_model_not_found: 'המודל לא זמין בחשבון — בדוק ANTHROPIC_MODEL_QUALITY',
   aiErr_api_error: 'שגיאה ביצירה — נסה שוב',
