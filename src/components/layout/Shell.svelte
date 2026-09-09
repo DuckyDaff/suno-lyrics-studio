@@ -25,7 +25,7 @@
   });
 </script>
 
-<div class="shell" class:phone={$isPhone} class:focus={$editorFocus} style="--editor-w:{$settings.editorW}px">
+<div class="shell" class:phone={$isPhone} class:focus={$editorFocus && !$settings.editorCollapsed} class:collapsed={$settings.editorCollapsed} style="--editor-w:{$settings.editorW}px">
   {#if !$isPhone}<div class="rail"><Rail /></div>{/if}
   <div class="top"><TopBar /></div>
 
@@ -70,6 +70,7 @@
     --panel-w: 340px;
   }
   .shell.focus { grid-template-columns: var(--rail-w) minmax(0, 1fr) 460px var(--panel-w); }
+  .shell.collapsed { grid-template-columns: var(--rail-w) 40px minmax(0, 1fr) var(--panel-w); }
 
   .rail   { grid-column: 1; grid-row: 1 / -1; border-inline-end: 1px solid var(--line); background: var(--bg1); }
   .top    { grid-column: 2 / -1; grid-row: 1; border-bottom: 1px solid var(--line); background: var(--bg1); position: relative; }
@@ -81,7 +82,7 @@
   .full   { grid-column: 2 / -1; grid-row: 2 / -1; overflow: auto; min-height: 0; }
 
   @media (max-width: 1400px) { .shell { --panel-w: 300px; } }
-  @media (max-width: 1180px) { .shell { --panel-w: 270px; } .shell:not(.focus):not(.phone) { grid-template-columns: var(--rail-w) min(var(--editor-w), 360px) minmax(0, 1fr) var(--panel-w); } }
+  @media (max-width: 1180px) { .shell { --panel-w: 270px; } .shell:not(.focus):not(.phone):not(.collapsed) { grid-template-columns: var(--rail-w) min(var(--editor-w), 360px) minmax(0, 1fr) var(--panel-w); } }
 
   .shell.phone {
     grid-template-columns: minmax(0, 1fr) !important;

@@ -47,7 +47,7 @@ export default {
   toastLatinDone: 'הומר לאותיות לטיניות', toastPhoneticDone: 'הומר לכתיב פונטי', toastToolFail: 'ההמרה נכשלה', toastAllDone: 'בוצע ב-{n} סקשנים',
   toastHomographs: 'ניקוד בוצע — {n} מילים הומוגרפיות, בחר מין למטה', homographs: 'זכר / נקבה:', masc: '♂ זכר', fem: '♀ נקבה',
   kbdDelete: 'מחק ניקוד', kbdHint: 'שים את הסמן אחרי אות ולחץ על ניקוד — לחיצה נוספת מחליפה',
-  wsCreate: 'יצירה', wsStyle: 'Style', editorTitle: 'עורך', editorFocus: 'הרחב עורך', editorUnfocus: 'כווץ עורך', resultHere: 'התוצאה תופיע כאן — כתוב על מה השיר ולחץ "כתוב שיר"',
+  editorOpen: 'פתח עורך', editorClose: 'כווץ עורך', wsCreate: 'יצירה', wsStyle: 'Style', editorTitle: 'עורך', editorFocus: 'הרחב עורך', editorUnfocus: 'כווץ עורך', resultHere: 'התוצאה תופיע כאן — כתוב על מה השיר ולחץ "כתוב שיר"',
   // AI
   tabAI: 'יצירה', aiIdea: 'על מה השיר?', aiIdeaPh: 'כל רעיון — "אופרה על פינגווין שמנהל בנק בתל אביב", "ראפ על אמא שלי", "בלדה על גשם בחיפה"...',
   aiForm: 'צורה', aiLang: 'שפה', aiRhyme: 'חריזה', aiLength: 'אורך', aiShort: 'קצר', aiNormal: 'רגיל', aiLong: 'ארוך',

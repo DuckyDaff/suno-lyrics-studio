@@ -6,6 +6,7 @@ export const settings = persisted('melodraft_v2_settings', {
   sunoVersion: 'v5.5',  // see suno.js
   aiModel: 'fast',      // fast | quality
   editorW: 440,         // desktop editor panel width (px)
+  editorCollapsed: true, // desktop editor panel starts collapsed
 }, {
   // carry over v1 preferences
   migrate: () => ({

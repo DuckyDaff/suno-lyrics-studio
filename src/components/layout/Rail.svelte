@@ -1,6 +1,7 @@
 <script>
   import { view, wsTab, leftTab, editorFocus } from '../../lib/ui.js';
   import { t } from '../../lib/i18n.js';
+  import { settings, setSetting } from '../../lib/settings.js';
   import Icon from '../ui/Icon.svelte';
 
   const items = $derived([
@@ -16,13 +17,13 @@
     if (id === 'songs') { view.set('songs'); return; }
     view.set('editor');
     if (id === 'ai' || id === 'style') { wsTab.set(id); editorFocus.set(false); }
-    else if (id === 'editor') editorFocus.update(v => !v);
+    else if (id === 'editor') { if ($settings.editorCollapsed) setSetting('editorCollapsed', false); else editorFocus.update(v => !v); }
     else leftTab.set(id);
   }
   const isActive = id =>
     id === 'songs' ? $view === 'songs'
     : $view !== 'editor' ? false
-    : id === 'editor' ? $editorFocus
+    : id === 'editor' ? !$settings.editorCollapsed
     : id === 'ai' || id === 'style' ? $wsTab === id && !$editorFocus
     : $leftTab === id;
 </script>

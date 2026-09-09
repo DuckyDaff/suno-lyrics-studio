@@ -41,7 +41,7 @@ export default {
   toastLatinDone: 'Converted to Latin letters', toastPhoneticDone: 'Converted to phonetic spelling', toastToolFail: 'Conversion failed', toastAllDone: 'Done in {n} sections',
   toastHomographs: 'Nikud done — {n} homographs, pick the gender below', homographs: 'Masc / fem:', masc: '♂ masc', fem: '♀ fem',
   kbdDelete: 'Delete mark', kbdHint: 'Put the caret after a letter and press a mark — pressing again replaces it',
-  wsCreate: 'Create', wsStyle: 'Style', editorTitle: 'Editor', editorFocus: 'Expand editor', editorUnfocus: 'Shrink editor', resultHere: 'The result will appear here — describe the song and press "Write song"',
+  editorOpen: 'Open editor', editorClose: 'Collapse editor', wsCreate: 'Create', wsStyle: 'Style', editorTitle: 'Editor', editorFocus: 'Expand editor', editorUnfocus: 'Shrink editor', resultHere: 'The result will appear here — describe the song and press "Write song"',
   // AI
   tabAI: 'Create', aiIdea: 'What is the song about?', aiIdeaPh: 'Any idea — "an opera about a penguin who runs a bank", "a rap about my mom", "a ballad about rain in Haifa"...',
   aiForm: 'Form', aiLang: 'Language', aiRhyme: 'Rhyme', aiLength: 'Length', aiShort: 'Short', aiNormal: 'Normal', aiLong: 'Long',
