@@ -72,6 +72,7 @@ export default {
   nikudPopTitle: 'Pick a mark to replace · Esc to close',
   aiTag: 'Intro signature (ad-lib):',
   aiFixing: 'Fixing line counts…',
+  aiConnecting: 'Connecting…',
   aiThinking: 'Planning the song…', aiWriting: 'Writing…', aiRetry: 'Retrying briefly…',
   aiErr_thinking_overflow: 'The model spent its budget planning and wrote nothing — try again or switch to Fast',
   aiErr_unauthorized: 'Please sign in again', aiErr_no_api_key: 'No Anthropic key configured on the server (ANTHROPIC_API_KEY)', aiErr_bad_api_key: 'The Anthropic API key is invalid',

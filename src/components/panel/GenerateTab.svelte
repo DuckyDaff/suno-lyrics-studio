@@ -298,7 +298,7 @@
   {#if $g.output || $busy}
     <section class="out">
       <div class="hd">
-        <span class="lbl">{$t('aiResult')} {#if nikudBusy}<span class="ph">{$t('aiNikud')}</span><span class="dots">●●●</span>{:else if $busy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $phase === 'fixing' ? $t('aiFixing') : $phase === 'retry' ? $t('aiRetry') : $t('aiThinking')}</span><span class="dots">●●●</span>{/if}</span>
+        <span class="lbl">{$t('aiResult')} {#if nikudBusy}<span class="ph">{$t('aiNikud')}</span><span class="dots">●●●</span>{:else if $busy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $phase === 'fixing' ? $t('aiFixing') : $phase === 'retry' ? $t('aiRetry') : $phase === 'connecting' ? $t('aiConnecting') : $t('aiThinking')}</span><span class="dots">●●●</span>{/if}</span>
         {#if $g.usage}<span class="counter">{$g.usage.out} tok</span>{/if}
         {#if bare}<button class="nkBtn" title={$t('aiNikudAllTitle', { n: bare })} onclick={vocalizeOut}>נ׳ {$t('aiNikudAll')} <span class="n">{bare}</span></button>{/if}
         <Button size="sm" variant="ghost" icon="copy" title={$t('copy')} onclick={copyOut} />

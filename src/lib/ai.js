@@ -6,7 +6,7 @@ import { limits, buildLyrics } from './suno.js';
 
 /** true while a generation is streaming (any mode) */
 export const busy = writable(false);
-/** '' | 'thinking' | 'writing' | 'retry' — what the model is doing right now */
+/** '' | 'connecting' | 'thinking' | 'writing' | 'fixing' | 'retry' — what the model is doing right now */
 export const phase = writable('');
 
 /**
@@ -30,7 +30,7 @@ export async function generate(fields, onDelta, { signal } = {}) {
     ...fields,
   };
 
-  busy.set(true); phase.set('thinking');
+  busy.set(true); phase.set('connecting');
   try {
     const r = await fetch('/api/generate', {
       method: 'POST',

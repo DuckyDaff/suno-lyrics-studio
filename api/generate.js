@@ -351,8 +351,10 @@ module.exports = async function handler(req, res) {
     const stream = client.messages.stream({
       model,
       max_tokens: 12000,
-      // fast model: no thinking at all → first line in ~3s, every time; quality model: short adaptive plan
-      ...(body.model === 'fast' ? { thinking: { type: 'disabled' } } : { thinking: { type: 'adaptive' }, output_config: { effort } }),
+      // No thinking channel by default: even at low effort Opus planned for 60-90s before the first
+      // line, which looks stuck. The system prompt already carries the craft rules. Set GEN_THINKING=adaptive
+      // on the server to re-enable a (short) planning phase for the quality model.
+      ...(body.model !== 'fast' && process.env.GEN_THINKING === 'adaptive' ? { thinking: { type: 'adaptive' }, output_config: { effort } } : { thinking: { type: 'disabled' } }),
       system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: userMsg }],
     });

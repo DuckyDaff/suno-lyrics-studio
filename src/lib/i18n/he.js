@@ -78,6 +78,7 @@ export default {
   nikudPopTitle: 'לחץ על ניקוד כדי להחליף · Esc לסגירה',
   aiTag: 'חתימה באינטרו (אד-ליב):',
   aiFixing: 'מתקן ספירת שורות…',
+  aiConnecting: 'מתחבר לשרת…',
   aiThinking: 'מתכנן את השיר…', aiWriting: 'כותב…', aiRetry: 'מנסה שוב בקצרה…',
   aiErr_thinking_overflow: 'המודל בזבז את התקציב על תכנון ולא כתב — נסה שוב, או עבור למצב מהיר',
   aiErr_unauthorized: 'צריך להתחבר מחדש', aiErr_no_api_key: 'לא הוגדר מפתח Anthropic בשרת (ANTHROPIC_API_KEY)', aiErr_bad_api_key: 'מפתח ה-API של Anthropic לא תקין',
