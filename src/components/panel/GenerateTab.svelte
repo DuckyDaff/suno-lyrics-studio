@@ -30,6 +30,7 @@
 
   let { wide = false } = $props();
   let error = $state('');
+  let errorDetail = $state('');
   let presetId = $state('');
   let nikudBusy = $state(false);
   let nikudProg = $state('');
@@ -116,7 +117,7 @@
 
   async function run(mode) {
     if ($busy) { genAbort.current?.abort(); return; }
-    error = '';
+    error = ''; errorDetail = '';
     setGen({ output: '', outMode: mode, usage: null });
     const ctrl = new AbortController(); genAbort.current = ctrl;
     const s = $g;
@@ -139,7 +140,7 @@
       if (ctrl.signal.aborted) return;
       setGen({ output: text, usage: r.meta?.usage || null });
     } catch (e) {
-      if (e.code !== 'aborted') error = e.code || 'api_error';
+      if (e.code !== 'aborted') { error = e.code || 'api_error'; errorDetail = (e.detail || (e.code === 'api_error' ? e.message : '') || '').slice(0, 160); if (e.partial) setGen({ output: e.partial }); }
     } finally { if (genAbort.current === ctrl) genAbort.current = null; }
   }
 
@@ -287,7 +288,7 @@
 
   <div class="result">
   {#if error}
-    <div class="err"><Icon name="alert" size={14} /> {errText}</div>
+    <div class="err"><Icon name="alert" size={14} /> <span>{errText}{#if errorDetail}<span class="detail mono">{errorDetail}</span>{/if}</span></div>
   {/if}
 
   {#if !$g.output && !$busy && wide}
@@ -399,6 +400,7 @@
   .ph { font-weight: 500; color: var(--accent); margin-inline-start: 6px; font-size: var(--fs-xs); }
   .dots { color: var(--accent); font-size: 8px; letter-spacing: 2px; animation: pulse 1s infinite; }
   @keyframes pulse { 50% { opacity: .3; } }
+  .err .detail { display: block; margin-top: 3px; font-size: 11px; opacity: .75; direction: ltr; text-align: start; word-break: break-word; }
   .boxWrap { position: relative; }
   .box.dim { opacity: .45; }
   .nkBanner { position: absolute; inset: auto 0 0 0; margin: 0 10px 10px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--r2); background: var(--bg1); border: 1px solid var(--accent); color: var(--tx0); font-weight: 700; font-size: var(--fs-sm); box-shadow: var(--shadow); }

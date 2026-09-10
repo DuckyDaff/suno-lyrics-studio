@@ -39,7 +39,7 @@ export async function generate(fields, onDelta, { signal } = {}) {
       signal,
     });
     if (!r.ok) {
-      let code = 'api_error', extra = {};
+      let code = r.status === 504 || r.status === 408 ? 'gateway_timeout' : r.status >= 500 ? 'server_error' : 'api_error', extra = {};
       try { const j = await r.json(); code = j.error || code; extra = j; } catch {}
       throw Object.assign(new Error(code), { code, status: r.status, ...extra });
     }
@@ -58,13 +58,16 @@ export async function generate(fields, onDelta, { signal } = {}) {
         if (ev.status) phase.set(ev.status);
         if (ev.replace != null) { full = ev.replace; onDelta?.('', full); continue; }
         if (ev.t) { full += ev.t; onDelta?.(ev.t, full); }
-        else if (ev.error) throw Object.assign(new Error(ev.error), { code: ev.error, message: ev.message });
+        else if (ev.error) throw Object.assign(new Error(ev.message || ev.error), { code: ev.error, detail: ev.message });
         else if (ev.done) meta = ev;
       }
     }
+    if (!meta) throw Object.assign(new Error('stream ended without done'), { code: 'stream_lost', partial: full.trim() });
     return { text: full.trim(), meta };
   } catch (e) {
     if (e.name === 'AbortError') throw Object.assign(new Error('aborted'), { code: 'aborted' });
+    if (!e.code) Object.assign(e, { code: /load failed|network|fetch/i.test(e.message || '') ? 'stream_lost' : 'api_error', detail: e.message, partial: full.trim() });
+    console.error('generate failed:', e.code, e.detail || e.message);
     throw e;
   } finally {
     busy.set(false); phase.set('');

@@ -83,6 +83,9 @@ export default {
   aiErr_unauthorized: 'צריך להתחבר מחדש', aiErr_no_api_key: 'לא הוגדר מפתח Anthropic בשרת (ANTHROPIC_API_KEY)', aiErr_bad_api_key: 'מפתח ה-API של Anthropic לא תקין',
   aiErr_daily_limit: 'הגעת למכסה היומית של יצירות', aiErr_anthropic_rate_limit: 'Anthropic עמוס — נסה שוב בעוד רגע', aiErr_model_not_found: 'המודל לא זמין בחשבון — בדוק ANTHROPIC_MODEL_QUALITY',
   aiErr_api_error: 'שגיאה ביצירה — נסה שוב',
+  aiErr_anthropic_overloaded: 'Anthropic עמוס כרגע — ניסיתי שוב פעם אחת, נסה שוב בעוד רגע', aiErr_anthropic_down: 'תקלה זמנית אצל Anthropic — נסה שוב בעוד רגע',
+  aiErr_bad_request: 'הבקשה נדחתה על ידי Anthropic — הפרטים למטה', aiErr_stream_lost: 'החיבור לשרת נותק באמצע (למשל מעבר לאפליקציה אחרת בטלפון) — מה שהתקבל נשמר, לחץ שוב כדי להשלים',
+  aiErr_gateway_timeout: 'השרת לא ענה בזמן — נסה שוב, או עבור למצב מהיר', aiErr_server_error: 'שגיאת שרת — נסה שוב בעוד רגע',
   // settings
   settingsTitle: 'הגדרות', appearance: 'מראה', dark: 'כהה', light: 'בהיר', system: 'לפי המערכת',
   sunoVersion: 'גרסת Suno', sunoVersionHint: 'קובעת את מגבלת התווים ל-Style ולמילים',

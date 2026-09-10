@@ -368,7 +368,19 @@ module.exports = async function handler(req, res) {
     // Low effort everywhere: with this system prompt the models otherwise plan for a minute
     // before the first line; low keeps a short plan and starts writing within seconds.
     const effort = 'low';
-    const { final, got, text } = await attempt(effort);
+    let result;
+    try { result = await attempt(effort); }
+    catch (e) {
+      // Anthropic hiccup (overloaded / 5xx / dropped connection) before any text: one retry, no loop
+      const st = e && e.status;
+      const transient = st === 529 || st === 500 || st === 502 || st === 503 || (!st && /fetch|network|socket|ECONNRESET|terminated/i.test(e && e.message || ''));
+      if (!transient) throw e;
+      console.warn('generate: transient error, retrying once', st, e && e.message);
+      send({ status: 'retry' });
+      await new Promise(r => setTimeout(r, 1500));
+      result = await attempt(effort);
+    }
+    const { final, got, text } = result;
     let cleaned = stripPreamble(text, body.mode);
     if (cleaned !== text) send({ replace: cleaned });
     const issues = got ? lineIssues(cleaned, body) : [];
@@ -397,7 +409,8 @@ module.exports = async function handler(req, res) {
     } });
   } catch (e) {
     const status = e && e.status;
-    const code = status === 401 ? 'bad_api_key' : status === 429 ? 'anthropic_rate_limit' : status === 404 ? 'model_not_found' : 'api_error';
+    const code = status === 401 ? 'bad_api_key' : status === 429 ? 'anthropic_rate_limit' : status === 404 ? 'model_not_found'
+      : status === 529 ? 'anthropic_overloaded' : status >= 500 ? 'anthropic_down' : status === 400 ? 'bad_request' : 'api_error';
     console.error('generate:', code, e && e.message);
     send({ error: code, message: (e && e.message || '').slice(0, 300), model });
   }
