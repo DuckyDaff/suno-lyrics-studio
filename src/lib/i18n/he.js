@@ -74,6 +74,7 @@ export default {
   aiKindLyrics: 'טקסט', aiKindInstr: 'אינסטרומנטלי', aiKindBacking: 'קולות רקע', aiTotal: 'סה״כ', aiApprox: 'כ־',
   aiIdeas: 'תן לי רעיונות', aiIdeasMore: 'עוד רעיונות', aiIdeasBusy: 'חושב…', aiIdeasTitle: '3 רעיונות לשיר לפי ה-Style והצורה שנבחרו', aiIdeaSet: 'הרעיון נכנס — עכשיו "כתוב שיר"',
   aiAutoNikud: 'ניקוד אוטומטי לעברית (לחיצה על אות בעורך משנה את הניקוד שלה)', aiNikud: 'מנקד…',
+  aiNikudBanner: 'מנקד את השיר (דיקטה)…', aiNikudPartial: '{n} מילים נשארו בלי ניקוד — לחץ "נקד הכל" כדי להשלים', aiNikudAll: 'נקד הכל', aiNikudAllTitle: '{n} מילים בעברית עדיין בלי ניקוד — ניקוד חוזר לכל הטקסט',
   nikudPopTitle: 'לחץ על ניקוד כדי להחליף · Esc לסגירה',
   aiTag: 'חתימה באינטרו (אד-ליב):',
   aiFixing: 'מתקן ספירת שורות…',

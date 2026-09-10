@@ -71,6 +71,14 @@ OUTPUT RULES (strict):
 - Grammatical rhymes — rhyming identical suffixes only (־ים/־ים, ־ות/־ות, ־תי/־תי, ־נו/־נו, -ing/-ing, -tion/-tion) — count as weak; use at most one per stanza. Prefer rhyming a noun with a verb, a name with an object.
 - Slant rhymes (matching vowel, near consonant) are welcome for variety, but they must be audible when sung. Never end two rhymed lines on the same word. Never rhyme the abstract "song words" listed above with each other.
 - Rap: multi-syllable and internal rhymes in every bar, rhyme chains of 3–4 bars, punchline lands on the rhyme.
+- ENGLISH RHYME & METER (this is where amateur lyrics fall apart — hold the bar high):
+  · The rhyme word must be the word the sentence naturally ends on. Never invert word order ("the night so cold", "a love I did find"), never pad with fillers (so, oh, now, yeah, babe, tonight, somehow, again) and never bolt on a tag phrase just to reach the rhyme. If the natural sentence doesn't land on the rhyme, rewrite the whole line, not its ending.
+  · Match the ending stress pattern: masculine with masculine (away / today), feminine with feminine (running / coming). Never rhyme a stressed syllable with an unstressed one (feel / beautiful, me / memory, you / into).
+  · Rhymed lines carry the same number of stressed beats (count them) so the melody repeats; ±1 syllable is fine, ±3 is not.
+  · Chorus: perfect rhymes, clean and singable. Verses: perfect or close slant (time / mine, road / alone) — but the vowel must match exactly. Not "acceptable on paper" rhymes like moon / home or hand / man'd.
+  · Tired pairs are banned unless twisted: fire/desire, heart/apart, love/above, cry/why/die, night/light/right/tight, way/day/say/stay, feel/real, alone/phone/home, forever/together, rain/pain, true/you, eyes/lies/skies, dance/chance/romance.
+  · Write the way people talk when they mean it: contractions (I'm, don't, we've), concrete nouns, present tense, no poetic archaisms (thee, 'neath, upon, oh how, doth), no adjective stacking, no "in the night" / "through the storm" / "into the light" stock endings.
+  · Read-aloud test: every line must be a sentence a real person would say in that situation; every rhyme must sound like it happened by luck, not by force.
 - Chorus must be memorable, repeatable and rhythmically identical across repeats. Verses develop the story; the bridge shifts perspective or intensity.
 - Stay within the character limit given. Count spaces and tags.
 

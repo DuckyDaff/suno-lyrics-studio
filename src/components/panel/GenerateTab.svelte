@@ -5,7 +5,7 @@
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
   import { generate, busy, phase } from '../../lib/ai.js';
-  import { nikudLyrics, HEBREW_RE } from '../../lib/hebrew/nikud.js';
+  import { nikudLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
   import { genState as g, setGen, blankMix, genAbort } from '../../lib/genState.js';
   import { parseLyrics, parseWild, parseLines } from '../../lib/lyricsParse.js';
   import { copyText } from '../../lib/clipboard.js';
@@ -32,6 +32,21 @@
   let error = $state('');
   let presetId = $state('');
   let nikudBusy = $state(false);
+  let nikudProg = $state('');
+  const bare = $derived(!$busy && !nikudBusy && ($g.outMode === 'song' || $g.outMode === 'wild') ? unvocalizedWords(shown).length : 0);
+  async function vocalize(text) {
+    nikudBusy = true; nikudProg = '';
+    try { return await nikudLyrics(text, (d, n) => { nikudProg = n > 1 ? `${d}/${n}` : ''; }); }
+    catch { toast($t('toastNikudFail'), 'error'); return text; }
+    finally { nikudBusy = false; nikudProg = ''; }
+  }
+  async function vocalizeOut() {
+    const before = unvocalizedWords($g.output).length;
+    const text = await vocalize($g.output);
+    setGen({ output: text });
+    const left = unvocalizedWords(text).length;
+    toast(left ? $t('aiNikudPartial', { n: left }) : $t('toastNikudDone'), left ? 'error' : 'success');
+  }
 
   /* ── idea generator ─────────────────────────────────────────── */
   let ideas = $state([]);
@@ -117,9 +132,9 @@
       const r = await generate(fields, (_, full) => setGen({ output: full }), { signal: ctrl.signal });
       let text = r.text;
       if ((mode === 'song' || mode === 'wild') && $settings.autoNikud && HEBREW_RE.test(text)) {
-        nikudBusy = true;
-        try { text = await nikudLyrics(text); } catch { toast($t('toastNikudFail'), 'error'); }
-        finally { nikudBusy = false; }
+        text = await vocalize(text);
+        const left = unvocalizedWords(text).length;
+        if (left) toast($t('aiNikudPartial', { n: left }), 'error', 6000);
       }
       if (ctrl.signal.aborted) return;
       setGen({ output: text, usage: r.meta?.usage || null });
@@ -284,6 +299,7 @@
       <div class="hd">
         <span class="lbl">{$t('aiResult')} {#if nikudBusy}<span class="ph">{$t('aiNikud')}</span><span class="dots">●●●</span>{:else if $busy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $phase === 'fixing' ? $t('aiFixing') : $phase === 'retry' ? $t('aiRetry') : $t('aiThinking')}</span><span class="dots">●●●</span>{/if}</span>
         {#if $g.usage}<span class="counter">{$g.usage.out} tok</span>{/if}
+        {#if bare}<button class="nkBtn" title={$t('aiNikudAllTitle', { n: bare })} onclick={vocalizeOut}>נ׳ {$t('aiNikudAll')} <span class="n">{bare}</span></button>{/if}
         <Button size="sm" variant="ghost" icon="copy" title={$t('copy')} onclick={copyOut} />
         <Button size="sm" variant="ghost" icon="x" title={$t('clear')} onclick={clearOut} disabled={$busy} />
       </div>
@@ -297,7 +313,12 @@
             {#if wild.style}<div class="ws mono">{wild.style}</div>{/if}
           </div>
         {/if}
-        <pre class="box" dir="auto">{shown}</pre>
+        <div class="boxWrap">
+          <pre class="box" class:dim={nikudBusy} dir="auto">{shown}</pre>
+          {#if nikudBusy}
+            <div class="nkBanner"><span class="spin"></span><span>{$t('aiNikudBanner')}</span>{#if nikudProg}<span class="mono">{nikudProg}</span>{/if}</div>
+          {/if}
+        </div>
       {/if}
 
       {#if !$busy && $g.output}
@@ -378,6 +399,13 @@
   .ph { font-weight: 500; color: var(--accent); margin-inline-start: 6px; font-size: var(--fs-xs); }
   .dots { color: var(--accent); font-size: 8px; letter-spacing: 2px; animation: pulse 1s infinite; }
   @keyframes pulse { 50% { opacity: .3; } }
+  .boxWrap { position: relative; }
+  .box.dim { opacity: .45; }
+  .nkBanner { position: absolute; inset: auto 0 0 0; margin: 0 10px 10px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--r2); background: var(--bg1); border: 1px solid var(--accent); color: var(--tx0); font-weight: 700; font-size: var(--fs-sm); box-shadow: var(--shadow); }
+  .spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--accent); border-top-color: transparent; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .nkBtn { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 700; color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); }
+  .nkBtn .n { font-size: 10px; padding: 0 5px; border-radius: 999px; background: var(--warn); color: var(--bg0); }
   .box { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--r2); padding: 12px 14px; font-family: var(--font-ui); font-size: var(--fs-md); line-height: 1.7; white-space: pre-wrap; word-break: break-word; max-height: 50vh; overflow: auto; min-height: 60px; }
   .wildhd { display: flex; flex-direction: column; gap: 4px; }
   .wt { font-size: var(--fs-lg); font-weight: 700; }

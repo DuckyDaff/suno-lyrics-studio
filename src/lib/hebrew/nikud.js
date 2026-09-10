@@ -162,24 +162,46 @@ export function buildNikudText(rawData, choices) {
   return parts.join('').trim();
 }
 
+/** Hebrew words (2+ letters) that carry no nikud at all */
+export function unvocalizedWords(text) {
+  return String(text || '').split(/\s+/).filter(w => /[א-ת]{2,}/.test(w) && !NIKUD_RE.test(w));
+}
+const lineNeedsNikud = l => !/^\s*\[/.test(l) && !/^\s*(TITLE|STYLE):/i.test(l) && unvocalizedWords(l).length > 0;
+
+async function nakdanLineRetry(line) {
+  for (let i = 0; i < 2; i++) {
+    try { const r = await nakdan(line); if (r && !unvocalizedWords(r).length) return r; if (i === 1 && r) return r; }
+    catch (e) { if (i === 1) throw e; }
+    await new Promise(r => setTimeout(r, 400));
+  }
+  return line;
+}
+
 /**
  * Vocalize a whole Suno-formatted lyrics text. Section tags, TITLE:/STYLE: lines and
- * lines without Hebrew are left untouched; everything else goes to Dicta in one request.
+ * lines without Hebrew are left untouched. Pass 1 sends everything in one request;
+ * pass 2 re-runs (sequentially, with a retry) any line that still has bare Hebrew words,
+ * so a hiccup at Dicta cannot leave half a song unvocalized. onProgress(done, total).
  */
-export async function nikudLyrics(text) {
+export async function nikudLyrics(text, onProgress) {
   const lines = String(text || '').replace(/\r/g, '').split('\n');
-  const keep = l => /^\s*\[/.test(l) || /^\s*(TITLE|STYLE):/i.test(l) || !HEBREW_RE.test(l);
   const idx = [];
-  lines.forEach((l, i) => { if (!keep(l)) idx.push(i); });
+  lines.forEach((l, i) => { if (lineNeedsNikud(l)) idx.push(i); });
   if (!idx.length) return text;
-  const raw = await nakdanRaw(idx.map(i => lines[i]).join('\n'));
-  const out = buildNikudText(raw, null).split('\n');
-  if (out.length !== idx.length) {           // separator mismatch — fall back to per-line
-    const res = await Promise.all(idx.map(i => nakdan(lines[i]).catch(() => lines[i])));
-    idx.forEach((i, k) => { lines[i] = res[k]; });
-    return lines.join('\n');
+  onProgress?.(0, idx.length);
+  try {
+    const raw = await nakdanRaw(idx.map(i => lines[i]).join('\n'));
+    const out = buildNikudText(raw, null).split('\n');
+    if (out.length === idx.length) idx.forEach((i, k) => { lines[i] = out[k]; });
+  } catch {}
+  // pass 2: whatever is still bare, line by line
+  const left = idx.filter(i => lineNeedsNikud(lines[i]));
+  onProgress?.(idx.length - left.length, idx.length);
+  let k = 0;
+  for (const i of left) {
+    try { lines[i] = await nakdanLineRetry(lines[i]); } catch {}
+    onProgress?.(idx.length - left.length + (++k), idx.length);
   }
-  idx.forEach((i, k) => { lines[i] = out[k]; });
   return lines.join('\n');
 }
 

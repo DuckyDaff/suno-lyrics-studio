@@ -79,7 +79,7 @@
       let out = base ? `${base}\n${r.text}` : r.text;
       if ($settings.autoNikud && /[א-ת]/.test(r.text) && op !== 'translate' && op !== 'backing') {
         working = 'nikud';
-        try { out = base ? `${base}\n${await nikudLyrics(r.text)}` : await nikudLyrics(r.text); } catch {}
+        try { out = await nikudLyrics(out); } catch {}
         finally { working = ''; }
         actions.setText(sec.id, out);
       }

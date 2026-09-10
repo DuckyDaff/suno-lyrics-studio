@@ -68,6 +68,7 @@ export default {
   aiKindLyrics: 'lyrics', aiKindInstr: 'instrumental', aiKindBacking: 'backing vocals', aiTotal: 'Total', aiApprox: '~',
   aiIdeas: 'Give me ideas', aiIdeasMore: 'More ideas', aiIdeasBusy: 'Thinking…', aiIdeasTitle: '3 song ideas based on the chosen Style and form', aiIdeaSet: 'Idea set — now press "Write song"',
   aiAutoNikud: 'Auto-vocalize Hebrew (click a letter in the editor to change its nikud)', aiNikud: 'Adding nikud…',
+  aiNikudBanner: 'Adding nikud (Dicta)…', aiNikudPartial: '{n} words are still unvocalized — press "Vocalize all" to finish', aiNikudAll: 'Vocalize all', aiNikudAllTitle: '{n} Hebrew words still have no nikud — rerun nikud on the whole text',
   nikudPopTitle: 'Pick a mark to replace · Esc to close',
   aiTag: 'Intro signature (ad-lib):',
   aiFixing: 'Fixing line counts…',
