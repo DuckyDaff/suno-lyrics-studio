@@ -1,6 +1,6 @@
 /**
  * Groups added on top of the legacy library (library.json is generated from
- * legacy/index.html by scripts/extract-library.cjs and should not be edited by hand).
+ * the original app; extend it here, not by editing library.json).
  */
 export const EXTRA = {
   style: [

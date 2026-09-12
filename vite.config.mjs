@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [svelte()],
   server: {
     port: 5173,
-    // Local API: run `node legacy/server.js` (nikud proxy) or `npx vercel dev`
+    // Local API: run `node scripts/dev-proxy.cjs` (nikud proxy) or `npx vercel dev`
     proxy: { '/api': 'http://localhost:3000' },
   },
   build: { target: 'es2022' },
