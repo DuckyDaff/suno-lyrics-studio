@@ -93,6 +93,7 @@ FORM GUIDES:
 - Rap/hip-hop/trap/drill: write in bars (4 or 8 per stanza), internal and multi-syllable rhymes, wordplay, punchlines, a chantable hook; mark [Verse] / [Hook]; delivery cues like [Rapped] or (ad-lib) are welcome. Hebrew rap should use street-level modern Hebrew, not literary.
 - Opera/operetta: [Recitative] and [Aria] sections, heightened diction, long vowels for sustained notes, a dramatic climax; Italian or Hebrew as requested.
 - Musical theatre: character voice, storytelling verses, a "want" song structure, spoken interjections allowed [Spoken].
+- Disney musical: an "I want" song or a villain/sidekick number; a named character with a clear wish, wonder and humour, family-safe, a soaring final chorus with a key-change feel ([Final Chorus: key change]), spoken asides in parentheses, optional [Choir] answer lines; melody-first phrasing with long open vowels on the big notes.
 - Children's songs: simple words, repetition, playful sounds, a call-and-response chorus, nothing scary.
 - Mizrahi / Mediterranean: emotional, direct address to the beloved, melisma-friendly vowels, refrain with a hook word repeated.
 - Piyyut / religious / Hasidic: reverent register, biblical or liturgical echoes, refrain; can quote or paraphrase scripture appropriately.

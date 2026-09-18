@@ -213,6 +213,13 @@ export const GENRES = [
     bpm:   ['60 BPM', '66 BPM', '72 BPM', '78 BPM', '85 BPM'] }),
 
   // ── Cinematic ────────────────────────────────────────────────────
+  f('disney', 'Disney Musical', 'Cinematic', {
+    genre: ['Disney Musical', 'Broadway Musical', 'Animated Musical', 'Theatrical Pop', 'Family Musical'],
+    mood:  ['Magical', 'Wonder', 'Uplifting', 'Whimsical', 'Heartfelt', 'Triumphant', 'Playful'],
+    instr: ['Orchestra', 'Soaring strings', 'Piano', 'Woodwinds', 'Brass fanfare', 'Harp', 'Celesta', 'Timpani'],
+    vox:   ['Female lead vocals', 'Male lead vocals', 'Character vocals', 'Choir finale', 'Duet', 'Kids choir'],
+    prod:  ['Cinematic production', 'Key change finale', 'Big Broadway ending', 'Lush arrangement', 'Storytelling'],
+    bpm:   ['76 BPM', '88 BPM', '96 BPM', '112 BPM', '126 BPM'] }),
   f('cinematic', 'Cinematic / Epic', 'Cinematic', {
     genre: ['Cinematic', 'Epic Orchestral', 'Film Score', 'Trailer Music', 'Neoclassical'],
     mood:  ['Epic', 'Dramatic', 'Triumphant', 'Mysterious', 'Haunting', 'Emotional'],

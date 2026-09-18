@@ -11,17 +11,18 @@
     { id: 'editor',  icon: 'pen',      label: $t('navEditor') },
     { id: 'library', icon: 'library',  label: $t('navLibrary') },
     { id: 'studio',  icon: 'grid',     label: $t('navStudio') },
+    { id: 'kid',     icon: 'user',     label: $t('navKid') },
   ]);
 
   function go(id) {
-    if (id === 'songs') { view.set('songs'); return; }
+    if (id === 'songs' || id === 'kid') { view.set(id); return; }
     view.set('editor');
     if (id === 'ai' || id === 'style') { wsTab.set(id); editorFocus.set(false); }
     else if (id === 'editor') { if ($settings.editorCollapsed) setSetting('editorCollapsed', false); else editorFocus.update(v => !v); }
     else leftTab.set(id);
   }
   const isActive = id =>
-    id === 'songs' ? $view === 'songs'
+    id === 'songs' || id === 'kid' ? $view === id
     : $view !== 'editor' ? false
     : id === 'editor' ? !$settings.editorCollapsed
     : id === 'ai' || id === 'style' ? $wsTab === id && !$editorFocus

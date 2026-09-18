@@ -15,6 +15,7 @@
   import SidePanel from '../panel/SidePanel.svelte';
   import Songs from '../views/Songs.svelte';
   import Settings from '../views/Settings.svelte';
+  import KidIdeas from '../views/KidIdeas.svelte';
 
   // phone: which surface fills the screen
   const phoneSurface = $derived(
@@ -37,6 +38,7 @@
       {:else if phoneSurface === 'panel'}<SidePanel />
       {:else if phoneSurface === 'export'}<ExportView />
       {:else if $view === 'songs'}<Songs />
+      {:else if $view === 'kid'}<KidIdeas />
       {:else if $view === 'settings'}<Settings />{/if}
     </main>
     <div class="tabs"><MobileTabs /></div>
@@ -47,7 +49,7 @@
     <div class="export"><ExportBar /></div>
   {:else}
     <main class="full">
-      {#if $view === 'songs'}<Songs />{:else if $view === 'settings'}<Settings />{/if}
+      {#if $view === 'songs'}<Songs />{:else if $view === 'kid'}<KidIdeas />{:else if $view === 'settings'}<Settings />{/if}
     </main>
   {/if}
 </div>

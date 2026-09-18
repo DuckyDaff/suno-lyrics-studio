@@ -92,6 +92,7 @@
         {#if $isPhone}
           <button onclick={() => { view.set('settings'); menuOpen = false; }}><Icon name="settings" size={15} /> {$t('navSettings')}</button>
           <button onclick={() => { view.set('songs'); menuOpen = false; }}><Icon name="music" size={15} /> {$t('navSongs')}</button>
+          <button onclick={() => { view.set('kid'); menuOpen = false; }}><Icon name="user" size={15} /> {$t('navKid')}</button>
         {/if}
         <hr />
         <button class="danger" onclick={logout}><Icon name="logout" size={15} /> {$t('logout')}</button>

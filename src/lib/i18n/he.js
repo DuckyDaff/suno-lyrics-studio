@@ -2,6 +2,17 @@ export default {
   appName: 'MeloDraft',
   // nav
   navSongs: 'שירים', navEditor: 'עורך', navLibrary: 'ספרייה', navStudio: 'Studio', navSettings: 'הגדרות',
+  navKid: 'גאלה', refresh: 'רענן', loading: 'טוען…',
+  kidTitle: 'הרעיונות של {n}', kidName: 'שם:', kidMakeLink: 'צור קישור לאייפד', kidLinkCopied: 'הקישור הועתק — פתח אותו באייפד פעם אחת והוסף למסך הבית',
+  kidLinkHint: 'הקישור פותח את "מלודראפט לילדים" בלי סיסמה, ומאפשר רק לשלוח רעיונות לחשבון הזה. הקישור תקף לשנתיים; אפשר ליצור חדש בכל רגע.',
+  kidLinkFail: 'לא הצלחתי ליצור קישור', kidLoadFail: 'לא הצלחתי לטעון רעיונות', kidEmpty: 'עדיין אין רעיונות. כשהיא תשלח רעיון מהאייפד הוא יופיע כאן.',
+  kidF_new: 'חדשים', kidF_used: 'בעבודה / הפכו לשיר', kidF_archived: 'בארכיון', kidF_all: 'הכל',
+  kidTranscribe: 'תמלל הקלטות', kidTranscribing: 'מתמלל…', kidTranscribed: 'התמלול מוכן', kidNoStt: 'תמלול לא מוגדר — הוסף OPENAI_API_KEY ב-Vercel (Whisper), או האזן וכתוב הערה', kidSttFail: 'התמלול נכשל',
+  kidDescribe: 'קרא את התמונה', kidDescribing: 'קורא…', kidDescribeFail: 'לא הצלחתי לקרוא את התמונה',
+  kidNote: 'הערה שלך (נכנסת לבריף):', kidNotePh: 'למשל: היא התכוונה לחתולה של סבתא, בשם מיצי',
+  kidTake: 'קח ליצירה', kidTaken: 'הרעיון נכנס ליצירה — ה-Style נבחר מהקלף שלה', kidSendSong: 'שלח לה את השיר', kidSendSongBtn: 'שלח',
+  kidSongUrlPh: 'קישור לשיר (MP3 מסונו או קישור לעמוד)', kidSongTitlePh: 'שם השיר', kidSongSent: 'השיר נשלח — יופיע אצלה עם כוכב', kidSongAttached: 'שיר מצורף',
+  kidArchive: 'לארכיון', kidUnarchive: 'החזר', kidConfirmDelete: 'למחוק את הרעיון כולל ההקלטות והציורים? אי אפשר לשחזר.',
   tabEditor: 'עורך', tabStyle: 'Style', tabLibrary: 'ספרייה', tabExport: 'ייצוא',
   // top bar
   songTitle: 'שם השיר...', undo: 'בטל', redo: 'שחזר', newSong: 'שיר חדש',

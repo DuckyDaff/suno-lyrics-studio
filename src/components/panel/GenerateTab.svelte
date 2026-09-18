@@ -14,7 +14,7 @@
   import Icon from '../ui/Icon.svelte';
 
   const FORMS = ['pop song', 'ballad', 'rap / hip-hop', 'trap', 'drill', 'rock anthem', 'punk', 'metal', 'opera', 'musical theatre',
-    'mizrahi', 'israeli rock', 'piyyut / religious', 'hasidic', 'children\'s song', 'lullaby', 'folk', 'country', 'jazz', 'blues',
+    'disney musical', 'mizrahi', 'israeli rock', 'piyyut / religious', 'hasidic', 'children\'s song', 'lullaby', 'folk', 'country', 'jazz', 'blues',
     'gospel', 'reggae', 'reggaeton', 'afrobeats', 'k-pop', 'synthwave', 'spoken word', 'poem', 'parody / comedy', 'wedding song',
     'birthday song', 'love song', 'breakup song', 'protest song', 'anthem', 'christmas / holiday', 'chanukah / jewish holiday'];
   const LANGS = ['Hebrew', 'English', 'Hebrew and English mixed', 'Italian', 'Spanish', 'French', 'Arabic', 'Russian', 'Yiddish', 'Ladino', 'Aramaic'];

@@ -13,6 +13,7 @@
     "vite": "^8.2.2"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.124.0"
+    "@anthropic-ai/sdk": "^0.124.0",
+    "@vercel/blob": "^2.8.0"
   }
 }
