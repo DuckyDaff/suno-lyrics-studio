@@ -6,6 +6,7 @@
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
   import Icon from '../ui/Icon.svelte';
+  import { mediaUrl } from '../../lib/media.js';
   import Button from '../ui/Button.svelte';
 
   let q = $state('');
@@ -61,7 +62,7 @@
       {@const cur = s.id === $song.id}
       <li class="card" class:cur>
         <button class="main" onclick={() => open(s.id)}>
-          <div class="ic"><Icon name="music" size={20} /></div>
+          {#if s.coverPath}<img class="ic cov" src={mediaUrl(s.coverPath)} alt="" />{:else}<div class="ic"><Icon name="music" size={20} /></div>{/if}
           <div class="info">
             <div class="name">{s.title || $t('untitled')} {#if cur}<span class="tag">{$t('currentSong')}</span>{/if}</div>
             <div class="meta faint">{(s.sections || []).length} {$t('sectionsN')} · {words(s)} {$t('wordsN')} · {$t('edited')} {when(s.updatedAt)}{#if (s.versions || []).length} · {s.versions.length} {$t('versionsN')}{/if}</div>
@@ -114,6 +115,7 @@
   .card:hover { border-color: var(--accent-bd); }
   .main { flex: 1; min-width: 240px; display: flex; align-items: flex-start; gap: 12px; text-align: start; }
   .ic { width: 40px; height: 40px; flex-shrink: 0; border-radius: var(--r2); background: var(--accent-bg); color: var(--accent); display: grid; place-items: center; }
+  .ic.cov { object-fit: cover; width: 56px; height: 56px; }
   .info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
   .name { font-weight: 700; font-size: var(--fs-md); display: flex; align-items: center; gap: 8px; }
   .meta, .style, .prev { font-size: var(--fs-xs); }

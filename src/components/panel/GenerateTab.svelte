@@ -12,6 +12,7 @@
   import { STRUCTURE_PRESETS, TIME_SIGS, SECTION_NAMES, estimateSeconds } from '../../lib/data/structures.js';
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
+  import CoverGen from './CoverGen.svelte';
 
   const FORMS = ['pop song', 'ballad', 'rap / hip-hop', 'trap', 'drill', 'rock anthem', 'punk', 'metal', 'opera', 'musical theatre',
     'disney musical', 'mizrahi', 'israeli rock', 'piyyut / religious', 'hasidic', 'children\'s song', 'lullaby', 'folk', 'country', 'jazz', 'blues',
@@ -322,6 +323,7 @@
               </div>
             {/if}
           {/each}
+          <CoverGen {cover} />
           <p class="faint small">{$t('aiCoverHint')}</p>
         </div>
       {:else}

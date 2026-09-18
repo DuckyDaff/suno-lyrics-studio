@@ -102,8 +102,8 @@ module.exports = async function handler(req, res) {
       if (!ext || typeof data !== 'string') return json(400, { ok: false, error: 'bad_file' });
       const buf = Buffer.from(data, 'base64');
       if (!buf.length || buf.length > MAX_UPLOAD) return json(413, { ok: false, error: 'too_large' });
-      if (kind === 'song' && isKid) return json(403, { ok: false, error: 'forbidden' });
-      const path = `${prefix}${kind === 'img' ? 'img' : kind === 'song' ? 'songs' : 'audio'}/${Date.now().toString(36)}-${crypto.randomBytes(6).toString('hex')}.${ext}`;
+      if ((kind === 'song' || kind === 'cover') && isKid) return json(403, { ok: false, error: 'forbidden' });
+      const path = `${prefix}${kind === 'img' ? 'img' : kind === 'song' ? 'songs' : kind === 'cover' ? 'covers' : 'audio'}/${Date.now().toString(36)}-${crypto.randomBytes(6).toString('hex')}.${ext}`;
       const r = await put(path, buf, { access: 'private', contentType: type, addRandomSuffix: false });
       return json(200, { ok: true, path: r.pathname, size: buf.length });
     }

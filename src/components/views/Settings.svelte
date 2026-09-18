@@ -4,6 +4,7 @@
   import { user, logout } from '../../lib/auth.js';
   import { t } from '../../lib/i18n.js';
   import Button from '../ui/Button.svelte';
+  import ComfySettings from '../settings/ComfySettings.svelte';
   import { BOOKMARKLET } from '../../lib/launch.js';
   import { copyText } from '../../lib/clipboard.js';
   import { toast } from '../../lib/toast.js';
@@ -56,6 +57,8 @@
       {/each}
     </div>
   </section>
+
+  <ComfySettings />
 
   <section class="card">
     <h3>{$t('account')}</h3>

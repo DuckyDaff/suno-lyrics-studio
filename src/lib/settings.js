@@ -12,6 +12,7 @@ export const settings = persisted('melodraft_v2_settings', {
   producerTag: "It's a Denver Production", // signature ad-lib in every intro
   producerTagOn: true,
   autoNikud: true,
+  comfyUrl: 'http://127.0.0.1:8188', comfyEngine: 'sdxl', comfyModels: {}, comfySize: null, comfyCustom: null,
   kidName: 'גאלה',     // Gala mode: the child's name     // vocalize Hebrew AI output automatically
 }, {
   // carry over v1 preferences

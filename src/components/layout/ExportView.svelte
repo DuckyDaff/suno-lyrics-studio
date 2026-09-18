@@ -12,6 +12,8 @@
   import { view } from '../../lib/ui.js';
   import { setSetting } from '../../lib/settings.js';
   import Button from '../ui/Button.svelte';
+  import { mediaUrl, downloadBlob } from '../../lib/media.js';
+  async function dlCover() { try { const b = await (await fetch(mediaUrl($song.coverPath))).blob(); downloadBlob(b, (($song.title || 'cover').replace(/[\\/:*?"<>|]+/g, '_')) + '-cover.png'); } catch { toast($t('toastCopyFail'), 'error'); } }
 
   let { modal = false } = $props();
 
@@ -78,6 +80,13 @@
     <Button icon="copy" size="lg" onclick={() => copy('lyrics')}>{$t('copyLyrics')}</Button>
   </section>
 
+  {#if $song.coverPath}
+    <section class="block">
+      <span class="lbl">{$t('coverLabel')}</span>
+      <div class="coverRow"><img class="coverImg" src={mediaUrl($song.coverPath)} alt="" /><Button size="sm" onclick={dlCover}>⬇ {$t('coverDownload')}</Button></div>
+    </section>
+  {/if}
+
   <section class="block">
     <span class="lbl">{$t('step3')}</span>
     <Button variant="suno" icon="send" size="lg" onclick={launch}>⚡ {$t('launch')}</Button>
@@ -105,6 +114,8 @@
   .txt { white-space: pre-wrap; }
   .small { font-size: var(--fs-xs); line-height: 1.5; }
   .link { color: var(--accent); font-weight: 700; font-size: var(--fs-xs); text-decoration: underline; }
+  .coverRow { display: flex; align-items: center; gap: 12px; }
+  .coverImg { width: 120px; height: 120px; object-fit: cover; border-radius: var(--r2); border: 1px solid var(--line); }
   .badge { font-size: var(--fs-xs); font-weight: 700; padding: 3px 9px; border-radius: 999px; }
   .badge.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 12%, transparent); }
   .badge.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); }
