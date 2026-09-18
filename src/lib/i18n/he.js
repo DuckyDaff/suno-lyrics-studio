@@ -12,6 +12,7 @@ export default {
   kidNote: 'הערה שלך (נכנסת לבריף):', kidNotePh: 'למשל: היא התכוונה לחתולה של סבתא, בשם מיצי',
   kidTake: 'קח ליצירה', kidTaken: 'הרעיון נכנס ליצירה — ה-Style נבחר מהקלף שלה', kidSendSong: 'שלח לה את השיר', kidSendSongBtn: 'שלח',
   kidSongUrlPh: 'קישור לשיר (MP3 מסונו או קישור לעמוד)', kidSongTitlePh: 'שם השיר', kidSongSent: 'השיר נשלח — יופיע אצלה עם כוכב', kidSongAttached: 'שיר מצורף',
+  kidSongUpload: 'העלה MP3', kidSongUploading: 'מעלה…', kidSongOr: 'או קישור:', kidSongBadFile: 'צריך קובץ אודיו (MP3 / M4A / WAV)', kidSongTooBig: 'הקובץ גדול מ-30MB', kidSongUploadFail: 'ההעלאה נכשלה',
   kidArchive: 'לארכיון', kidUnarchive: 'החזר', kidConfirmDelete: 'למחוק את הרעיון כולל ההקלטות והציורים? אי אפשר לשחזר.',
   tabEditor: 'עורך', tabStyle: 'Style', tabLibrary: 'ספרייה', tabExport: 'ייצוא',
   // top bar

@@ -20,6 +20,7 @@
   let link = $state('');
   let busy = $state({});         // id → 'transcribe' | 'describe' | 'status'
   let songForm = $state(null);   // { id, url, title }
+  let uploading = $state('');    // idea id while an MP3 uploads
 
   const hdr = () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${$user?.token || ''}` });
   async function call(action, body, method = 'POST') {
@@ -103,6 +104,22 @@
       toast($t('kidSongSent'), 'success'); songForm = null;
     } catch { toast($t('toastToolFail'), 'error'); }
   }
+  async function uploadSong(it, e) {
+    const f = e.target.files?.[0]; if (!f) return;
+    e.target.value = '';
+    if (!/audio\/(mpeg|mp4|wav|ogg|webm)/.test(f.type) && !/\.(mp3|m4a|wav)$/i.test(f.name)) return toast($t('kidSongBadFile'), 'error');
+    if (f.size > 30 * 1024 * 1024) return toast($t('kidSongTooBig'), 'error');
+    uploading = it.id;
+    try {
+      const data = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = rej; fr.readAsDataURL(f); });
+      const up = await call('upload', { type: f.type || 'audio/mpeg', data, kind: 'song' });
+      const title = (songForm?.id === it.id && songForm.title) || it.songTitle || f.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
+      await call('song', { id: it.id, songPath: up.path, title });
+      ideas = ideas.map(x => x.id === it.id ? { ...x, songPath: up.path, songTitle: title, status: 'used' } : x);
+      toast($t('kidSongSent'), 'success'); songForm = null;
+    } catch (e) { toast($t('kidSongUploadFail') + (e.detail ? ': ' + e.detail : ''), 'error', 6000); }
+    uploading = '';
+  }
   const when = ts => new Date(ts || 0).toLocaleString();
   const mmss = n => `${Math.floor((n || 0) / 60)}:${String((n || 0) % 60).padStart(2, '0')}`;
 </script>
@@ -164,7 +181,8 @@
           <input class="field" value={it.note || ''} placeholder={$t('kidNotePh')} onchange={e => { const note = e.target.value; ideas = ideas.map(x => x.id === it.id ? { ...x, note } : x); call('status', { id: it.id, note }).catch(() => {}); }} />
         </label>
 
-        {#if it.songUrl}<div class="song">⭐ {$t('kidSongAttached')}: <a href={it.songUrl} target="_blank" rel="noopener">{it.songTitle || it.songUrl}</a></div>{/if}
+        {#if it.songPath}<div class="song">⭐ {$t('kidSongAttached')}: <b>{it.songTitle}</b><audio controls preload="none" src={fileUrl(it.songPath)}></audio></div>
+        {:else if it.songUrl}<div class="song">⭐ {$t('kidSongAttached')}: <a href={it.songUrl} target="_blank" rel="noopener">{it.songTitle || it.songUrl}</a></div>{/if}
 
         <div class="acts">
           <Button variant="primary" icon="sparkles" onclick={() => takeToCreate(it)}>{$t('kidTake')}</Button>
@@ -175,9 +193,11 @@
         </div>
         {#if songForm?.id === it.id}
           <div class="songForm">
-            <input class="field" placeholder={$t('kidSongUrlPh')} bind:value={songForm.url} dir="ltr" />
             <input class="field" placeholder={$t('kidSongTitlePh')} bind:value={songForm.title} />
-            <Button size="sm" icon="check" onclick={sendSong}>{$t('kidSendSongBtn')}</Button>
+            <label class="upl"><input type="file" accept=".mp3,.m4a,.wav,audio/*" onchange={e => uploadSong(it, e)} disabled={!!uploading} />🎵 {uploading === it.id ? $t('kidSongUploading') : $t('kidSongUpload')}</label>
+            <span class="faint small">{$t('kidSongOr')}</span>
+            <input class="field" placeholder={$t('kidSongUrlPh')} bind:value={songForm.url} dir="ltr" />
+            <Button size="sm" icon="check" onclick={sendSong} disabled={!songForm.url}>{$t('kidSendSongBtn')}</Button>
           </div>
         {/if}
       </li>
@@ -218,7 +238,10 @@
   figure { display: flex; flex-direction: column; gap: 6px; align-items: center; }
   figure img { max-width: 260px; max-height: 220px; border-radius: var(--r2); border: 1px solid var(--line); background: #fff; }
   .note { display: flex; flex-direction: column; gap: 4px; font-size: var(--fs-xs); color: var(--tx1); }
-  .song { font-size: var(--fs-sm); font-weight: 700; color: var(--warn); }
+  .song { font-size: var(--fs-sm); font-weight: 700; color: var(--warn); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .song audio { height: 36px; flex: 1; min-width: 220px; }
+  .upl { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: var(--r2); background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-bd); font-size: var(--fs-sm); font-weight: 700; cursor: pointer; }
+  .upl input { display: none; }
   .song a { color: var(--accent); text-decoration: underline; }
   .acts { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .songForm { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 10px; border-radius: var(--r2); background: var(--bg2); border: 1px dashed var(--line); }

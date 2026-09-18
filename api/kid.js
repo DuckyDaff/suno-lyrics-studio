@@ -40,7 +40,7 @@ async function kv(...cmd) {
   return j.result;
 }
 
-const MAX_UPLOAD = 12 * 1024 * 1024;   // 12 MB (a 3-minute m4a is ~1.5 MB)
+const MAX_UPLOAD = 30 * 1024 * 1024;   // 30 MB (a 3-minute m4a is ~1.5 MB; a Suno MP3 4–8 MB)
 const ALLOWED = { 'audio/mp4': 'm4a', 'audio/webm': 'webm', 'audio/ogg': 'ogg', 'audio/wav': 'wav', 'audio/mpeg': 'mp3', 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
 const SAFE_ID = /^[A-Za-z0-9_-]{4,40}$/;
 
@@ -76,7 +76,7 @@ module.exports = async function handler(req, res) {
       const h = await kv('HGETALL', key);
       const ideas = [];
       for (let i = 0; i + 1 < (h || []).length; i += 2) { try { ideas.push(JSON.parse(h[i + 1])); } catch {} }
-      const out = ideas.filter(x => x.status !== 'deleted' && (!isKid || x.status !== 'archived'))
+      const out = ideas.filter(x => x.status !== 'deleted' && (!isKid || x.status !== 'archived' || x.songPath || x.songUrl))
         .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       return json(200, { ok: true, ideas: isKid ? out.map(x => ({ ...x, transcript: undefined, description: undefined })) : out });
     }
@@ -102,7 +102,8 @@ module.exports = async function handler(req, res) {
       if (!ext || typeof data !== 'string') return json(400, { ok: false, error: 'bad_file' });
       const buf = Buffer.from(data, 'base64');
       if (!buf.length || buf.length > MAX_UPLOAD) return json(413, { ok: false, error: 'too_large' });
-      const path = `${prefix}${kind === 'img' ? 'img' : 'audio'}/${Date.now().toString(36)}-${crypto.randomBytes(6).toString('hex')}.${ext}`;
+      if (kind === 'song' && isKid) return json(403, { ok: false, error: 'forbidden' });
+      const path = `${prefix}${kind === 'img' ? 'img' : kind === 'song' ? 'songs' : 'audio'}/${Date.now().toString(36)}-${crypto.randomBytes(6).toString('hex')}.${ext}`;
       const r = await put(path, buf, { access: 'private', contentType: type, addRandomSuffix: false });
       return json(200, { ok: true, path: r.pathname, size: buf.length });
     }
@@ -145,7 +146,7 @@ module.exports = async function handler(req, res) {
       if (!existing) return json(404, { ok: false, error: 'not_found' });
       const idea = JSON.parse(existing);
       if (status === 'deleted') {
-        const paths = [...(idea.takes || []).map(t => t.path), idea.drawing, idea.photo].filter(Boolean);
+        const paths = [...(idea.takes || []).map(t => t.path), idea.drawing, idea.photo, idea.songPath].filter(Boolean);
         for (const p of paths) { try { await del(p); } catch {} }
         await kv('HDEL', key, id);
         return json(200, { ok: true });
@@ -159,12 +160,19 @@ module.exports = async function handler(req, res) {
 
     if (action === 'song' && req.method === 'POST') {
       if (parentOnly()) return;
-      const { id, songUrl, title } = req.body || {};
+      const { id, songUrl, songPath, title } = req.body || {};
       if (!SAFE_ID.test(String(id || ''))) return json(400, { ok: false, error: 'bad_id' });
       const existing = await kv('HGET', key, id);
       if (!existing) return json(404, { ok: false, error: 'not_found' });
       const idea = JSON.parse(existing);
-      idea.songUrl = String(songUrl || '').slice(0, 500); idea.songTitle = String(title || '').slice(0, 120);
+      if (songPath !== undefined) {
+        const p = String(songPath || '');
+        if (p && !p.startsWith(prefix + 'songs/')) return json(403, { ok: false, error: 'forbidden' });
+        if (idea.songPath && idea.songPath !== p) { try { await del(idea.songPath); } catch {} }
+        idea.songPath = p;
+      }
+      if (songUrl !== undefined) idea.songUrl = String(songUrl || '').slice(0, 500);
+      idea.songTitle = String(title || idea.songTitle || '').slice(0, 120);
       idea.songAt = Date.now(); idea.status = 'used'; idea.updatedAt = Date.now();
       await kv('HSET', key, id, JSON.stringify(idea));
       return json(200, { ok: true, idea });

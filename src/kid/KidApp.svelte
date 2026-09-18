@@ -12,6 +12,19 @@
   let sending = $state(false);
   let photoBusy = $state(false);
   let starting = $state(false);
+  let nowId = $state(null);       // jukebox: which song is loaded
+  let playing = $state(false);
+  let player = $state(null);
+  const songs = $derived(ideas.filter(i => i.songPath || i.songUrl));
+  const songSrc = it => it.songPath ? fileUrl(it.songPath) : it.songUrl;
+  const playable = it => !!it.songPath || /\.(mp3|m4a|wav|ogg)(\?|$)/i.test(it.songUrl || '');
+  function toggle(it) {
+    if (!playable(it)) { window.open(it.songUrl, '_blank'); return; }
+    if (nowId === it.id) { playing ? player.pause() : player.play(); return; }
+    nowId = it.id; playing = false;
+    setTimeout(() => { if (player) { player.src = songSrc(it); player.play().catch(() => {}); } }, 0);
+  }
+  async function loadJukebox() { screen = 'jukebox'; try { ideas = (await api.list()).ideas || []; } catch { ideas = []; } if (songs.length) say('השירים שלך'); else say('עוד אין שירים מוכנים'); }
 
   const name = $derived($kid?.name || 'גָּאלָה');
   const d = $derived($draft);
@@ -116,6 +129,7 @@
         <button class="tile pink" onclick={startNew}><span class="big">✨</span>רַעְיוֹן חָדָשׁ</button>
         <button class="tile purple" onclick={randomAll}><span class="big">🎲</span>מְכוֹנַת רַעְיוֹנוֹת</button>
         <button class="tile blue" onclick={loadMine}><span class="big">📚</span>הָרַעְיוֹנוֹת שֶׁלִּי</button>
+        <button class="tile gold" onclick={loadJukebox}><span class="big">🎧</span>הַשִּׁירִים שֶׁלִּי</button>
       </div>
     </section>
 
@@ -229,13 +243,32 @@
             <div class="mt">
               <div class="ms">{it.sentence || sentence(it.cards || {})}</div>
               <div class="md">{when(it.createdAt)} {#if it.status === 'used' && !it.songUrl}· אַבָּא עוֹבֵד עַל זֶה 🎧{/if}</div>
-              {#if it.songUrl}
+              {#if it.songPath || it.songUrl}
                 <div class="songbox">⭐ הַשִּׁיר שֶׁלָּךְ מוּכָן: <b>{it.songTitle || ''}</b>
-                  {#if /\.(mp3|m4a|wav|ogg)(\?|$)/i.test(it.songUrl)}<audio controls preload="none" src={it.songUrl}></audio>
+                  {#if playable(it)}<audio controls preload="none" src={songSrc(it)}></audio>
                   {:else}<a class="pill go" href={it.songUrl} target="_blank" rel="noopener">▶️ לְהַאֲזִין</a>{/if}
                 </div>
               {/if}
             </div>
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {:else if screen === 'jukebox'}
+    <section>
+      <h2 class="q">הַשִּׁירִים שֶׁלִּי 🎧</h2>
+      {#if !songs.length}<p class="p">עוֹד אֵין שִׁירִים מוּכָנִים. כְּשֶׁאַבָּא יְסַיֵּם שִׁיר הוּא יוֹפִיעַ כָּאן ⭐</p>{/if}
+      <audio bind:this={player} onplay={() => (playing = true)} onpause={() => (playing = false)} onended={() => (playing = false)}></audio>
+      <ul class="juke">
+        {#each songs as it (it.id)}
+          <li class:now={nowId === it.id}>
+            <button class="play" onclick={() => toggle(it)} aria-label="ניגון">{nowId === it.id && playing ? '⏸' : '▶️'}</button>
+            <div class="jt">
+              <div class="emojis sm">{#each STEPS as s}{#if it.cards?.[s.id]}<span>{card(s.id, it.cards[s.id])?.emoji}</span>{/if}{/each}</div>
+              <div class="jn">{it.songTitle || it.sentence || 'שִׁיר'}</div>
+              {#if nowId === it.id && playing}<div class="eq"><i></i><i></i><i></i><i></i></div>{/if}
+            </div>
+            <button class="speak" onclick={() => say(it.songTitle || it.sentence || '')}>🔊</button>
           </li>
         {/each}
       </ul>
@@ -269,6 +302,18 @@
   .purple { background: linear-gradient(145deg, #a78bfa, #7c3aed); }
   .blue { background: linear-gradient(145deg, #38bdf8, #0284c7); }
   .green { background: linear-gradient(145deg, #4ade80, #16a34a); }
+  .gold { background: linear-gradient(145deg, #fbbf24, #f59e0b); }
+  .juke { list-style: none; display: flex; flex-direction: column; gap: 14px; max-width: 760px; margin: 0 auto; width: 100%; }
+  .juke li { display: flex; align-items: center; gap: 16px; background: #fff; border: 5px solid #fde68a; border-radius: 28px; padding: 14px 18px; }
+  .juke li.now { border-color: #f59e0b; background: #fffbeb; box-shadow: 0 10px 30px rgba(245,158,11,.25); }
+  .play { width: 92px; height: 92px; border-radius: 50%; font-size: 44px; background: linear-gradient(145deg, #fbbf24, #f59e0b); border: 6px solid #fff; box-shadow: 0 8px 24px rgba(245,158,11,.4); flex-shrink: 0; }
+  .play:active { transform: scale(.94); }
+  .jt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .jn { font-size: 26px; font-weight: 900; }
+  .eq { display: flex; gap: 4px; align-items: flex-end; height: 22px; }
+  .eq i { width: 6px; background: #f59e0b; border-radius: 3px; animation: eq .8s ease-in-out infinite; }
+  .eq i:nth-child(2) { animation-delay: .15s; } .eq i:nth-child(3) { animation-delay: .3s; } .eq i:nth-child(4) { animation-delay: .45s; }
+  @keyframes eq { 0%, 100% { height: 6px; } 50% { height: 22px; } }
   .tile:disabled { filter: grayscale(.6); }
   .camera input { position: absolute; inset: 0; opacity: 0; }
   .q { display: flex; align-items: center; gap: 12px; justify-content: center; text-align: center; margin-bottom: 8px; }

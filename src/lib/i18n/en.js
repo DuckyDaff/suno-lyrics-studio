@@ -11,6 +11,7 @@ export default {
   kidNote: 'Your note (goes into the brief):', kidNotePh: "e.g. she meant grandma's cat, called Mitzi",
   kidTake: 'Take to Create', kidTaken: 'Idea loaded into Create — Style set from her card', kidSendSong: 'Send her the song', kidSendSongBtn: 'Send',
   kidSongUrlPh: 'Song link (Suno MP3 or page link)', kidSongTitlePh: 'Song title', kidSongSent: 'Sent — it shows up for her with a star', kidSongAttached: 'Song attached',
+  kidSongUpload: 'Upload MP3', kidSongUploading: 'Uploading…', kidSongOr: 'or a link:', kidSongBadFile: 'Needs an audio file (MP3 / M4A / WAV)', kidSongTooBig: 'File is over 30MB', kidSongUploadFail: 'Upload failed',
   kidArchive: 'Archive', kidUnarchive: 'Restore', kidConfirmDelete: 'Delete this idea including recordings and pictures? This cannot be undone.',
   tabEditor: 'Editor', tabStyle: 'Style', tabLibrary: 'Library', tabExport: 'Export',
   songTitle: 'Song title...', undo: 'Undo', redo: 'Redo', newSong: 'New song',
