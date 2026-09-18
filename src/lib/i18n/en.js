@@ -66,6 +66,8 @@ export default {
   aiForm: 'Form', aiLang: 'Language', aiRhyme: 'Rhyme', aiLength: 'Length', aiShort: 'Short', aiNormal: 'Normal', aiLong: 'Long',
   aiPersonaPh: 'Who is speaking? (optional) — "a heartbroken man", "an 8-year-old girl", "a robot in love"', aiExtraPh: 'Extra instructions (optional) — "no clichés", "one English line in the chorus"',
   aiUseStyle: 'Match the current Style', aiUseStructure: 'Use the existing sections', aiModel: 'Model', aiQuality: 'Quality (Opus)', aiFast: 'Fast (Sonnet)',
+  aiCover: 'Cover art', aiCoverTitle: 'Art direction for the cover — ready prompts for ComfyUI / Stable Diffusion / Flux / Gemini', aiCoverMain: 'Main prompt (ComfyUI / SD / Flux)', aiCoverNegative: 'Negative prompt', aiCoverPhoto: 'Variation: photographic', aiCoverIllustrated: 'Variation: illustrated', aiCoverMinimal: 'Variation: minimal', aiCoverGemini: 'For Gemini (natural language)', aiCoverText: 'Cover text (add after generating)',
+  aiCoverSave: 'Save with the song', aiCoverSaved: 'Art direction saved with the song', aiCoverCopyMain: 'Copy main', aiCoverHint: 'Paste the main prompt into ComfyUI (or the Gemini version into Gemini). Images come out without text — add the title afterwards.',
   aiWriteSong: 'Write song', aiWild: 'Wild idea', aiStyleOnly: 'Style only', aiTitles: 'Titles', aiStop: 'Stop', aiResult: 'Result',
   aiReplace: 'Insert into editor (replace)', aiAppend: 'Append', aiApplyStyle: 'Apply Style', aiAgain: 'Again', aiDone: 'Done ✨',
   toastAppliedLyrics: 'Inserted {n} sections',

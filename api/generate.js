@@ -229,6 +229,24 @@ function buildUser(b) {
         b.persona ? `Speaker / persona: ${clean(b.persona, 200)}.` : '',
       ].filter(Boolean).join('\n');
     }
+    case 'cover': {
+      return [
+        `Write the ART DIRECTION for this song's cover artwork (square album cover). You are briefing an image model, not a person: concrete, visual, specific. No lyrics, no explanations.`,
+        `SUBJECT comes from the song: the central image, character, place or moment in the brief and the lyrics (if the song is about a unicorn dancing in space at a birthday party, the cover shows exactly that — never a generic singer, stage or microphone unless the song is about one). The GENRE decides only the LOOK: palette, medium, lighting, finish. A hasidic song must not look like a trap cover; K-pop is glossy and saturated; a Disney musical is painterly and magical; a ballad is quiet and cinematic. ONE strong visual idea per prompt, not a collage.`,
+        `Rules for the prompts: English only. Describe subject, composition/framing, environment, lighting, colour palette, texture/medium, camera or art style, and mood. Include "album cover, square 1:1". NO text, letters, logos or typography inside the image (say "no text"). Avoid real people's names and brands. Keep each prompt 60–110 words.`,
+        `Output EXACTLY this format, these labels, nothing else:`,
+        `MAIN: <the primary prompt, comma-separated descriptive phrases in Stable Diffusion / Flux style>`,
+        `NEGATIVE: <negative prompt: text, watermark, logo, extra fingers, blurry, low quality, plus whatever must not appear for this song>`,
+        `PHOTO: <variation as a cinematic photograph — camera, lens, film stock, time of day>`,
+        `ILLUSTRATED: <variation as illustration/painting — medium, artist-free style words, brushwork, palette>`,
+        `MINIMAL: <variation as a minimalist / graphic cover — one symbol or object, flat colour, negative space>`,
+        `GEMINI: <the MAIN idea rewritten as 2–3 natural-language sentences for Gemini / Nano Banana, same content>`,
+        `TEXT: <title and artist line to place on the cover afterwards, in the song's language, plus a one-line typography suggestion>`,
+        `Song idea / brief: ${clean(b.idea, 2000)}`,
+        b.form && b.form !== 'auto' ? `Form / genre: ${b.form}` : '',
+        songContext(b),
+      ].filter(Boolean).join('\n');
+    }
     case 'titles': {
       return [
         `Suggest 8 song titles, one per line, no numbering, no quotes. Language: ${lang}. Mix literal, poetic and hook-based titles.`,
@@ -275,6 +293,10 @@ function stripPreamble(text, mode) {
   }
   if (mode === 'wild') {
     const i = text.search(/^\s*TITLE:/mi);
+    return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
+  }
+  if (mode === 'cover') {
+    const i = text.search(/^\s*MAIN:/mi);
     return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
   }
   return text;

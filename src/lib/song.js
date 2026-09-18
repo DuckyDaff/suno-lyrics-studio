@@ -81,6 +81,7 @@ export const actions = {
   setTitle:   v => mutate(s => { s.title = v; }, { typing: true }),
   setStyle:   v => mutate(s => { s.style = v; }, { typing: true }),
   setExclude: v => mutate(s => { s.exclude = v; }, { typing: true }),
+  setCoverPrompt: v => mutate(s => { s.coverPrompt = v; }),
   setText:    (id, v) => mutate(s => { const x = s.sections.find(q => q.id === id); if (x) x.text = v; }, { typing: true }),
   setName:    (id, v) => mutate(s => { const x = s.sections.find(q => q.id === id); if (x) x.name = v; }),
   toggleDir:  id => mutate(s => { const x = s.sections.find(q => q.id === id); if (x) x.dir = x.dir === 'rtl' ? 'ltr' : 'rtl'; }),

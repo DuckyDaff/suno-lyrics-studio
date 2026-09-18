@@ -7,7 +7,7 @@
   import { generate, busy, phase } from '../../lib/ai.js';
   import { nikudLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
   import { genState as g, setGen, blankMix, genAbort } from '../../lib/genState.js';
-  import { parseLyrics, parseWild, parseLines } from '../../lib/lyricsParse.js';
+  import { parseLyrics, parseWild, parseLines, parseCover } from '../../lib/lyricsParse.js';
   import { copyText } from '../../lib/clipboard.js';
   import { STRUCTURE_PRESETS, TIME_SIGS, SECTION_NAMES, estimateSeconds } from '../../lib/data/structures.js';
   import Button from '../ui/Button.svelte';
@@ -95,6 +95,10 @@
   const lim = $derived(limits($settings.sunoVersion));
   const wild = $derived($g.outMode === 'wild' ? parseWild($g.output) : null);
   const titles = $derived($g.outMode === 'titles' ? parseLines($g.output) : []);
+  const cover = $derived($g.outMode === 'cover' ? parseCover($g.output) : {});
+  const COVER_ROWS = [['main', 'aiCoverMain'], ['negative', 'aiCoverNegative'], ['photo', 'aiCoverPhoto'], ['illustrated', 'aiCoverIllustrated'], ['minimal', 'aiCoverMinimal'], ['gemini', 'aiCoverGemini'], ['text', 'aiCoverText']];
+  async function copyPart(txt) { (await copyText(txt)) ? toast($t('toastAllCopied'), 'success') : toast($t('toastCopyFail'), 'error'); }
+  function saveCover() { actions.setCoverPrompt($g.output); toast($t('aiCoverSaved'), 'success'); }
   const shown = $derived($g.outMode === 'wild' ? (wild?.lyrics ?? '') : $g.output);
 
   const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -283,6 +287,7 @@
       <Button icon="dice" onclick={() => run('wild')} disabled={$busy}>{$t('aiWild')}</Button>
       <Button variant="ghost" icon="sliders" onclick={() => run('style')} disabled={$busy}>{$t('aiStyleOnly')}</Button>
       <Button variant="ghost" icon="pen" onclick={() => run('titles')} disabled={$busy}>{$t('aiTitles')}</Button>
+      <Button variant="ghost" onclick={() => run('cover')} disabled={$busy} title={$t('aiCoverTitle')}>🎨 {$t('aiCover')}</Button>
     </div>
   </section>
 
@@ -307,6 +312,18 @@
 
       {#if $g.outMode === 'titles'}
         <ul class="titles">{#each titles as tt}<li><button onclick={() => applyTitle(tt)}>{tt}</button></li>{/each}</ul>
+      {:else if $g.outMode === 'cover' && !$busy && cover.main}
+        <div class="cover">
+          {#each COVER_ROWS as [k, lbl]}
+            {#if cover[k]}
+              <div class="cv" class:main={k === 'main'}>
+                <div class="cvhd"><span class="lbl">{$t(lbl)}</span><button class="cpy" onclick={() => copyPart(cover[k])}><Icon name="copy" size={13} /> {$t('copy')}</button></div>
+                <pre class="cvtext" dir={k === 'text' ? 'auto' : 'ltr'}>{cover[k]}</pre>
+              </div>
+            {/if}
+          {/each}
+          <p class="faint small">{$t('aiCoverHint')}</p>
+        </div>
       {:else}
         {#if $g.outMode === 'wild' && (wild.title || wild.style)}
           <div class="wildhd">
@@ -330,6 +347,9 @@
             {#if $g.outMode === 'wild' && wild.style}<Button variant="ghost" onclick={applyStyle}>{$t('aiApplyStyle')}</Button>{/if}
           {:else if $g.outMode === 'style'}
             <Button variant="primary" icon="check" onclick={applyStyle}>{$t('aiApplyStyle')}</Button>
+          {:else if $g.outMode === 'cover'}
+            <Button variant="primary" icon="check" onclick={saveCover}>{$t('aiCoverSave')}</Button>
+            <Button variant="ghost" icon="copy" onclick={() => copyPart(cover.main || '')}>{$t('aiCoverCopyMain')}</Button>
           {/if}
           <Button variant="ghost" icon="undo" onclick={() => run($g.outMode)}>{$t('aiAgain')}</Button>
         </div>
@@ -412,6 +432,15 @@
   .wildhd { display: flex; flex-direction: column; gap: 4px; }
   .wt { font-size: var(--fs-lg); font-weight: 700; }
   .ws { font-size: 11px; color: var(--tx1); direction: ltr; text-align: left; }
+  .cover { display: flex; flex-direction: column; gap: 8px; }
+  .cv { border: 1px solid var(--line); border-radius: var(--r2); background: var(--bg2); padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+  .cv.main { border-color: var(--accent-bd); background: var(--accent-bg); }
+  .cvhd { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .cvhd .lbl { font-size: var(--fs-xs); font-weight: 700; color: var(--tx1); }
+  .cpy { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fs-xs); font-weight: 700; color: var(--accent); padding: 3px 8px; border-radius: 999px; background: var(--bg1); border: 1px solid var(--line); }
+  .cpy:hover { border-color: var(--accent); }
+  .cvtext { font-family: var(--font-ui); font-size: var(--fs-sm); line-height: 1.55; white-space: pre-wrap; word-break: break-word; text-align: start; }
+  .small { font-size: var(--fs-xs); line-height: 1.5; }
   .titles { list-style: none; display: flex; flex-direction: column; gap: 4px; }
   .titles button { width: 100%; text-align: start; padding: 8px 12px; border-radius: var(--r2); background: var(--bg2); border: 1px solid var(--line); font-size: var(--fs-md); }
   .titles button:hover { border-color: var(--accent-bd); color: var(--accent); }

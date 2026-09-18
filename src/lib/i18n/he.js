@@ -72,6 +72,8 @@ export default {
   aiForm: 'צורה', aiLang: 'שפה', aiRhyme: 'חריזה', aiLength: 'אורך', aiShort: 'קצר', aiNormal: 'רגיל', aiLong: 'ארוך',
   aiPersonaPh: 'מי מדבר? (אופציונלי) — "גבר שבור לב", "ילדה בת 8", "רובוט מאוהב"', aiExtraPh: 'הוראות נוספות (אופציונלי) — "בלי קלישאות", "עם משפט באנגלית בפזמון"',
   aiUseStyle: 'להתאים ל-Style הנוכחי', aiUseStructure: 'לפי הסקשנים הקיימים', aiModel: 'מודל', aiQuality: 'איכות (Opus)', aiFast: 'מהיר (Sonnet)',
+  aiCover: 'עטיפה', aiCoverTitle: 'ארט-דיירקשן לעטיפת השיר — פרומפטים מוכנים ל-ComfyUI / Stable Diffusion / Flux / ג׳מיני', aiCoverMain: 'פרומפט ראשי (ComfyUI / SD / Flux)', aiCoverNegative: 'Negative prompt', aiCoverPhoto: 'וריאציה: צילומי', aiCoverIllustrated: 'וריאציה: מאויר', aiCoverMinimal: 'וריאציה: מינימליסטי', aiCoverGemini: 'לג׳מיני (שפה טבעית)', aiCoverText: 'טקסט לעטיפה (להוסיף אחרי היצירה)',
+  aiCoverSave: 'שמור עם השיר', aiCoverSaved: 'ארט-דיירקשן נשמר עם השיר', aiCoverCopyMain: 'העתק ראשי', aiCoverHint: 'הדבק את הפרומפט הראשי ב-ComfyUI (או את גרסת ג׳מיני ב-Gemini). התמונות יוצאות בלי טקסט — את שם השיר מוסיפים אחר כך.',
   aiWriteSong: 'כתוב שיר', aiWild: 'רעיון מטורף', aiStyleOnly: 'Style בלבד', aiTitles: 'כותרות', aiStop: 'עצור', aiResult: 'תוצאה',
   aiReplace: 'הכנס לעורך (החלף)', aiAppend: 'הוסף בסוף', aiApplyStyle: 'החל Style', aiAgain: 'עוד פעם', aiDone: 'מוכן ✨',
   toastAppliedLyrics: 'הוכנסו {n} סקשנים',

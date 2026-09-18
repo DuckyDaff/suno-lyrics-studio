@@ -33,6 +33,19 @@ export function parseWild(text) {
   return { title, style, lyrics: lines.slice(i).join('\n').trim() };
 }
 
+/** Cover art-direction output: "MAIN: …\nNEGATIVE: …" → { main, negative, photo, illustrated, minimal, gemini, text } */
+export const COVER_KEYS = ['main', 'negative', 'photo', 'illustrated', 'minimal', 'gemini', 'text'];
+export function parseCover(text) {
+  const out = {};
+  let cur = null;
+  for (const raw of String(text || '').replace(/\r/g, '').split('\n')) {
+    const m = raw.match(/^\s*(MAIN|NEGATIVE|PHOTO|ILLUSTRATED|MINIMAL|GEMINI|TEXT)\s*:\s*(.*)$/i);
+    if (m) { cur = m[1].toLowerCase(); out[cur] = m[2].trim(); continue; }
+    if (cur && raw.trim()) out[cur] = (out[cur] ? out[cur] + '\n' : '') + raw.trim();
+  }
+  return out;
+}
+
 /** "line\nline" → ["line", …] non-empty, for title suggestions */
 export function parseLines(text) {
   return String(text || '').split('\n').map(l => l.replace(/^\s*[\d]+[.)]\s*/, '').replace(/^["“”']+|["“”']+$/g, '').trim()).filter(Boolean);
