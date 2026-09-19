@@ -6,7 +6,7 @@ export default {
   kidLinkHint: 'The link opens "MeloDraft for kids" without a password and only allows sending ideas to this account. Valid for two years; you can create a new one any time.',
   kidLinkFail: 'Could not create a link', kidLoadFail: 'Could not load ideas', kidEmpty: 'No ideas yet. When she sends one from the iPad it shows up here.',
   kidF_new: 'New', kidF_used: 'In progress / became a song', kidF_archived: 'Archived', kidF_all: 'All',
-  kidTranscribe: 'Transcribe takes', kidTranscribing: 'Transcribing…', kidTranscribed: 'Transcript ready', kidNoStt: 'Transcription not configured — add OPENAI_API_KEY on Vercel (Whisper), or listen and write a note', kidSttFail: 'Transcription failed',
+  kidTranscribe: 'Transcribe takes', kidTranscribing: 'Transcribing…', kidTranscribed: 'Transcript ready', kidNoStt: 'Transcription unavailable — needs AI Gateway on the Vercel account (with credit), or OPENAI_API_KEY', kidSttFail: 'Transcription failed', kidSttGatewayAuth: 'AI Gateway rejected the request — check Vercel credit (AI → Gateway) and that OIDC is enabled on the project',
   kidDescribe: 'Read the picture', kidDescribing: 'Reading…', kidDescribeFail: 'Could not read the picture',
   kidNote: 'Your note (goes into the brief):', kidNotePh: "e.g. she meant grandma's cat, called Mitzi",
   kidTake: 'Take to Create', kidTaken: 'Idea loaded into Create — Style set from her card', kidSendSong: 'Send her the song', kidSendSongBtn: 'Send',

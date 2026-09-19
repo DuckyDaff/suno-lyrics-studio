@@ -7,7 +7,7 @@ export default {
   kidLinkHint: 'הקישור פותח את "מלודראפט לילדים" בלי סיסמה, ומאפשר רק לשלוח רעיונות לחשבון הזה. הקישור תקף לשנתיים; אפשר ליצור חדש בכל רגע.',
   kidLinkFail: 'לא הצלחתי ליצור קישור', kidLoadFail: 'לא הצלחתי לטעון רעיונות', kidEmpty: 'עדיין אין רעיונות. כשהיא תשלח רעיון מהאייפד הוא יופיע כאן.',
   kidF_new: 'חדשים', kidF_used: 'בעבודה / הפכו לשיר', kidF_archived: 'בארכיון', kidF_all: 'הכל',
-  kidTranscribe: 'תמלל הקלטות', kidTranscribing: 'מתמלל…', kidTranscribed: 'התמלול מוכן', kidNoStt: 'תמלול לא מוגדר — הוסף OPENAI_API_KEY ב-Vercel (Whisper), או האזן וכתוב הערה', kidSttFail: 'התמלול נכשל',
+  kidTranscribe: 'תמלל הקלטות', kidTranscribing: 'מתמלל…', kidTranscribed: 'התמלול מוכן', kidNoStt: 'תמלול לא זמין — צריך AI Gateway פעיל בחשבון Vercel (עם קרדיט), או OPENAI_API_KEY', kidSttFail: 'התמלול נכשל', kidSttGatewayAuth: 'AI Gateway דחה את הבקשה — בדוק שיש קרדיט ב-Vercel (AI → Gateway) ושה-OIDC מופעל בפרויקט',
   kidDescribe: 'קרא את התמונה', kidDescribing: 'קורא…', kidDescribeFail: 'לא הצלחתי לקרוא את התמונה',
   kidNote: 'הערה שלך (נכנסת לבריף):', kidNotePh: 'למשל: היא התכוונה לחתולה של סבתא, בשם מיצי',
   kidTake: 'קח ליצירה', kidTaken: 'הרעיון נכנס ליצירה — ה-Style נבחר מהקלף שלה', kidSendSong: 'שלח לה את השיר', kidSendSongBtn: 'שלח',

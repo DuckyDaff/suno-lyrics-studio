@@ -69,7 +69,7 @@
       ideas = ideas.map(x => x.id === it.id ? { ...x, transcript } : x);
       await saveField(it.id, { transcript });
       toast($t('kidTranscribed'), 'success');
-    } catch (e) { toast(e.code === 'no_stt' ? $t('kidNoStt') : ($t('kidSttFail') + (e.detail ? ': ' + e.detail : '')), 'error', 6000); }
+    } catch (e) { toast(e.code === 'no_stt' ? $t('kidNoStt') : e.code === 'stt_gateway_auth' ? $t('kidSttGatewayAuth') : ($t('kidSttFail') + (e.detail ? ': ' + e.detail : '')), 'error', 6000); }
     busy = { ...busy, [it.id]: '' };
   }
   async function describe(it, kind) {

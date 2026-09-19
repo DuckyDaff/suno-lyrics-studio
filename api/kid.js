@@ -180,21 +180,40 @@ module.exports = async function handler(req, res) {
 
     if (action === 'transcribe' && req.method === 'POST') {
       if (parentOnly()) return;
-      if (!process.env.OPENAI_API_KEY) return json(503, { ok: false, error: 'no_stt' });
       const p = String((req.body && req.body.path) || '');
       if (!p.startsWith(prefix)) return json(403, { ok: false, error: 'forbidden' });
       const r = await get(p, { access: 'private' });
       if (!r || r.statusCode !== 200) return json(404, { ok: false, error: 'not_found' });
       const buf = Buffer.from(await new Response(r.stream).arrayBuffer());
+      const ctype = r.blob.contentType || 'audio/mp4';
+      // 1) Vercel AI Gateway (billed to the Vercel account; OIDC on Vercel, or AI_GATEWAY_API_KEY)
+      const viaGateway = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN || process.env.VERCEL;
+      if (viaGateway && !process.env.STT_FORCE_OPENAI) {
+        try {
+          const { experimental_transcribe } = await import('ai');
+          const { gateway } = await import('@ai-sdk/gateway');
+          const out = await experimental_transcribe({
+            model: gateway.transcriptionModel(process.env.STT_MODEL || 'openai/whisper-1'),
+            audio: buf, mediaType: ctype,
+            providerOptions: { openai: { language: 'he', prompt: 'ילדה בת שבע מספרת רעיון לשיר בעברית, בקול חופשי.' } },
+          });
+          return json(200, { ok: true, text: String(out.text || '').trim(), via: 'gateway', seconds: out.durationInSeconds });
+        } catch (e) {
+          console.error('stt gateway:', e && e.name, e && e.message && e.message.slice(0, 300));
+          if (!process.env.OPENAI_API_KEY) return json(502, { ok: false, error: e && /auth|credit|402|401/i.test(e.message || '') ? 'stt_gateway_auth' : 'stt_failed', detail: String(e && e.message || '').slice(0, 200) });
+        }
+      }
+      // 2) direct OpenAI key
+      if (!process.env.OPENAI_API_KEY) return json(503, { ok: false, error: 'no_stt' });
       const fd = new FormData();
-      fd.append('file', new Blob([buf], { type: r.blob.contentType || 'audio/mp4' }), 'take.' + (ALLOWED[r.blob.contentType] || 'm4a'));
+      fd.append('file', new Blob([buf], { type: ctype }), 'take.' + (ALLOWED[ctype] || 'm4a'));
       fd.append('model', process.env.OPENAI_STT_MODEL || 'gpt-4o-mini-transcribe');
       fd.append('language', 'he');
       fd.append('prompt', 'ילדה בת שבע מספרת רעיון לשיר בעברית, בקול חופשי.');
       const o = await fetch('https://api.openai.com/v1/audio/transcriptions', { method: 'POST', headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` }, body: fd });
       const j = await o.json().catch(() => ({}));
       if (!o.ok) { console.error('stt:', o.status, JSON.stringify(j).slice(0, 300)); return json(502, { ok: false, error: 'stt_failed', detail: (j.error && j.error.message) || o.status }); }
-      return json(200, { ok: true, text: String(j.text || '').trim() });
+      return json(200, { ok: true, text: String(j.text || '').trim(), via: 'openai' });
     }
 
     if (action === 'describe' && req.method === 'POST') {
