@@ -13,7 +13,8 @@ function loadKid() {
       const payload = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0))));
       const kid = { token: k, name: payload.name || 'גאלה', owner: payload.owner };
       localStorage.setItem(TOKEN_KEY, JSON.stringify(kid));
-      u.searchParams.delete('k'); history.replaceState(null, '', u.pathname);
+      // keep ?k= in the address on purpose: an iOS home-screen app launches with the URL it was saved
+      // from and has its own storage, so the token must travel in the URL itself
       return kid;
     }
     return JSON.parse(localStorage.getItem(TOKEN_KEY) || 'null');
