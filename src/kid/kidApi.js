@@ -70,15 +70,23 @@ export function pickVoice(force = false) {
 export function setVoice(name) { try { name ? localStorage.setItem(VOICE_KEY, name) : localStorage.removeItem(VOICE_KEY); } catch {} pickVoice(true); }
 export const currentVoiceName = () => (voice && voice.name) || '';
 if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = () => pickVoice(true); }
-export function say(text) {
-  if (!('speechSynthesis' in window)) return;
-  try {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(stripNikud(text));
-    u.lang = 'he-IL'; u.rate = 0.9; u.pitch = 1.15;
-    pickVoice(); if (voice) u.voice = voice;
-    speechSynthesis.speak(u);
-  } catch {}
+/** Speak `text`; resolves when it finished (or after maxMs as a safety net). */
+export function say(text, maxMs = 6000) {
+  return new Promise(resolve => {
+    if (!('speechSynthesis' in window) || !text) return resolve();
+    let done = false;
+    const finish = () => { if (!done) { done = true; clearTimeout(t); resolve(); } };
+    const t = setTimeout(finish, maxMs);
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(stripNikud(text));
+      u.lang = 'he-IL'; u.rate = 0.9; u.pitch = 1.15;
+      pickVoice(); if (voice) u.voice = voice;
+      u.onend = finish; u.onerror = finish;
+      // iOS sometimes needs a tick after cancel() before speak() is honoured
+      setTimeout(() => { try { speechSynthesis.speak(u); } catch { finish(); } }, 30);
+    } catch { finish(); }
+  });
 }
 
 /* ── tiny sounds (no assets) ── */

@@ -3,6 +3,9 @@
   import { onMount } from 'svelte';
   import { kid, draft, newDraft, api, fileUrl, say, beep, hebrewVoices, setVoice, currentVoiceName } from './kidApi.js';
   import { STEPS, CARDS, card, sentence } from './cards.js';
+  import cardArt from './cardArt.json';
+  const ART = new Set(cardArt);
+  const art = (step, id) => (ART.has(`${step}-${id}`) ? `/kid/cards/${step}-${id}.jpg` : null);
   import Recorder from './Recorder.svelte';
   import Draw from './Draw.svelte';
 
@@ -44,9 +47,12 @@
     beep(880, 80);
     if (id === 'none') { draft.update(x => { const cards = { ...x.cards }; delete cards[stepDef.id]; return { ...x, cards }; }); setTimeout(next, 200); return; }
     draft.update(x => ({ ...x, cards: { ...x.cards, [stepDef.id]: id } }));
-    const c = card(stepDef.id, id); if (c) say(c.he);
-    setTimeout(next, 450);
+    const c = card(stepDef.id, id);
+    const token = ++chooseSeq;
+    // let her hear the whole word before the page turns (max 3.5s), then move on
+    (c ? say(c.he, 3500) : Promise.resolve()).then(() => { if (token === chooseSeq) setTimeout(next, 250); });
   }
+  let chooseSeq = 0;
   function next() {
     if (step < STEPS.length - 1) { step++; say(STEPS[step].q); }
     else { screen = 'record'; say('עכשיו ספרי לי את הרעיון בקול'); }
@@ -182,7 +188,7 @@
       <div class="grid">
         {#each CARDS[stepDef.id] as c (c.id)}
           <button class="card" class:on={pick[stepDef.id] === c.id} onclick={() => choose(c.id)}>
-            <span class="em">{c.emoji}</span><span class="lb">{c.he}</span>
+            {#if art(stepDef.id, c.id)}<img class="art" src={art(stepDef.id, c.id)} alt="" loading="lazy" />{:else}<span class="em">{c.emoji}</span>{/if}<span class="lb">{c.he}</span>
           </button>
         {/each}
       </div>
@@ -237,7 +243,7 @@
     <section class="center">
       <h2 class="q">הִנֵּה הָרַעְיוֹן שֶׁלָּךְ:</h2>
       <div class="sum">
-        <div class="emojis">{#each STEPS as s}{#if pick[s.id]}<span>{card(s.id, pick[s.id]).emoji}</span>{/if}{/each}</div>
+        <div class="emojis">{#each STEPS as s}{#if pick[s.id]}{#if art(s.id, pick[s.id])}<img class="mini" src={art(s.id, pick[s.id])} alt="" />{:else}<span>{card(s.id, pick[s.id]).emoji}</span>{/if}{/if}{/each}</div>
         <p class="sentence">{sentence(pick)}</p>
         <button class="speak lg" onclick={() => say(sentence(pick))}>🔊 תַּקְרִיא לִי</button>
         <div class="extras">
@@ -270,7 +276,7 @@
       <ul class="mine">
         {#each ideas as it (it.id)}
           <li class:song={it.songPath || it.songUrl}>
-            <div class="emojis sm">{#each STEPS as s}{#if it.cards?.[s.id]}<span>{card(s.id, it.cards[s.id])?.emoji}</span>{/if}{/each}</div>
+            <div class="emojis sm">{#each STEPS as s}{#if it.cards?.[s.id]}{#if art(s.id, it.cards[s.id])}<img class="mini" src={art(s.id, it.cards[s.id])} alt="" loading="lazy" />{:else}<span>{card(s.id, it.cards[s.id])?.emoji}</span>{/if}{/if}{/each}</div>
             <div class="mt">
               <div class="ms">{it.sentence || sentence(it.cards || {})}</div>
               <div class="md">{when(it.createdAt)} {#if it.status === 'used' && !it.songUrl && !it.songPath}· אַבָּא עוֹבֵד עַל זֶה 🎧{/if}</div>
@@ -296,7 +302,7 @@
           <li class:now={nowId === it.id}>
             <button class="play" onclick={() => toggle(it)} aria-label="ניגון">{nowId === it.id && playing ? '⏸' : '▶️'}</button>
             <div class="jt">
-              <div class="emojis sm">{#each STEPS as s}{#if it.cards?.[s.id]}<span>{card(s.id, it.cards[s.id])?.emoji}</span>{/if}{/each}</div>
+              <div class="emojis sm">{#each STEPS as s}{#if it.cards?.[s.id]}{#if art(s.id, it.cards[s.id])}<img class="mini" src={art(s.id, it.cards[s.id])} alt="" loading="lazy" />{:else}<span>{card(s.id, it.cards[s.id])?.emoji}</span>{/if}{/if}{/each}</div>
               <div class="jn">{it.songTitle || it.sentence || 'שִׁיר'}</div>
               {#if nowId === it.id && playing}<div class="eq"><i></i><i></i><i></i><i></i></div>{/if}
             </div>
@@ -366,6 +372,9 @@
   .em { font-size: 62px; line-height: 1.1; width: 96px; height: 96px; display: grid; place-items: center; border-radius: 50%; background: var(--k-cream2); }
   .card:nth-child(4n+1) .em { background: var(--k-pink2); } .card:nth-child(4n+2) .em { background: var(--k-blue2); } .card:nth-child(4n+3) .em { background: var(--k-green2); } .card:nth-child(4n+4) .em { background: var(--k-yellow2); }
   .card .lb { font-size: 21px; font-weight: 700; text-align: center; line-height: 1.25; }
+  .art { width: 118px; height: 118px; border-radius: 22px; object-fit: cover; }
+  .mini { width: 58px; height: 58px; border-radius: 14px; object-fit: cover; border: 3px solid #fff; box-shadow: var(--k-shadow2); }
+  .emojis.sm .mini { width: 40px; height: 40px; border-radius: 10px; border-width: 2px; }
   .row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
   .pill { font-size: 22px; font-weight: 700; padding: 12px 26px; border-radius: 999px; background: #fff; border: 3px solid var(--k-line); color: var(--k-ink2); text-decoration: none; box-shadow: var(--k-shadow2); }
   .pill.go { background: var(--k-green); color: #fff; border-color: #fff; box-shadow: 0 8px 22px rgba(123, 211, 137, .45); }
@@ -416,7 +425,7 @@
 
   @media (max-width: 700px) {
     .tile { width: 46%; } .tile .lb { font-size: 19px; } h1 { font-size: 32px; } h2 { font-size: 26px; }
-    .grid { grid-template-columns: repeat(3, 1fr); } .em { font-size: 46px; width: 74px; height: 74px; } .card .lb { font-size: 17px; }
+    .grid { grid-template-columns: repeat(3, 1fr); } .em { font-size: 46px; width: 74px; height: 74px; } .art { width: 84px; height: 84px; } .card .lb { font-size: 17px; }
     .hero { flex-direction: column; text-align: center; } .hero .mascot { width: 120px; height: 120px; }
     .tab { min-width: 64px; padding: 6px 10px; } .tab .ti { font-size: 26px; } .tab .tl { font-size: 13px; }
   }
