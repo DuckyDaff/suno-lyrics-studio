@@ -70,8 +70,43 @@ export function pickVoice(force = false) {
 export function setVoice(name) { try { name ? localStorage.setItem(VOICE_KEY, name) : localStorage.removeItem(VOICE_KEY); } catch {} pickVoice(true); }
 export const currentVoiceName = () => (voice && voice.name) || '';
 if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = () => pickVoice(true); }
+/* ── cloud voice (natural, via the server; cached per phrase) ── */
+export const CLOUD_VOICES = [['nova', 'נוֹבָה'], ['shimmer', 'שִׁימֶר'], ['coral', 'קוֹרָל'], ['sage', 'סֵייג׳']];
+const voicePref = () => { try { return localStorage.getItem(VOICE_KEY) || 'cloud:nova'; } catch { return 'cloud:nova'; } };
+export const isCloudVoice = () => voicePref().startsWith('cloud:');
+const cloudVoiceId = () => voicePref().replace(/^cloud:/, '');
+let audioEl = null, unlocked = false;
+const SILENT = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQxAADB8AhSmxhIIEVCSiJrDCQBTcu3UrAIwUdkRgQbFAZC1CQEwTJ9mjRvBA4UOLD8nKVOWfh+UlK3z/177OXrfOdKl7pyn3Xf//WreyTRUoAWgBgkOAGbZHBgG1OF6zM82DWbZaUmMBptgQhGjsyYqc9ae9XFz280948NMBWInluyfN9dBNYb5yXf1rIlWKD3mOpSbYVjOwc8k/8N/wAAAADiAcgtNAAAAAAAAAAAAAAAAAAAA//tQxAoBBXRDaBtYAAB4Iv0YZtANWLlIxFxJYS6ss1BJnqvDo6WBJ5r1SKCU5IPHUJj8u2cFNFxmwnCXPdlgHPT5cW9m1HmdwcjqFxE1oDGXeCWPMhrDTGVsKl3AfnGPbAAABBAaAeIBPYb0uvktCjCnyJ4oZ6HZuMLL2pLOiyxzHB97TcZLMEV1NbEsjRcuLh/Sgq8xzEvG3pBfBGzHGWuDPyMBQQiCbyZzk8s+AAAA';
+/** call from a user gesture: lets iOS play later audio from code (same element stays unlocked) */
+export function unlockAudio() {
+  if (unlocked) return;
+  try { audioEl = audioEl || new Audio(); audioEl.src = SILENT; audioEl.play().then(() => { unlocked = true; }).catch(() => {}); } catch {}
+}
+function sayCloud(text, maxMs) {
+  return new Promise(resolve => {
+    let done = false;
+    const finish = () => { if (!done) { done = true; clearTimeout(t); resolve(true); } };
+    const fail = () => { if (!done) { done = true; clearTimeout(t); resolve(false); } };
+    const t = setTimeout(finish, maxMs);
+    try {
+      audioEl = audioEl || new Audio();
+      audioEl.onended = finish; audioEl.onerror = fail;
+      audioEl.src = `/api/kid?action=tts&v=${encodeURIComponent(cloudVoiceId())}&text=${encodeURIComponent(stripNikud(text))}&t=${encodeURIComponent(get(kid)?.token || '')}`;
+      audioEl.play().catch(fail);
+    } catch { fail(); }
+  });
+}
+
 /** Speak `text`; resolves when it finished (or after maxMs as a safety net). */
-export function say(text, maxMs = 6000) {
+export async function say(text, maxMs = 6000) {
+  if (!text) return;
+  if (isCloudVoice() && get(kid)) {
+    try { speechSynthesis.cancel(); } catch {}
+    if (await sayCloud(text, Math.max(maxMs, 8000))) return;
+  }
+  return sayDevice(text, maxMs);
+}
+function sayDevice(text, maxMs) {
   return new Promise(resolve => {
     if (!('speechSynthesis' in window) || !text) return resolve();
     let done = false;

@@ -65,6 +65,24 @@ module.exports = async function handler(req, res) {
   const parentOnly = () => { if (isKid) { json(403, { ok: false, error: 'forbidden' }); return true; } return false; };
 
   try {
+    if (action === 'tts' && req.method === 'GET') {
+      // natural voice for the kid app (kid or parent token); cached per phrase
+      const { ttsBuffer } = require('./_tts.js');
+      const text = String(q.text || '');
+      if (!text.trim()) return json(400, { ok: false, error: 'empty' });
+      try {
+        const { buf, cached } = await ttsBuffer(text, String(q.v || 'nova'));
+        res.setHeader('Content-Type', 'audio/mpeg');
+        res.setHeader('Content-Length', String(buf.length));
+        res.setHeader('Cache-Control', 'private, max-age=31536000, immutable');
+        res.setHeader('X-TTS-Cache', cached ? 'hit' : 'miss');
+        return res.status(200).end(buf);
+      } catch (e) {
+        console.error('tts:', e && e.message);
+        return json(502, { ok: false, error: 'tts_failed', detail: String(e && e.message || '').slice(0, 200) });
+      }
+    }
+
     if (action === 'link' && req.method === 'POST') {
       if (parentOnly()) return;
       const name = String((req.body && req.body.name) || 'גאלה').slice(0, 40);

@@ -1,7 +1,7 @@
 <script>
   /** Gala mode — full-screen iPad app at /gala. Everything is vocalized Hebrew with big pictures. */
   import { onMount } from 'svelte';
-  import { kid, draft, newDraft, api, fileUrl, say, beep, hebrewVoices, setVoice, currentVoiceName } from './kidApi.js';
+  import { kid, draft, newDraft, api, fileUrl, say, beep, hebrewVoices, setVoice, currentVoiceName, unlockAudio, isCloudVoice, CLOUD_VOICES } from './kidApi.js';
   import { STEPS, CARDS, card, sentence } from './cards.js';
   import cardArt from './cardArt.json';
   const ART = new Set(cardArt);
@@ -34,7 +34,7 @@
   const stepDef = $derived(STEPS[step]);
   const inFlow = $derived(['cards', 'record', 'draw', 'photo', 'summary'].includes(screen));
 
-  onMount(() => { document.documentElement.dataset.theme = 'light'; document.documentElement.dir = 'rtl'; document.documentElement.lang = 'he'; });
+  onMount(() => { document.documentElement.dataset.theme = 'light'; document.documentElement.dir = 'rtl'; document.documentElement.lang = 'he'; document.addEventListener('pointerdown', unlockAudio, { passive: true }); });
 
   function startNew() {
     if (d && (Object.keys(d.cards || {}).length || d.takes?.length || d.drawing || d.photo)) { screen = 'resume'; return; }
@@ -112,9 +112,10 @@
   let voices = $state([]);
   let voiceName = $state('');
   let voicesOpen = $state(false);
-  function refreshVoices() { voices = hebrewVoices(); voiceName = currentVoiceName(); }
+  const voiceKey = () => { try { return localStorage.getItem('melodraft_kid_voice') || 'cloud:nova'; } catch { return 'cloud:nova'; } };
+  function refreshVoices() { voices = hebrewVoices(); voiceName = isCloudVoice() ? '☁️ ' + (CLOUD_VOICES.find(v => 'cloud:' + v[0] === voiceKey())?.[1] || 'נוֹבָה') : currentVoiceName(); }
   onMount(() => { refreshVoices(); if ('speechSynthesis' in window) speechSynthesis.addEventListener('voiceschanged', refreshVoices); });
-  function chooseVoice(n) { setVoice(n); voiceName = currentVoiceName(); say(`שלום ${name}, אני הקול החדש שלך`); }
+  function chooseVoice(n) { setVoice(n); refreshVoices(); say(`שלום ${name}, אני הקול החדש שלך`); }
 
   const TABS = [
     { id: 'home', he: 'בַּיִת', emoji: '🏠', go: () => (screen = 'home') },
@@ -163,9 +164,12 @@
         <button class="voiceBtn" onclick={() => { refreshVoices(); voicesOpen = !voicesOpen; }}>🔈 קוֹל: {voiceName || 'אוטומטי'}</button>
         {#if voicesOpen}
           <div class="voiceList">
-            {#if !voices.length}<span class="faintk">לא נמצאו קולות בעברית במכשיר</span>{/if}
+            {#each CLOUD_VOICES as [id, he] (id)}
+              <button class="voiceOpt cloud" class:on={voiceKey() === 'cloud:' + id} onclick={() => chooseVoice('cloud:' + id)}>☁️ {he}</button>
+            {/each}
+            {#if !voices.length}<span class="faintk">אֵין קוֹלוֹת עִבְרִיִּים בַּמַּכְשִׁיר</span>{/if}
             {#each voices as v (v.name)}
-              <button class="voiceOpt" class:on={v.name === voiceName} onclick={() => chooseVoice(v.name)}>{v.name}</button>
+              <button class="voiceOpt" class:on={voiceKey() === v.name} onclick={() => chooseVoice(v.name)}>📱 {v.name}</button>
             {/each}
           </div>
         {/if}
@@ -414,6 +418,7 @@
   .voiceList { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 720px; }
   .voiceOpt { font-size: 15px; padding: 6px 12px; border-radius: 999px; background: #fff; border: 2px solid var(--k-line); color: var(--k-ink2); }
   .voiceOpt.on { border-color: var(--k-pink); color: var(--k-pink); }
+  .voiceOpt.cloud { background: #F3F0FF; }
   .faintk { font-size: 15px; color: var(--k-muted); }
 
   /* bottom tabs */
