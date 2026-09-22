@@ -94,7 +94,7 @@ export default {
   aiAutoNikud: 'Auto-vocalize Hebrew (click a letter in the editor to change its nikud)', aiNikud: 'Adding nikud…',
   aiNikudBanner: 'Adding nikud (Dicta)…', aiNikudPartial: '{n} words are still unvocalized — press "Vocalize all" to finish', aiNikudAll: 'Vocalize all', aiNikudAllTitle: '{n} Hebrew words still have no nikud — rerun nikud on the whole text',
   nikudPopTitle: 'Pick a mark to replace · Esc to close',
-  aiTag: 'Intro signature (ad-lib):',
+  aiTag: 'Intro signature (ad-lib):', aiTagSaved: 'Signature saved to the list', aiTagSaveTitle: 'Save this signature to the list', aiTagUse: 'Use this signature',
   aiFixing: 'Fixing line counts…',
   aiConnecting: 'Connecting…',
   aiThinking: 'Planning the song…', aiWriting: 'Writing…', aiRetry: 'Retrying briefly…',

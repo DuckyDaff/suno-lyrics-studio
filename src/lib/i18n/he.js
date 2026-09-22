@@ -100,7 +100,7 @@ export default {
   aiAutoNikud: 'ניקוד אוטומטי לעברית (לחיצה על אות בעורך משנה את הניקוד שלה)', aiNikud: 'מנקד…',
   aiNikudBanner: 'מנקד את השיר (דיקטה)…', aiNikudPartial: '{n} מילים נשארו בלי ניקוד — לחץ "נקד הכל" כדי להשלים', aiNikudAll: 'נקד הכל', aiNikudAllTitle: '{n} מילים בעברית עדיין בלי ניקוד — ניקוד חוזר לכל הטקסט',
   nikudPopTitle: 'לחץ על ניקוד כדי להחליף · Esc לסגירה',
-  aiTag: 'חתימה באינטרו (אד-ליב):',
+  aiTag: 'חתימה באינטרו (אד-ליב):', aiTagSaved: 'החתימה נשמרה ברשימה', aiTagSaveTitle: 'שמור את החתימה הזאת ברשימה', aiTagUse: 'השתמש בחתימה הזאת',
   aiFixing: 'מתקן ספירת שורות…',
   aiConnecting: 'מתחבר לשרת…',
   aiThinking: 'מתכנן את השיר…', aiWriting: 'כותב…', aiRetry: 'מנסה שוב בקצרה…',

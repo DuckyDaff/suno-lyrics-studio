@@ -34,6 +34,14 @@
   let errorDetail = $state('');
   let presetId = $state('');
   let nikudBusy = $state(false);
+  /* saved intro signatures */
+  const savedTags = $derived(Array.isArray($settings.producerTags) ? $settings.producerTags : []);
+  function saveTag() {
+    const v = ($settings.producerTag || '').trim(); if (!v) return;
+    if (!savedTags.includes(v)) setSetting('producerTags', [...savedTags, v]);
+    toast($t('aiTagSaved'), 'success');
+  }
+  function removeTag(v) { setSetting('producerTags', savedTags.filter(x => x !== v)); }
   let nikudProg = $state('');
   const bare = $derived(!$busy && !nikudBusy && ($g.outMode === 'song' || $g.outMode === 'wild') ? unvocalizedWords(shown).length : 0);
   async function vocalize(text) {
@@ -275,7 +283,18 @@
       <label class="chk"><input type="checkbox" bind:checked={$g.useStructure} /> {$t('aiUseStructure')} <span class="faint mono">{$song.sections.map(x => x.name).join(' · ')}</span></label>
       <label class="chk"><input type="checkbox" checked={$settings.autoNikud} onchange={e => setSetting('autoNikud', e.target.checked)} /> {$t('aiAutoNikud')}</label>
       <label class="chk"><input type="checkbox" checked={$settings.producerTagOn} onchange={e => setSetting('producerTagOn', e.target.checked)} /> {$t('aiTag')}
-        <input class="field tagIn" value={$settings.producerTag} oninput={e => setSetting('producerTag', e.target.value)} placeholder="It's a Denver Production" dir="ltr" /></label>
+        <input class="field tagIn" value={$settings.producerTag} oninput={e => setSetting('producerTag', e.target.value)} placeholder="It's a Denver Production" dir="ltr" />
+        <button class="tagSave" type="button" onclick={saveTag} disabled={!($settings.producerTag || '').trim() || savedTags.includes(($settings.producerTag || '').trim())} title={$t('aiTagSaveTitle')}>💾</button></label>
+      {#if savedTags.length}
+        <div class="tagList">
+          {#each savedTags as tg (tg)}
+            <span class="tagChip" class:on={tg === ($settings.producerTag || '').trim()}>
+              <button type="button" class="pick" onclick={() => setSetting('producerTag', tg)} title={$t('aiTagUse')}>{tg}</button>
+              <button type="button" class="x" onclick={() => removeTag(tg)} title={$t('delete')}>×</button>
+            </span>
+          {/each}
+        </div>
+      {/if}
       <div class="model">
         <span>{$t('aiModel')}</span>
         <button class:on={$settings.aiModel !== 'fast'} onclick={() => setSetting('aiModel', 'quality')}>{$t('aiQuality')}</button>
@@ -394,6 +413,14 @@
   .chk span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
   .chk input { accent-color: var(--accent); }
   .tagIn { flex: 1; padding: 4px 8px; font-size: 11px; font-family: var(--font-mono); min-width: 0; }
+  .tagSave { font-size: 13px; padding: 2px 6px; border-radius: var(--r1); border: 1px solid var(--line); background: var(--bg2); }
+  .tagSave:disabled { opacity: .35; }
+  .tagList { display: flex; flex-wrap: wrap; gap: 5px; padding-inline-start: 22px; }
+  .tagChip { display: inline-flex; align-items: center; border-radius: 999px; border: 1px solid var(--line); background: var(--bg2); font-family: var(--font-mono); font-size: 11px; direction: ltr; overflow: hidden; }
+  .tagChip.on { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
+  .tagChip .pick { padding: 3px 9px; }
+  .tagChip .x { padding: 3px 7px; color: var(--tx2); border-inline-start: 1px solid var(--line); }
+  .tagChip .x:hover { color: var(--err); }
   .linkBtn { font-size: var(--fs-xs); font-weight: 700; color: var(--accent); white-space: nowrap; }
   .linkBtn.dim { color: var(--tx2); }
   .hint { font-size: 11px; line-height: 1.45; }
