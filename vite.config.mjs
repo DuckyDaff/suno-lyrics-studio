@@ -8,5 +8,5 @@ export default defineConfig({
     // Local API: run `node scripts/dev-proxy.cjs` (nikud proxy) or `npx vercel dev`
     proxy: { '/api': 'http://localhost:3000' },
   },
-  build: { target: 'es2022' },
+  build: { target: 'es2022', rollupOptions: { input: { main: 'index.html', gala: 'gala.html' } } },
 });

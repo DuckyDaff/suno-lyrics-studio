@@ -13,11 +13,13 @@
   import { STEPS, card, sentence, brief } from '../../kid/cards.js';
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
+  import QRCode from 'qrcode';
 
   let ideas = $state([]);
   let loading = $state(true);
   let filter = $state('new');   // new | used | archived | all
   let link = $state('');
+  let qr = $state('');
   let busy = $state({});         // id → 'transcribe' | 'describe' | 'status'
   let songForm = $state(null);   // { id, url, title }
   let uploading = $state('');    // idea id while an MP3 uploads
@@ -45,6 +47,7 @@
     try {
       const r = await call('link', { name: $settings.kidName || 'גאלה' });
       link = `${location.origin}/gala?k=${r.token}`;
+      try { qr = await QRCode.toDataURL(link, { width: 320, margin: 1, color: { dark: '#3A2B1F', light: '#FFFFFF' } }); } catch { qr = ''; }
       (await copyText(link)) ? toast($t('kidLinkCopied'), 'success') : null;
     } catch { toast($t('kidLinkFail'), 'error'); }
   }
@@ -136,7 +139,10 @@
       <Button icon="external" onclick={makeLink}>{$t('kidMakeLink')}</Button>
     </div>
     <p class="faint small">{$t('kidLinkHint')}</p>
-    {#if link}<input class="field mono" readonly value={link} onclick={e => e.target.select()} />{/if}
+    {#if link}
+      <input class="field mono" readonly value={link} onclick={e => e.target.select()} />
+      {#if qr}<div class="qrBox"><img class="qr" src={qr} alt="QR" /><p class="faint small">{$t('kidQrHint')}</p></div>{/if}
+    {/if}
   </section>
 
   <div class="filters">
@@ -215,6 +221,8 @@
   .field { padding: 7px 10px; border-radius: var(--r2); background: var(--bg2); border: 1px solid var(--line); color: var(--tx0); font-size: var(--fs-sm); width: 100%; }
   .field.name { width: 140px; }
   .small { font-size: var(--fs-xs); line-height: 1.5; }
+  .qrBox { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .qr { width: 200px; height: 200px; border-radius: var(--r2); border: 6px solid #fff; background: #fff; }
   .filters { display: flex; gap: 6px; flex-wrap: wrap; }
   .chip { padding: 5px 12px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 700; background: var(--bg2); border: 1px solid var(--line); color: var(--tx1); }
   .chip.on { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }

@@ -4,6 +4,7 @@ export default {
   navKid: 'Gala', refresh: 'Refresh', loading: 'Loading…',
   kidTitle: "{n}'s ideas", kidName: 'Name:', kidMakeLink: 'Create iPad link', kidLinkCopied: 'Link copied — open it once on the iPad and add to the home screen',
   kidLinkHint: 'The link opens "MeloDraft for kids" without a password and only allows sending ideas to this account. Valid for two years; you can create a new one any time.',
+  kidQrHint: 'Scan with the iPad camera — it opens the link in Safari. Then: Share → Add to Home Screen. The code contains the secret link; do not share it.',
   kidLinkFail: 'Could not create a link', kidLoadFail: 'Could not load ideas', kidEmpty: 'No ideas yet. When she sends one from the iPad it shows up here.',
   kidF_new: 'New', kidF_used: 'In progress / became a song', kidF_archived: 'Archived', kidF_all: 'All',
   kidTranscribe: 'Transcribe takes', kidTranscribing: 'Transcribing…', kidTranscribed: 'Transcript ready', kidNoStt: 'Transcription unavailable — needs AI Gateway on the Vercel account (with credit), or OPENAI_API_KEY', kidSttFail: 'Transcription failed', kidSttGatewayAuth: 'AI Gateway rejected the request — check Vercel credit (AI → Gateway) and that OIDC is enabled on the project',

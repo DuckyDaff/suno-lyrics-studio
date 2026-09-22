@@ -1,0 +1,47 @@
+/* Gala mode — global look: warm cream ground with doodles, rounded type, sticker cards. */
+:root {
+  --k-cream: #FFF6E5;
+  --k-cream2: #FFEFD2;
+  --k-ink: #3A2B1F;
+  --k-ink2: #6B5A4A;
+  --k-muted: #9C8B7A;
+  --k-pink: #FF6F91;
+  --k-pink2: #FFB8C9;
+  --k-purple: #8F7BFF;
+  --k-purple2: #D8D0FF;
+  --k-blue: #4DB4F5;
+  --k-blue2: #CDEBFF;
+  --k-green: #7BD389;
+  --k-green2: #D8F3DC;
+  --k-yellow: #FFC84A;
+  --k-yellow2: #FFE9B0;
+  --k-mint: #7EDDD0;
+  --k-card: #FFFFFF;
+  --k-line: #F1E3CC;
+  --k-shadow: 0 10px 26px rgba(120, 80, 30, .14);
+  --k-shadow2: 0 4px 12px rgba(120, 80, 30, .10);
+  --k-font: 'Varela Round', 'Heebo', system-ui, sans-serif;
+  --k-r: 28px;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; font-family: var(--k-font); color: var(--k-ink); background: var(--k-cream);
+  -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; overscroll-behavior: none;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; -webkit-user-select: none; user-select: none; }
+button:active { transform: scale(.97); }
+img { display: block; max-width: 100%; }
+ul { margin: 0; padding: 0; list-style: none; }
+h1, h2, h3, p { margin: 0; }
+/* doodle ground: suns, squiggles, dots */
+.k-ground {
+  background-color: var(--k-cream);
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(255, 200, 74, .28) 0 40px, transparent 41px),
+    radial-gradient(circle at 88% 92%, rgba(255, 184, 201, .35) 0 46px, transparent 47px),
+    radial-gradient(circle at 92% 18%, rgba(123, 211, 137, .25) 0 26px, transparent 27px),
+    radial-gradient(circle at 8% 86%, rgba(143, 123, 255, .22) 0 30px, transparent 31px),
+    radial-gradient(circle, rgba(58, 43, 31, .05) 1.5px, transparent 2px);
+  background-size: auto, auto, auto, auto, 34px 34px;
+}

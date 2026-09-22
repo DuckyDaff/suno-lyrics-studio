@@ -5,6 +5,7 @@ export default {
   navKid: 'גאלה', refresh: 'רענן', loading: 'טוען…',
   kidTitle: 'הרעיונות של {n}', kidName: 'שם:', kidMakeLink: 'צור קישור לאייפד', kidLinkCopied: 'הקישור הועתק — פתח אותו באייפד פעם אחת והוסף למסך הבית',
   kidLinkHint: 'הקישור פותח את "מלודראפט לילדים" בלי סיסמה, ומאפשר רק לשלוח רעיונות לחשבון הזה. הקישור תקף לשנתיים; אפשר ליצור חדש בכל רגע.',
+  kidQrHint: 'סרוק עם המצלמה של האייפד — זה פותח את הקישור בספארי. אחר כך: שיתוף → הוסף למסך הבית. הקוד מכיל את הקישור הסודי, אל תשתף אותו.',
   kidLinkFail: 'לא הצלחתי ליצור קישור', kidLoadFail: 'לא הצלחתי לטעון רעיונות', kidEmpty: 'עדיין אין רעיונות. כשהיא תשלח רעיון מהאייפד הוא יופיע כאן.',
   kidF_new: 'חדשים', kidF_used: 'בעבודה / הפכו לשיר', kidF_archived: 'בארכיון', kidF_all: 'הכל',
   kidTranscribe: 'תמלל הקלטות', kidTranscribing: 'מתמלל…', kidTranscribed: 'התמלול מוכן', kidNoStt: 'תמלול לא זמין — צריך AI Gateway פעיל בחשבון Vercel (עם קרדיט), או OPENAI_API_KEY', kidSttFail: 'התמלול נכשל', kidSttGatewayAuth: 'AI Gateway דחה את הבקשה — בדוק שיש קרדיט ב-Vercel (AI → Gateway) ושה-OIDC מופעל בפרויקט',

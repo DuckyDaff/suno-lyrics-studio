@@ -16,6 +16,7 @@
     "@ai-sdk/gateway": "^4.0.87",
     "@anthropic-ai/sdk": "^0.124.0",
     "@vercel/blob": "^2.8.0",
-    "ai": "^7.0.107"
+    "ai": "^7.0.107",
+    "qrcode": "^1.5.4"
   }
 }
