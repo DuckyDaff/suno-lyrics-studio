@@ -49,18 +49,32 @@ export const fileUrl = path => `/api/kid?action=file&p=${encodeURIComponent(path
 /* ── speech ── */
 export const stripNikud = s => String(s || '').replace(/[ְ-ׇֽֿׁׂ]/g, '');
 let voice = null;
-function pickVoice() {
-  if (voice || !('speechSynthesis' in window)) return;
-  const vs = speechSynthesis.getVoices();
-  voice = vs.find(v => /he[-_]IL/i.test(v.lang) && /Carmit|Google/i.test(v.name)) || vs.find(v => /^he/i.test(v.lang)) || null;
+const VOICE_KEY = 'melodraft_kid_voice';
+const FEMALE = /carmit|female|woman|girl|נקבה|kar[m]?it|sharon|inbal|maya|noa|shira|tamar/i;
+const MALE = /male|man|boy|זכר|gilad|guy|yaron|elad|david|asaf|eitan|ido/i;
+/** Hebrew voices available on this device */
+export function hebrewVoices() {
+  try { return speechSynthesis.getVoices().filter(v => /^he/i.test(v.lang)); } catch { return []; }
 }
-if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+export function pickVoice(force = false) {
+  if ((voice && !force) || !('speechSynthesis' in window)) return;
+  const vs = hebrewVoices();
+  const wanted = localStorage.getItem(VOICE_KEY);
+  voice = (wanted && vs.find(v => v.name === wanted))
+    || vs.find(v => FEMALE.test(v.name))
+    || vs.find(v => !MALE.test(v.name) && v.localService)
+    || vs.find(v => !MALE.test(v.name))
+    || vs[0] || null;
+}
+export function setVoice(name) { try { name ? localStorage.setItem(VOICE_KEY, name) : localStorage.removeItem(VOICE_KEY); } catch {} pickVoice(true); }
+export const currentVoiceName = () => (voice && voice.name) || '';
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = () => pickVoice(true); }
 export function say(text) {
   if (!('speechSynthesis' in window)) return;
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(stripNikud(text));
-    u.lang = 'he-IL'; u.rate = 0.9; u.pitch = 1.05;
+    u.lang = 'he-IL'; u.rate = 0.9; u.pitch = 1.15;
     pickVoice(); if (voice) u.voice = voice;
     speechSynthesis.speak(u);
   } catch {}

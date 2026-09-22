@@ -1,7 +1,7 @@
 <script>
   /** Gala mode — full-screen iPad app at /gala. Everything is vocalized Hebrew with big pictures. */
   import { onMount } from 'svelte';
-  import { kid, draft, newDraft, api, fileUrl, say, beep } from './kidApi.js';
+  import { kid, draft, newDraft, api, fileUrl, say, beep, hebrewVoices, setVoice, currentVoiceName } from './kidApi.js';
   import { STEPS, CARDS, card, sentence } from './cards.js';
   import Recorder from './Recorder.svelte';
   import Draw from './Draw.svelte';
@@ -42,6 +42,7 @@
 
   function choose(id) {
     beep(880, 80);
+    if (id === 'none') { draft.update(x => { const cards = { ...x.cards }; delete cards[stepDef.id]; return { ...x, cards }; }); setTimeout(next, 200); return; }
     draft.update(x => ({ ...x, cards: { ...x.cards, [stepDef.id]: id } }));
     const c = card(stepDef.id, id); if (c) say(c.he);
     setTimeout(next, 450);
@@ -62,7 +63,7 @@
   function randomAll() {
     beep(660, 80); setTimeout(() => beep(880, 80), 120); setTimeout(() => beep(1100, 120), 240);
     const cards = {};
-    for (const s of STEPS) { const list = CARDS[s.id]; cards[s.id] = list[Math.floor(Math.random() * list.length)].id; }
+    for (const s of STEPS) { const list = CARDS[s.id].filter(c => c.id !== 'none'); if (s.id === 'world' && Math.random() < 0.5) continue; cards[s.id] = list[Math.floor(Math.random() * list.length)].id; }
     draft.update(x => ({ ...(x || newDraft()), cards }));
     screen = 'summary'; setTimeout(() => say(sentence(cards)), 300);
   }
@@ -100,6 +101,14 @@
     try { ideas = (await api.list()).ideas || []; } catch { ideas = []; }
   }
   const when = ts => new Date(ts || 0).toLocaleDateString('he-IL');
+
+  // voice picker (small, for the parent): Hebrew voices installed on this device
+  let voices = $state([]);
+  let voiceName = $state('');
+  let voicesOpen = $state(false);
+  function refreshVoices() { voices = hebrewVoices(); voiceName = currentVoiceName(); }
+  onMount(() => { refreshVoices(); if ('speechSynthesis' in window) speechSynthesis.addEventListener('voiceschanged', refreshVoices); });
+  function chooseVoice(n) { setVoice(n); voiceName = currentVoiceName(); say(`שלום ${name}, אני הקול החדש שלך`); }
 </script>
 
 {#if !$kid}
@@ -130,6 +139,17 @@
         <button class="tile purple" onclick={randomAll}><span class="big">🎲</span>מְכוֹנַת רַעְיוֹנוֹת</button>
         <button class="tile blue" onclick={loadMine}><span class="big">📚</span>הָרַעְיוֹנוֹת שֶׁלִּי</button>
         <button class="tile gold" onclick={loadJukebox}><span class="big">🎧</span>הַשִּׁירִים שֶׁלִּי</button>
+      </div>
+      <div class="voiceBox">
+        <button class="voiceBtn" onclick={() => { refreshVoices(); voicesOpen = !voicesOpen; }}>🔈 קוֹל: {voiceName || 'אוטומטי'}</button>
+        {#if voicesOpen}
+          <div class="voiceList">
+            {#if !voices.length}<span class="faintk">לא נמצאו קולות בעברית במכשיר</span>{/if}
+            {#each voices as v (v.name)}
+              <button class="voiceOpt" class:on={v.name === voiceName} onclick={() => chooseVoice(v.name)}>{v.name}</button>
+            {/each}
+          </div>
+        {/if}
       </div>
     </section>
 
@@ -303,6 +323,12 @@
   .blue { background: linear-gradient(145deg, #38bdf8, #0284c7); }
   .green { background: linear-gradient(145deg, #4ade80, #16a34a); }
   .gold { background: linear-gradient(145deg, #fbbf24, #f59e0b); }
+  .voiceBox { margin-top: 26px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .voiceBtn { font-size: 15px; font-weight: 700; color: #6b7280; padding: 6px 14px; border-radius: 999px; background: rgba(255,255,255,.7); border: 2px solid #e5e7eb; }
+  .voiceList { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 720px; }
+  .voiceOpt { font-size: 15px; padding: 6px 12px; border-radius: 999px; background: #fff; border: 2px solid #e5e7eb; color: #374151; }
+  .voiceOpt.on { border-color: #ff3d71; color: #ff3d71; }
+  .faintk { font-size: 15px; color: #9ca3af; }
   .juke { list-style: none; display: flex; flex-direction: column; gap: 14px; max-width: 760px; margin: 0 auto; width: 100%; }
   .juke li { display: flex; align-items: center; gap: 16px; background: #fff; border: 5px solid #fde68a; border-radius: 28px; padding: 14px 18px; }
   .juke li.now { border-color: #f59e0b; background: #fffbeb; box-shadow: 0 10px 30px rgba(245,158,11,.25); }
