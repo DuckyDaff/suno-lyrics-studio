@@ -3,16 +3,20 @@
   import { t } from '../../lib/i18n.js';
   import GenerateTab from '../panel/GenerateTab.svelte';
   import StyleTab from '../panel/StyleTab.svelte';
+  import CoverTab from '../panel/CoverTab.svelte';
 </script>
 
 <div class="ws">
   <div class="tabs">
     <button class:on={$wsTab === 'ai'} onclick={() => wsTab.set('ai')}>✨ {$t('wsCreate')}</button>
+    <button class:on={$wsTab === 'cover'} onclick={() => wsTab.set('cover')}>🎤 {$t('wsCover')}</button>
     <button class:on={$wsTab === 'style'} onclick={() => wsTab.set('style')}>🎨 {$t('wsStyle')}</button>
   </div>
   <div class="body">
     {#if $wsTab === 'ai'}
       <GenerateTab wide />
+    {:else if $wsTab === 'cover'}
+      <CoverTab wide />
     {:else}
       <div class="styleWrap"><StyleTab /></div>
     {/if}

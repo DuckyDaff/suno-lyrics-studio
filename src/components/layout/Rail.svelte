@@ -7,6 +7,7 @@
   const items = $derived([
     { id: 'songs',   icon: 'music',    label: $t('navSongs') },
     { id: 'ai',      icon: 'sparkles', label: $t('wsCreate') },
+    { id: 'cover',   icon: 'music',    label: $t('wsCover') },
     { id: 'style',   icon: 'sliders',  label: $t('wsStyle') },
     { id: 'editor',  icon: 'pen',      label: $t('navEditor') },
     { id: 'library', icon: 'library',  label: $t('navLibrary') },
@@ -17,7 +18,7 @@
   function go(id) {
     if (id === 'songs' || id === 'kid') { view.set(id); return; }
     view.set('editor');
-    if (id === 'ai' || id === 'style') { wsTab.set(id); editorFocus.set(false); }
+    if (id === 'ai' || id === 'style' || id === 'cover') { wsTab.set(id); editorFocus.set(false); }
     else if (id === 'editor') { if ($settings.editorCollapsed) setSetting('editorCollapsed', false); else editorFocus.update(v => !v); }
     else leftTab.set(id);
   }
@@ -25,7 +26,7 @@
     id === 'songs' || id === 'kid' ? $view === id
     : $view !== 'editor' ? false
     : id === 'editor' ? !$settings.editorCollapsed
-    : id === 'ai' || id === 'style' ? $wsTab === id && !$editorFocus
+    : id === 'ai' || id === 'style' || id === 'cover' ? $wsTab === id && !$editorFocus
     : $leftTab === id;
 </script>
 

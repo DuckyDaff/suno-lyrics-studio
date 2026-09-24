@@ -24,7 +24,7 @@
     $mobileTab === 'export' ? 'export' : 'panel'
   );
   $effect(() => {
-    if ($isPhone && ['ai', 'style', 'library'].includes($mobileTab)) panelTab.set($mobileTab);
+    if ($isPhone && ['ai', 'style', 'library', 'cover'].includes($mobileTab)) panelTab.set($mobileTab);
   });
 </script>
 

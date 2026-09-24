@@ -66,6 +66,7 @@
           <div class="info">
             <div class="name">{s.title || $t('untitled')} {#if cur}<span class="tag">{$t('currentSong')}</span>{/if}</div>
             <div class="meta faint">{(s.sections || []).length} {$t('sectionsN')} · {words(s)} {$t('wordsN')} · {$t('edited')} {when(s.updatedAt)}{#if (s.versions || []).length} · {s.versions.length} {$t('versionsN')}{/if}</div>
+            {#if s.coverOf}<div class="meta faint">🎤 {$t('cvCoverOf')} {s.coverOf.title || ''}</div>{/if}
             {#if s.style}<div class="style faint">{s.style.slice(0, 120)}</div>{/if}
             {#if preview(s)}<div class="prev faint" dir="auto">{preview(s)}</div>{/if}
           </div>

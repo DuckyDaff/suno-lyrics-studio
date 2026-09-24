@@ -229,6 +229,36 @@ function buildUser(b) {
         b.persona ? `Speaker / persona: ${clean(b.persona, 200)}.` : '',
       ].filter(Boolean).join('\n');
     }
+    case 'coverSong': {
+      const src = clean(b.srcLyrics, 9000);
+      const second = b.secondLyrics ? clean(b.secondLyrics, 6000) : '';
+      return [
+        `Make a COVER VERSION of an existing song. This is a re-arrangement / re-imagining, the way a good producer covers a song: it must be recognizable as the same song, but sound native to the new form.`,
+        `RECIPE: ${clean(b.recipe, 1500)}`,
+        b.target ? `TARGET STYLE: ${clean(b.target, 400)}` : '',
+        b.targetLanguage ? `TARGET LANGUAGE for the lyrics: ${b.targetLanguage}.` : `Language for lyrics: ${lang}.`,
+        b.topic ? `NEW TOPIC: ${clean(b.topic, 400)}` : '',
+        clean(b.touchRule, 800),
+        b.notes ? `Writer's notes: ${clean(b.notes, 1200)}` : '',
+        producerTag(b),
+        blendText(b),
+        `Rules: never put artist or band names in the STYLE (describe the sound instead). Keep Suno formatting. Write section tags that make the new arrangement explicit (e.g. [Intro: piano], [Drop], [Verse 1: rap], [Chorus: both], [Bridge: niggun]). If the original has a title, the new title is the original title plus the cover flavour in parentheses, e.g. "שם השיר (גרסת רגאטון)".`,
+        `ORIGINAL SONG${b.srcTitle ? ` — "${clean(b.srcTitle, 150)}"` : ''}${b.srcStyle ? ` (original style: ${clean(b.srcStyle, 300)})` : ''}:\n${src || '(no lyrics given — work from the title and notes)'}`,
+        second ? `SECOND SONG${b.secondTitle ? ` — "${clean(b.secondTitle, 150)}"` : ''}:\n${second}` : '',
+        `Output format, exactly:`,
+        `TITLE: <new title>`,
+        `STYLE: <Suno style prompt in English, comma-separated tags: genre, mood, instruments, vocals, production, BPM — max 900 characters, no artist names>`,
+        `(blank line)`,
+        `<full lyrics of the cover version with Suno section tags>`,
+        limit,
+      ].filter(Boolean).join('\n');
+    }
+    case 'coverIdeas': {
+      return [
+        `Suggest 4 different cover-version directions for this song, one per line, no numbering. Each line: "<direction in ${lang}> — <one-line Suno style in English> — <how the chorus would feel, 6–10 words in ${lang}>". Make the four clearly different (tempo, genre, mood, performer).`,
+        `ORIGINAL SONG${b.srcTitle ? ` — "${clean(b.srcTitle, 150)}"` : ''}:\n${clean(b.srcLyrics, 4000) || clean(b.idea, 800)}`,
+      ].filter(Boolean).join('\n');
+    }
     case 'cover': {
       return [
         `Write the ART DIRECTION for this song's cover artwork (square album cover). You are briefing an image model, not a person: concrete, visual, specific. No lyrics, no explanations.`,
@@ -291,7 +321,7 @@ function stripPreamble(text, mode) {
     const i = text.search(/^\s*\[[^\]\n]{1,80}\]\s*$/m);
     return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
   }
-  if (mode === 'wild') {
+  if (mode === 'wild' || mode === 'coverSong') {
     const i = text.search(/^\s*TITLE:/mi);
     return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
   }
