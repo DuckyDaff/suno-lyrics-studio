@@ -170,6 +170,14 @@ function songContext(b) {
   return lines.join('\n');
 }
 
+const CLUB_RE = /house|techno|trance|psy|goa|drum ?& ?bass|dnb|jungle|neurofunk|jump-up|dubstep|riddim|hardstyle|rawstyle|hardcore|gabber|frenchcore|garage|2-step|bassline|eurodance|rave|italo|electro|breakbeat|big beat|club|footwork|juke|amapiano|gqom|moombahton|baile|edm|big room|future bass|dj tool|idm|chillwave/i;
+/** extra rule for electronic / club forms: keep the words few so the track can breathe */
+function clubRule(b) {
+  const f = `${b.form || ''} ${(b.mix && Object.values(b.mix).map(m => m && m.form).join(' ')) || ''}`;
+  if (!CLUB_RE.test(f)) return '';
+  return 'CLUB TRACK — lyric budget: at most 12–16 lyric lines in the whole song. Verses are 2–4 short lines (or one spoken line), the hook is 1–4 short lines that repeat, drops and grooves are instrumental tags with at most a chopped hook in parentheses. The emotional sung lines go in the [Breakdown]. Use one DJ-friendly [Intro] and one [Outro] (no duplicated section tags).';
+}
+
 function buildUser(b) {
   const lang = b.language || 'Hebrew';
   const limit = b.limit ? `Character limit for the whole lyrics: ${b.limit}.` : '';
@@ -193,6 +201,7 @@ function buildUser(b) {
         b.length === 'short' ? 'Length: short (about 12–20 lines).' : b.length === 'long' ? 'Length: long (a full 3-verse song).' : 'Length: normal (about 24–36 lines).',
         structure,
         producerTag(b),
+        clubRule(b),
         musicText(b),
         blendText(b),
         b.style ? `Match the lyrics to this Suno style prompt: ${clean(b.style, 1200)}` : '',
@@ -208,6 +217,7 @@ function buildUser(b) {
         `Language for lyrics: ${lang}.`,
         b.form && b.form !== 'auto' ? `Form: ${b.form}.` : 'Pick whichever form fits the concept best (pop, rap, opera, musical, ballad, mizrahi, punk, children…).',
         producerTag(b),
+        clubRule(b),
         musicText(b),
         blendText(b) || (b.blend ? 'Make it a GENRE / VOICE BLEND: choose two or three contrasting styles and performers for different sections (e.g. rap verses with an operatic chorus, a female rapper and a male cantor) and follow the blend rules.' : ''),
         `Output format, exactly:`,
@@ -247,6 +257,7 @@ function buildUser(b) {
         b.targetLanguage ? `TARGET LANGUAGE for the lyrics: ${b.targetLanguage}.` : `Language for lyrics: ${lang}.`,
         b.topic ? `NEW TOPIC: ${clean(b.topic, 400)}` : '',
         clean(b.touchRule, 800),
+        clubRule({ form: `${b.target || ''} ${b.recipe || ''}` }),
         b.notes ? `Writer's notes: ${clean(b.notes, 1200)}` : '',
         producerTag(b),
         blendText(b),
