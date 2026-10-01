@@ -55,7 +55,7 @@ export const GENRES = [
     prod:  ['Big drop', 'Sidechain compression', 'Build-up and release', 'Festival mix'],
     bpm:   ['126 BPM', '128 BPM', '130 BPM', '150 BPM'] }),
   f('house', 'House', 'House & Techno', {
-    genre: ['House', 'Deep House', 'Tech House', 'Disco House', 'Afro House'],
+    genre: ['House', 'Classic House', 'Piano House', 'Vocal House', 'Chicago House'],
     mood:  ['Groovy', 'Warm', 'Hypnotic', 'Late-night', 'Sexy', 'Uplifting'],
     instr: ['Four-on-the-floor kick', 'Piano chords', 'Deep bass', 'Shakers', 'Filtered disco sample', 'Organ stabs'],
     vox:   ['Soulful vocals', 'Vocal chops', 'Spoken vocal', 'No vocals'],

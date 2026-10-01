@@ -15,6 +15,7 @@
   import CoverGen from './CoverGen.svelte';
 
   import { FORM_GROUPS } from '../../lib/data/forms.js';
+  import { genreHint } from '../../lib/genreHint.js';
   const LANGS = ['Hebrew', 'English', 'Hebrew and English mixed', 'Italian', 'Spanish', 'French', 'Arabic', 'Russian', 'Yiddish', 'Ladino', 'Aramaic'];
   const RHYMES = ['auto', 'AABB', 'ABAB', 'ABCB', 'AAAA', 'free verse'];
   const VOICES = ['male rapper', 'female rapper', 'two rappers trading bars', 'male singer', 'female singer', 'male & female duet',
@@ -139,6 +140,7 @@
       ...musicPayload(),
     };
     if (mode === 'style') fields.limit = lim.style;
+    if (s.form && s.form !== 'auto') { const h = genreHint(s.form); if (h) fields.genreHint = h; }
     try {
       const r = await generate(fields, (_, full) => setGen({ output: full }), { signal: ctrl.signal });
       let text = r.text;

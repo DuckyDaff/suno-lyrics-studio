@@ -232,6 +232,9 @@ function buildUser(b) {
       return [
         `Write a Suno "Style of Music" prompt for this song: comma-separated English tags only (genre, sub-genre, mood, 2–4 instruments, vocal description, production feel, BPM). No sentences, no lyrics.`,
         `Maximum ${b.limit || 900} characters.`,
+        b.form && b.form !== 'auto' ? `GENRE / FORM: ${clean(b.form, 80)} — this decides the genre. Build the whole Style for it: the exact sub-genre name first, then its real tempo and signature sounds. If the current style below belongs to a different genre, do NOT keep it; only reuse what still fits (mood, vocal gender, language).` : '',
+        b.genreHint ? `Vocabulary that fits this genre (choose and combine, do not copy all): ${clean(b.genreHint, 700)}` : '',
+        musicText(b) ? 'Respect the chosen tempo and time signature:\n' + musicText(b) : '',
         `Brief: ${clean(b.idea, 2000) || '(infer from the lyrics)'}`,
         blendText(b) ? blendText(b) + '\nThe style prompt must name each blended style and each voice.' : '',
         songContext(b),
