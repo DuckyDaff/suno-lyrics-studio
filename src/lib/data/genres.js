@@ -5,7 +5,7 @@
  */
 const f = (id, label, group, d) => ({ id, label, group, ...d });
 
-export const GENRE_GROUPS = ['Pop', 'Electronic', 'Urban', 'Rock', 'Soul & Funk', 'Jazz & Blues',
+export const GENRE_GROUPS = ['Pop', 'Electronic', 'House & Techno', 'Urban', 'Rock', 'Soul & Funk', 'Jazz & Blues',
   'Acoustic', 'Cinematic', 'Chill', 'Israeli & Mediterranean', 'Latin & Caribbean', 'World'];
 
 export const GENRES = [
@@ -54,14 +54,14 @@ export const GENRES = [
     vox:   ['Female vocals', 'Vocal chops', 'Anthemic vocal hook', 'No vocals'],
     prod:  ['Big drop', 'Sidechain compression', 'Build-up and release', 'Festival mix'],
     bpm:   ['126 BPM', '128 BPM', '130 BPM', '150 BPM'] }),
-  f('house', 'House', 'Electronic', {
+  f('house', 'House', 'House & Techno', {
     genre: ['House', 'Deep House', 'Tech House', 'Disco House', 'Afro House'],
     mood:  ['Groovy', 'Warm', 'Hypnotic', 'Late-night', 'Sexy', 'Uplifting'],
     instr: ['Four-on-the-floor kick', 'Piano chords', 'Deep bass', 'Shakers', 'Filtered disco sample', 'Organ stabs'],
     vox:   ['Soulful vocals', 'Vocal chops', 'Spoken vocal', 'No vocals'],
     prod:  ['Filtered build', 'Sidechain pump', 'Warm analog mix', 'Loop-based'],
     bpm:   ['120 BPM', '122 BPM', '124 BPM', '126 BPM'] }),
-  f('techno', 'Techno', 'Electronic', {
+  f('techno', 'Techno', 'House & Techno', {
     genre: ['Techno', 'Melodic Techno', 'Industrial Techno', 'Minimal Techno', 'Peak-time Techno'],
     mood:  ['Dark', 'Hypnotic', 'Relentless', 'Cold', 'Driving', 'Tense'],
     instr: ['Pounding kick', 'Acid bass', 'Modular synth', 'Metallic percussion', 'Rumble bass', 'Arpeggiator'],
@@ -91,6 +91,141 @@ export const GENRES = [
     bpm:   ['140 BPM', '145 BPM', '150 BPM'] }),
 
   // ── Urban ────────────────────────────────────────────────────────
+  // ── Electronic (more) ────────────────────────────────────────────
+  f('psytrance', 'Psytrance / Goa', 'Electronic', {
+    genre: ['Psytrance', 'Full-on Psy', 'Progressive Psytrance', 'Goa Trance', 'Dark Psy'],
+    mood:  ['Psychedelic', 'Hypnotic', 'Euphoric', 'Driving', 'Cosmic'],
+    instr: ['Rolling 16th bassline', 'Acid lead', 'Psychedelic FX', 'Kick drum', 'Eastern melody', 'Spoken word sample'],
+    vox:   ['No vocals', 'Spoken samples', 'Chanted vocal', 'Ethereal female vocal'],
+    prod:  ['Forest party energy', 'Long build', 'Stereo panning FX', 'Tight low end'],
+    bpm:   ['140 BPM', '142 BPM', '145 BPM', '148 BPM'] }),
+  f('hardstyle', 'Hardstyle / Hardcore', 'Electronic', {
+    genre: ['Hardstyle', 'Euphoric Hardstyle', 'Rawstyle', 'Hardcore', 'Frenchcore'],
+    mood:  ['Anthemic', 'Aggressive', 'Euphoric', 'Massive', 'Relentless'],
+    instr: ['Reverse bass kick', 'Screech lead', 'Supersaw', 'Distorted kick', 'Orchestral hits', 'Risers'],
+    vox:   ['Anthemic chant', 'MC vocals', 'Female vocals', 'Pitched vocal'],
+    prod:  ['Massive climax', 'Festival mix', 'Big breakdown', 'Hard compression'],
+    bpm:   ['150 BPM', '155 BPM', '160 BPM', '180 BPM'] }),
+  f('futurebass', 'Future Bass / Melodic Bass', 'Electronic', {
+    genre: ['Future Bass', 'Melodic Bass', 'Melodic Dubstep', 'Color Bass', 'Kawaii Future Bass'],
+    mood:  ['Bright', 'Emotional', 'Euphoric', 'Dreamy', 'Uplifting'],
+    instr: ['Wide supersaw chords', 'Vocal chops', 'Sub bass', 'Snare rolls', 'Pluck synth', 'Pitch-bend leads'],
+    vox:   ['Female vocals', 'Pitched vocal chops', 'Airy vocals'],
+    prod:  ['Sidechained chords', 'Big drop', 'Glossy mix', 'Half-time groove'],
+    bpm:   ['140 BPM', '150 BPM', '160 BPM'] }),
+  f('electro', 'Electro / Breakbeat', 'Electronic', {
+    genre: ['Electro', 'Breakbeat', 'Big Beat', 'Electro Swing', 'Electroclash'],
+    mood:  ['Funky', 'Gritty', 'Playful', 'Energetic', 'Retro'],
+    instr: ['Breakbeat drums', '808 cowbell', 'Vocoder', 'Brass samples', 'Funky bass', 'Scratches'],
+    vox:   ['Vocoder', 'Robotic vocal', 'Female vocals', 'Rap verse'],
+    prod:  ['Chopped breaks', 'Filter sweeps', 'Punchy mix', 'Retro sampling'],
+    bpm:   ['115 BPM', '125 BPM', '130 BPM', '135 BPM'] }),
+  f('eurodance', 'Eurodance / 90s Rave', 'Electronic', {
+    genre: ['Eurodance', '90s Rave', 'Happy Hardcore', 'Hands Up', 'Italo Dance'],
+    mood:  ['Euphoric', 'Nostalgic', 'Energetic', 'Fun', 'Uplifting'],
+    instr: ['Supersaw stabs', 'Rave piano', 'Hoover synth', 'Four-on-the-floor kick', 'Offbeat bass'],
+    vox:   ['Female sung chorus', 'Male rap verse', 'Diva vocals'],
+    prod:  ['90s production', 'Big chorus', 'Rave energy'],
+    bpm:   ['130 BPM', '135 BPM', '140 BPM', '160 BPM'] }),
+  f('hyperpop', 'Hyperpop', 'Electronic', {
+    genre: ['Hyperpop', 'Digicore', 'Glitchcore', 'Bubblegum Bass'],
+    mood:  ['Chaotic', 'Playful', 'Hyper', 'Glossy', 'Emotional'],
+    instr: ['Distorted 808', 'Glitch FX', 'Pitched synths', 'Chiptune leads', 'Trap hats'],
+    vox:   ['Pitched-up vocals', 'Autotuned vocals', 'Female vocals'],
+    prod:  ['Maximalist', 'Clipping on purpose', 'Sudden switches'],
+    bpm:   ['140 BPM', '150 BPM', '160 BPM'] }),
+  f('idm', 'IDM / Glitch', 'Electronic', {
+    genre: ['IDM', 'Glitch', 'Braindance', 'Experimental Electronic'],
+    mood:  ['Cerebral', 'Intricate', 'Melancholic', 'Curious', 'Alien'],
+    instr: ['Granular textures', 'Glitch percussion', 'Modular synth', 'Detuned pads', 'Field recordings'],
+    vox:   ['No vocals', 'Processed vocal fragments'],
+    prod:  ['Complex rhythms', 'Micro-edits', 'Spatial mix'],
+    bpm:   ['90 BPM', '110 BPM', '130 BPM'] }),
+  // ── House & Techno ──────────────────────────────────────────────
+  f('techhouse', 'Tech House', 'House & Techno', {
+    genre: ['Tech House', 'Groovy Tech House', 'Minimal Tech', 'Latin Tech House'],
+    mood:  ['Groovy', 'Cheeky', 'Rolling', 'Late-night', 'Bouncy'],
+    instr: ['Rolling bassline', 'Shuffled hi-hats', 'Punchy kick', 'Percussion loops', 'Vocal chops', 'Stabs'],
+    vox:   ['Spoken vocal hook', 'Chopped vocal', 'Male talk-sung vocal', 'No vocals'],
+    prod:  ['DJ-friendly intro and outro', 'Tight low end', 'Filter build', 'Club mix'],
+    bpm:   ['124 BPM', '125 BPM', '126 BPM', '128 BPM'] }),
+  f('deephouse', 'Deep House', 'House & Techno', {
+    genre: ['Deep House', 'Soulful House', 'Lo-Fi House', 'Garage House'],
+    mood:  ['Warm', 'Sensual', 'Smooth', 'Late-night', 'Dreamy'],
+    instr: ['Rhodes chords', 'Deep sub bass', 'Soft kick', 'Shakers', 'Pads', 'Organ'],
+    vox:   ['Soulful vocals', 'Whispered vocal', 'Female vocals'],
+    prod:  ['Warm analog mix', 'Subtle sidechain', 'Long grooves'],
+    bpm:   ['118 BPM', '120 BPM', '122 BPM', '124 BPM'] }),
+  f('afrohouse', 'Afro / Melodic House', 'House & Techno', {
+    genre: ['Afro House', 'Melodic House', 'Organic House', 'Melodic House & Techno'],
+    mood:  ['Hypnotic', 'Emotive', 'Spiritual', 'Sunset', 'Tribal'],
+    instr: ['Tribal percussion', 'Arpeggiated synth', 'Emotive pads', 'Kalimba', 'Deep bass', 'Hand drums'],
+    vox:   ['Chanted vocals', 'Ethereal vocals', 'Male vocal mantra'],
+    prod:  ['Long builds', 'Sunset set energy', 'Spacious reverb'],
+    bpm:   ['118 BPM', '120 BPM', '122 BPM', '124 BPM'] }),
+  f('progressive', 'Progressive House', 'House & Techno', {
+    genre: ['Progressive House', 'Melodic Progressive', 'Big Room Progressive'],
+    mood:  ['Uplifting', 'Emotional', 'Building', 'Euphoric', 'Cinematic'],
+    instr: ['Plucks', 'Supersaw pads', 'Piano', 'Rolling bass', 'Risers'],
+    vox:   ['Female vocals', 'Male vocals', 'No vocals'],
+    prod:  ['Long build-up', 'Euphoric drop', 'Wide stereo'],
+    bpm:   ['124 BPM', '126 BPM', '128 BPM'] }),
+  f('melodictechno', 'Melodic Techno', 'House & Techno', {
+    genre: ['Melodic Techno', 'Afterlife-style Techno', 'Progressive Techno'],
+    mood:  ['Dark', 'Emotional', 'Hypnotic', 'Cinematic', 'Melancholic'],
+    instr: ['Dark arpeggios', 'Analog bass', 'Pounding kick', 'Atmospheric pads', 'Strings'],
+    vox:   ['No vocals', 'Haunting vocal', 'Spoken vocal'],
+    prod:  ['Epic breakdown', 'Big room reverb', 'Slow-burn build'],
+    bpm:   ['122 BPM', '124 BPM', '126 BPM', '128 BPM'] }),
+  f('hardtechno', 'Hard Techno / Rave', 'House & Techno', {
+    genre: ['Hard Techno', 'Peak-time Techno', 'Industrial Techno', 'Acid Techno', 'Schranz'],
+    mood:  ['Relentless', 'Aggressive', 'Raw', 'Euphoric', 'Dark'],
+    instr: ['Distorted kick', 'Acid 303 line', 'Rave stabs', 'Metallic percussion', 'Rumble'],
+    vox:   ['No vocals', 'Shouted vocal sample', 'Rave chant'],
+    prod:  ['Warehouse energy', 'Hard compression', 'Fast builds'],
+    bpm:   ['140 BPM', '145 BPM', '150 BPM', '155 BPM'] }),
+  f('minimal', 'Minimal / Microhouse', 'House & Techno', {
+    genre: ['Minimal', 'Microhouse', 'Minimal Techno', 'Rominimal'],
+    mood:  ['Subtle', 'Hypnotic', 'Cool', 'Groovy', 'Mysterious'],
+    instr: ['Clicky percussion', 'Sub bass', 'Micro samples', 'Minimal synth stabs'],
+    vox:   ['No vocals', 'Vocal snippets'],
+    prod:  ['Sparse arrangement', 'Long evolving loop'],
+    bpm:   ['124 BPM', '126 BPM', '128 BPM'] }),
+  f('bassslap', 'Bass / Slap House', 'House & Techno', {
+    genre: ['Bass House', 'Slap House', 'Brazilian Bass', 'Future House'],
+    mood:  ['Punchy', 'Bouncy', 'Dark', 'Energetic', 'Moody'],
+    instr: ['Slap bass', 'Growl bass', 'Punchy kick', 'Plucks', 'Vocal chops'],
+    vox:   ['Deep male vocals', 'Female vocals', 'Chopped vocal'],
+    prod:  ['Heavy drop', 'Sidechain', 'Radio-club mix'],
+    bpm:   ['120 BPM', '124 BPM', '126 BPM'] }),
+  f('nudisco', 'Nu-Disco / Indie Dance', 'House & Techno', {
+    genre: ['Nu-Disco', 'Indie Dance', 'Disco House', 'French House'],
+    mood:  ['Funky', 'Glamorous', 'Sunny', 'Groovy', 'Nostalgic'],
+    instr: ['Disco guitar', 'Funky bass', 'Strings', 'Filtered samples', 'Clavinet'],
+    vox:   ['Falsetto vocals', 'Female vocals', 'Vocoder'],
+    prod:  ['Filter house', 'Warm groove', 'Retro polish'],
+    bpm:   ['110 BPM', '116 BPM', '120 BPM', '124 BPM'] }),
+  f('ukg', 'UK Garage / 2-Step', 'House & Techno', {
+    genre: ['UK Garage', '2-Step', 'Speed Garage', 'Bassline'],
+    mood:  ['Swung', 'Smooth', 'Bouncy', 'Late-night', 'Cheeky'],
+    instr: ['Shuffled 2-step drums', 'Pitched vocal chops', 'Organ bass', 'Sub bass', 'Chords'],
+    vox:   ['R&B female vocals', 'MC vocals', 'Pitched vocal chops'],
+    prod:  ['Swung groove', 'Chopped vocals', 'Club mix'],
+    bpm:   ['130 BPM', '132 BPM', '134 BPM', '138 BPM'] }),
+  f('jerseyclub', 'Jersey / Baltimore Club', 'House & Techno', {
+    genre: ['Jersey Club', 'Baltimore Club', 'Footwork', 'Juke'],
+    mood:  ['Bouncy', 'Hyped', 'Playful', 'Energetic'],
+    instr: ['Kick triplets', 'Bed-squeak sample', 'Chopped vocal samples', 'Claps', '808'],
+    vox:   ['Chopped vocal samples', 'Rap vocals', 'Female vocals'],
+    prod:  ['Dance challenge energy', 'Chopped edits'],
+    bpm:   ['130 BPM', '140 BPM', '160 BPM'] }),
+  f('orientalhouse', 'Oriental / Mizrahi House', 'House & Techno', {
+    genre: ['Oriental House', 'Mizrahi Dance', 'Ethnic House', 'Middle Eastern Techno'],
+    mood:  ['Hypnotic', 'Festive', 'Exotic', 'Driving', 'Celebratory'],
+    instr: ['Darbuka', 'Oud riff', 'Four-on-the-floor kick', 'Qanun', 'Deep bass', 'Hand claps'],
+    vox:   ['Hebrew chant', 'Male mizrahi vocals', 'Female vocals'],
+    prod:  ['Club mix', 'Long build', 'Wedding-dancefloor energy'],
+    bpm:   ['120 BPM', '124 BPM', '126 BPM', '128 BPM'] }),
   f('hiphop', 'Hip-Hop', 'Urban', {
     genre: ['Hip-Hop', 'Boom Bap', 'Conscious Hip-Hop', 'East Coast Hip-Hop', 'Old School Hip-Hop'],
     mood:  ['Confident', 'Gritty', 'Laid-back', 'Nostalgic', 'Reflective', 'Raw'],

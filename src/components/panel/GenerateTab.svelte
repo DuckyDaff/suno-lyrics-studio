@@ -14,10 +14,7 @@
   import Icon from '../ui/Icon.svelte';
   import CoverGen from './CoverGen.svelte';
 
-  const FORMS = ['pop song', 'ballad', 'rap / hip-hop', 'trap', 'drill', 'rock anthem', 'punk', 'metal', 'opera', 'musical theatre',
-    'disney musical', 'mizrahi', 'israeli rock', 'piyyut / religious', 'hasidic', 'children\'s song', 'lullaby', 'folk', 'country', 'jazz', 'blues',
-    'gospel', 'reggae', 'reggaeton', 'afrobeats', 'k-pop', 'synthwave', 'spoken word', 'poem', 'parody / comedy', 'wedding song',
-    'birthday song', 'love song', 'breakup song', 'protest song', 'anthem', 'christmas / holiday', 'chanukah / jewish holiday'];
+  import { FORM_GROUPS } from '../../lib/data/forms.js';
   const LANGS = ['Hebrew', 'English', 'Hebrew and English mixed', 'Italian', 'Spanish', 'French', 'Arabic', 'Russian', 'Yiddish', 'Ladino', 'Aramaic'];
   const RHYMES = ['auto', 'AABB', 'ABAB', 'ABCB', 'AAAA', 'free verse'];
   const VOICES = ['male rapper', 'female rapper', 'two rappers trading bars', 'male singer', 'female singer', 'male & female duet',
@@ -196,7 +193,7 @@
 
     <div class="grid">
       <label class="f"><span>{$t('aiForm')}</span>
-        <select class="field" bind:value={$g.form}>{#each FORMS as f}<option value={f}>{f}</option>{/each}</select></label>
+        <select class="field" bind:value={$g.form}>{#each FORM_GROUPS as fg}<optgroup label={$settings.lang === 'he' ? fg.he : fg.en}>{#each fg.items as f}<option value={f}>{f}</option>{/each}</optgroup>{/each}</select></label>
       <label class="f"><span>{$t('aiLang')}</span>
         <select class="field" bind:value={$g.language}>{#each LANGS as l}<option value={l}>{l}</option>{/each}</select></label>
       <label class="f"><span>{$t('aiRhyme')}</span>
@@ -266,7 +263,7 @@
             <span class="slot">{$t(lbl)}</span>
             <select class="field" bind:value={$g.mix[k].form}>
               <option value="">{$t('aiSameAsMain')}</option>
-              {#each FORMS as f}<option value={f}>{f}</option>{/each}
+              {#each FORM_GROUPS as fg}<optgroup label={$settings.lang === 'he' ? fg.he : fg.en}>{#each fg.items as f}<option value={f}>{f}</option>{/each}</optgroup>{/each}
             </select>
             <select class="field" bind:value={$g.mix[k].voice}>
               <option value="">{$t('aiAutoVoice')}</option>
