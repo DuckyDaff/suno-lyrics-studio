@@ -163,4 +163,5 @@ export default {
   arTag: 'Intro signature (ad-lib)', arExclude: 'Never (Exclude)', arLook: 'Cover visual identity', arNotes: 'Notes',
   arNotesPh: 'e.g. the artist\'s Persona name in Suno', arSave: 'Save artist', arNameNeeded: 'The artist needs a name',
   arConfirmDelete: 'Delete the artist "{name}"? Its songs stay.', arTagFrom: '({name})',
+  aiIdeaClearTitle: 'Clear the whole brief', aiIdeaRestore: 'Restore',
 };

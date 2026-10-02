@@ -72,6 +72,11 @@
     } catch (e) { if (e.code !== 'aborted') toast($t('aiErr_' + e.code) !== 'aiErr_' + e.code ? $t('aiErr_' + e.code) : $t('aiErr_api_error'), 'error'); }
     finally { ideasBusy = false; }
   }
+  /* clear the brief; the last cleared text can be brought back until the user types again */
+  let clearedIdea = $state('');
+  function clearIdea() { clearedIdea = $g.idea; setGen({ idea: '' }); ideas = []; }
+  function restoreIdea() { setGen({ idea: clearedIdea }); clearedIdea = ''; }
+  $effect(() => { if ($g.idea) clearedIdea = ''; });
   function useIdea(txt) { setGen({ idea: txt }); ideas = []; toast($t('aiIdeaSet'), 'success'); }
 
   /* ── musical structure ───────────────────────────────────────── */
@@ -191,9 +196,13 @@
     <ArtistBar />
     <div class="ideaHd">
       <label for="ai-idea">{$t('aiIdea')}</label>
+      <span class="ideaTools">
+      {#if $g.idea.trim()}<button class="clrBtn" onclick={clearIdea} title={$t('aiIdeaClearTitle')}>🗑 {$t('clear')}</button>
+      {:else if clearedIdea}<button class="clrBtn" onclick={restoreIdea}>↩ {$t('aiIdeaRestore')}</button>{/if}
       <button class="ideaBtn" onclick={suggestIdeas} disabled={ideasBusy || $busy} title={$t('aiIdeasTitle')}>
         💡 {ideasBusy ? $t('aiIdeasBusy') : ideas.length ? $t('aiIdeasMore') : $t('aiIdeas')}
       </button>
+      </span>
     </div>
     <textarea id="ai-idea" class="field" rows="4" bind:value={$g.idea} placeholder={$t('aiIdeaPh')}></textarea>
     {#if ideas.length}
@@ -406,6 +415,9 @@
   .result:empty { display: none; }
   .brief { display: flex; flex-direction: column; gap: 8px; }
   .ideaHd { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ideaTools { display: flex; gap: 6px; align-items: center; }
+  .clrBtn { padding: 5px 11px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 700; color: var(--tx1); background: var(--bg2); border: 1px solid var(--line); white-space: nowrap; }
+  .clrBtn:hover { color: var(--err); border-color: color-mix(in srgb, var(--err) 45%, transparent); }
   .ideaBtn { padding: 5px 11px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 700; color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, transparent); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); white-space: nowrap; }
   .ideaBtn:hover:not(:disabled) { background: color-mix(in srgb, var(--warn) 22%, transparent); }
   .ideas { list-style: none; display: flex; flex-direction: column; gap: 6px; }

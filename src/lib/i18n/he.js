@@ -172,4 +172,5 @@ export default {
   arTag: 'חתימת אינטרו (אד-ליב)', arExclude: 'לעולם לא (Exclude)', arLook: 'שפה ויזואלית לעטיפות', arNotes: 'הערות',
   arNotesPh: 'למשל: שם הפרסונה של האמן בסונו', arSave: 'שמור אמן', arNameNeeded: 'צריך שם לאמן',
   arConfirmDelete: 'למחוק את האמן "{name}"? השירים שלו נשארים.', arTagFrom: '(של {name})',
+  aiIdeaClearTitle: 'מחק את כל הטקסט ב״על מה השיר״', aiIdeaRestore: 'החזר',
 };
