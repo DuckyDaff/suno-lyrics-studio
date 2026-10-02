@@ -170,7 +170,7 @@ function artistText(b) {
   if (!a || typeof a !== 'object') return '';
   const name = clean(a.name, 60) || 'this artist';
   const L = [];
-  if (STYLE_MODES.has(b.mode) && a.sound) L.push(`- Signature sound, it must open every Style in this wording: ${clean(a.sound, 500)}. If the chosen form is another genre, make it ${name}'s take on that form: keep the signature voice, key sounds and production, and bring the new genre in around them.`);
+  if (STYLE_MODES.has(b.mode) && a.sound) L.push(`- Signature sound, it must open every Style in this wording: ${clean(a.sound, 500)}. If the chosen form is another genre, make it ${name}'s take on that form: keep the signature voice, key sounds and production, and bring the new genre in around them. The Style has exactly ONE BPM: the tempo of this song's form (drop any BPM from the signature).`);
   if ((STYLE_MODES.has(b.mode) || WORD_MODES.has(b.mode)) && a.voice) L.push(`- Signature voice: ${clean(a.voice, 200)}${STYLE_MODES.has(b.mode) ? ' (name it in the Style)' : ' (write for this voice)'}.`);
   if (WORD_MODES.has(b.mode) && a.writing) L.push(`- Writing identity (themes, point of view, vocabulary, motifs): ${clean(a.writing, 600)}. Use it as a voice, not a template: never reuse whole lines from other songs, at most one recurring signature motif per song.`);
   if (b.mode === 'cover' && a.look) L.push(`- Visual identity shared by all ${name} covers (keep it, so the releases look like one catalogue): ${clean(a.look, 400)}`);
@@ -337,7 +337,7 @@ function buildUser(b) {
         `NAME: <artist / DJ name, Latin letters, short and memorable, never a real artist's name>`,
         `EMOJI: <one emoji>`,
         `FORM: <the home genre, copied exactly from this list: ${clean(b.formList, 2600)}>`,
-        `SOUND: <the signature sound core as English Suno tags, 6–10 comma-separated tags, 120–220 characters: exact sub-genre, 2–3 signature instruments or sound-design elements, a production fingerprint, the typical BPM. This line is pasted at the start of every Style, so it must work with any song of the artist. No artist names.>`,
+        `SOUND: <the signature sound core as English Suno tags, 6–10 comma-separated tags, 120–220 characters: exact sub-genre, 2–3 signature instruments or sound-design elements, a production fingerprint. NO BPM here: the tempo follows each song's form. This line is pasted at the start of every Style, so it must work with any song of the artist. No artist names.>`,
         `VOICE: <the signature vocal in English, 4–10 words, e.g. "deep male baritone, half-spoken, dark reverb">`,
         `WRITING: <in ${lang}: themes, point of view, vocabulary and one or two recurring motifs, 1–2 sentences>`,
         `TAG: <a short spoken intro ad-lib signature in Latin letters, like "It's a Denver Production">`,
