@@ -8,7 +8,6 @@
     { id: 'songs',   icon: 'music',    label: $t('navSongs') },
     { id: 'ai',      icon: 'sparkles', label: $t('wsCreate') },
     { id: 'cover',   icon: 'music',    label: $t('wsCover') },
-    { id: 'style',   icon: 'sliders',  label: $t('wsStyle') },
     { id: 'editor',  icon: 'pen',      label: $t('navEditor') },
     { id: 'library', icon: 'library',  label: $t('navLibrary') },
     { id: 'studio',  icon: 'grid',     label: $t('navStudio') },

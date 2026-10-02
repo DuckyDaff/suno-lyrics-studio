@@ -1,7 +1,6 @@
 <script>
   import { panelTab, isPhone } from '../../lib/ui.js';
   import { t } from '../../lib/i18n.js';
-  import StyleTab from './StyleTab.svelte';
   import LibraryTab from './LibraryTab.svelte';
   import StudioTab from './StudioTab.svelte';
   import GenerateTab from './GenerateTab.svelte';
@@ -10,7 +9,6 @@
   const tabs = $derived([
     { id: 'ai',      label: '✨ ' + $t('tabAI') },
     { id: 'cover',   label: '🎤 ' + $t('wsCover') },
-    { id: 'style',   label: $t('tabStyle') },
     { id: 'library', label: $t('tabLibrary') },
     { id: 'studio',  label: $t('navStudio') },
   ]);
@@ -25,7 +23,6 @@
   <div class="body">
     {#if $panelTab === 'ai'}<GenerateTab />
     {:else if $panelTab === 'cover'}<CoverTab />
-    {:else if $panelTab === 'style'}<StyleTab />
     {:else if $panelTab === 'library'}<LibraryTab />
     {:else}<StudioTab />{/if}
   </div>

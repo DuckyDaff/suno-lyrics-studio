@@ -80,7 +80,7 @@ export default {
   tabAI: 'יצירה', aiIdea: 'על מה השיר?', aiIdeaPh: 'כל רעיון — "אופרה על פינגווין שמנהל בנק בתל אביב", "ראפ על אמא שלי", "בלדה על גשם בחיפה"...',
   aiForm: 'צורה', aiLang: 'שפה', aiRhyme: 'חריזה', aiLength: 'אורך', aiShort: 'קצר', aiNormal: 'רגיל', aiLong: 'ארוך',
   aiPersonaPh: 'מי מדבר? (אופציונלי) — "גבר שבור לב", "ילדה בת 8", "רובוט מאוהב"', aiExtraPh: 'הוראות נוספות (אופציונלי) — "בלי קלישאות", "עם משפט באנגלית בפזמון"',
-  aiUseStyle: 'להתאים ל-Style הנוכחי', aiUseStructure: 'לפי הסקשנים הקיימים', aiModel: 'מודל', aiQuality: 'איכות (Opus)', aiFast: 'מהיר (Sonnet)',
+  aiUseStyle: 'המילים יתאימו ל-Style הזה', aiUseStructure: 'לפי הסקשנים הקיימים', aiModel: 'מודל', aiQuality: 'איכות (Opus)', aiFast: 'מהיר (Sonnet)',
   aiCover: 'עטיפה', aiCoverTitle: 'ארט-דיירקשן לעטיפת השיר — פרומפטים מוכנים ל-ComfyUI / Stable Diffusion / Flux / ג׳מיני', aiCoverMain: 'פרומפט ראשי (ComfyUI / SD / Flux)', aiCoverNegative: 'Negative prompt', aiCoverPhoto: 'וריאציה: צילומי', aiCoverIllustrated: 'וריאציה: מאויר', aiCoverMinimal: 'וריאציה: מינימליסטי', aiCoverGemini: 'לג׳מיני (שפה טבעית)', aiCoverText: 'טקסט לעטיפה (להוסיף אחרי היצירה)',
   aiCoverSave: 'שמור עם השיר', aiCoverSaved: 'ארט-דיירקשן נשמר עם השיר', aiCoverCopyMain: 'העתק ראשי', aiCoverHint: 'הדבק את הפרומפט הראשי ב-ComfyUI (או את גרסת ג׳מיני ב-Gemini). התמונות יוצאות בלי טקסט — את שם השיר מוסיפים אחר כך.',
   comfyTitle: 'ComfyUI — יצירת עטיפות במחשב שלך', comfyWhy: 'האתר מדבר ישירות עם ה-ComfyUI שרץ על המחשב הזה (בלי לחשוף אותו לאינטרנט). עובד רק בדפדפן על המחשב שבו ComfyUI פועל.',
@@ -157,4 +157,19 @@ export default {
   loginTitle: 'התחברות', registerTitle: 'הרשמה', username: 'שם משתמש', password: 'סיסמה', email: 'אימייל',
   loginBtn: 'התחבר', registerBtn: 'הירשם', noAccount: 'אין לך חשבון?', haveAccount: 'יש לך חשבון?',
   loginError: 'ההתחברות נכשלה',
+  // Style box inside Create
+  sbAi: 'כתוב Style עם AI', sbRoll: 'הגרל בסגנון', sbSurprise: 'הפתע אותי', sbSurpriseTitle: 'סגנון אקראי מהרשימה, גם הסגנון של היצירה מתעדכן',
+  sbHint: 'אותה רשימת סגנונות של היצירה: מה שבחרת ב"צורה" קובע גם את ה-Style.', sbBefore: 'לפני השינוי', sbSig: 'כולל חתימת {name}',
+  aiLyricsBox: 'מילים', cancel: 'ביטול',
+  // artists ("hats")
+  arTitle: 'אמן', arNone: 'ללא', arNew: 'אמן חדש', arEdit: 'ערוך', arAll: 'כל האמנים', arNoArtist: 'ללא אמן',
+  arIntro: 'צור אמן (כובע) עם סאונד, קול וחתימה קבועים. כל שיר שתיצור תחתיו יישמע כמו אותו דיג׳יי. אפשר כמה אמנים שונים.',
+  arDescPh: 'תאר את האמן במילים שלך, למשל: דיג׳יי מלודיק טכנו אפל עם נגיעות מזרחיות וקול גברי עמוק',
+  arAi: 'בנה עם AI', arAiBusy: 'בונה…', arAiDone: 'האמן מולא, עבור ושמור', arFromSong: 'מהשיר הנוכחי', arFromSongTitle: 'בנה את זהות האמן מה-Style והמילים של השיר הפתוח',
+  arName: 'שם האמן', arEmoji: 'סמל', arForm: 'סגנון הבית', arFormAny: 'לא קבוע',
+  arSound: 'חתימת סאונד (נכנסת בתחילת כל Style)', arSoundHint: 'תגיות באנגלית. זה הסימן המזהה: אותן מילים, באותו סדר, בכל שיר.',
+  arVoice: 'קול קבוע', arWriting: 'זהות כתיבה', arWritingPh: 'נושאים, נקודת מבט, סלנג, מוטיב חוזר…',
+  arTag: 'חתימת אינטרו (אד-ליב)', arExclude: 'לעולם לא (Exclude)', arLook: 'שפה ויזואלית לעטיפות', arNotes: 'הערות',
+  arNotesPh: 'למשל: שם הפרסונה של האמן בסונו', arSave: 'שמור אמן', arNameNeeded: 'צריך שם לאמן',
+  arConfirmDelete: 'למחוק את האמן "{name}"? השירים שלו נשארים.', arTagFrom: '(של {name})',
 };

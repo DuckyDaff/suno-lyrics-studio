@@ -14,6 +14,7 @@ export const settings = persisted('melodraft_v2_settings', {
   producerTags: ["It's a Denver Production"],   // saved signatures to pick from
   autoNikud: true,
   comfyUrl: 'http://127.0.0.1:8188', comfyEngine: 'sdxl', comfyModels: {}, comfySize: null, comfyCustom: null,
+  artistId: '',         // active artist ("hat") — '' = none
   kidName: 'גאלה',     // Gala mode: the child's name     // vocalize Hebrew AI output automatically
 }, {
   // carry over v1 preferences

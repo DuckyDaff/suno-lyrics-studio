@@ -6,7 +6,7 @@
 const f = (id, label, group, d) => ({ id, label, group, ...d });
 
 export const GENRE_GROUPS = ['Pop', 'Electronic', 'House & Techno', 'Urban', 'Rock', 'Soul & Funk', 'Jazz & Blues',
-  'Acoustic', 'Cinematic', 'Chill', 'Israeli & Mediterranean', 'Latin & Caribbean', 'World'];
+  'Acoustic', 'Cinematic', 'Kids & Occasions', 'Chill', 'Israeli & Mediterranean', 'Latin & Caribbean', 'World'];
 
 export const GENRES = [
   // ── Pop ──────────────────────────────────────────────────────────
@@ -503,6 +503,56 @@ export const GENRES = [
     vox:   ['Female vocals', 'Male vocals', 'Group vocals', 'High-energy vocals'],
     prod:  ['Polished production', 'Key change', 'Big chorus', 'Dense arrangement'],
     bpm:   ['128 BPM', '140 BPM', '150 BPM', '165 BPM'] }),
+  // ── Stage, kids, occasions, spoken ──────────────────────────────
+  f('opera', 'Opera / Classical', 'Cinematic', {
+    genre: ['Opera', 'Operatic Pop', 'Classical Crossover', 'Aria', 'Neoclassical'],
+    mood:  ['Dramatic', 'Majestic', 'Passionate', 'Tragic', 'Grand', 'Soaring'],
+    instr: ['Full orchestra', 'Strings', 'French horns', 'Timpani', 'Grand piano', 'Harpsichord'],
+    vox:   ['Soprano', 'Tenor', 'Operatic vocals', 'Bel canto vocals', 'Choir'],
+    prod:  ['Concert hall reverb', 'Orchestral arrangement', 'Dynamic crescendos', 'Live recording feel'],
+    bpm:   ['60 BPM', '72 BPM', '84 BPM', '96 BPM'] }),
+  f('musical', 'Musical Theatre / Broadway', 'Cinematic', {
+    genre: ['Musical Theatre', 'Broadway', 'Show Tune', 'West End Musical', 'Theatrical Pop'],
+    mood:  ['Theatrical', 'Hopeful', 'Witty', 'Heartfelt', 'Triumphant', 'Playful'],
+    instr: ['Pit orchestra', 'Piano', 'Brass section', 'Strings', 'Snare rolls', 'Woodwinds'],
+    vox:   ['Belting female lead', 'Male lead vocals', 'Ensemble chorus', 'Duet', 'Spoken interjections'],
+    prod:  ['Stage musical production', 'Key change finale', 'Big ensemble ending', 'Dynamic storytelling'],
+    bpm:   ['80 BPM', '100 BPM', '120 BPM', '138 BPM'] }),
+  f('kids', "Children's Song", 'Kids & Occasions', {
+    genre: ["Children's Song", 'Kids Pop', 'Sing-along', 'Nursery Rhyme', 'Educational Song'],
+    mood:  ['Playful', 'Cheerful', 'Silly', 'Bright', 'Bouncy', 'Sweet'],
+    instr: ['Ukulele', 'Glockenspiel', 'Xylophone', 'Handclaps', 'Acoustic guitar', 'Toy piano'],
+    vox:   ['Kids choir', 'Friendly female vocals', 'Friendly male vocals', 'Call-and-response vocals'],
+    prod:  ['Simple catchy melody', 'Clean bright mix', 'Repetitive chorus', 'Sing-along hook'],
+    bpm:   ['100 BPM', '110 BPM', '120 BPM', '128 BPM'] }),
+  f('lullaby', 'Lullaby', 'Kids & Occasions', {
+    genre: ['Lullaby', 'Cradle Song', 'Gentle Folk Lullaby', 'Music Box Lullaby'],
+    mood:  ['Soothing', 'Tender', 'Calm', 'Sleepy', 'Warm', 'Dreamy'],
+    instr: ['Music box', 'Soft piano', 'Harp', 'Nylon guitar', 'Celesta', 'Soft strings'],
+    vox:   ['Soft female vocals', 'Whispered vocals', 'Gentle male vocals', 'Humming'],
+    prod:  ['Intimate', 'Soft dynamics', 'Warm close-mic', 'Minimal arrangement'],
+    bpm:   ['60 BPM', '66 BPM', '70 BPM', '76 BPM'] }),
+  f('holiday', 'Christmas / Holiday', 'Kids & Occasions', {
+    genre: ['Christmas Song', 'Holiday Pop', 'Festive Jazz', 'Winter Ballad'],
+    mood:  ['Festive', 'Cozy', 'Joyful', 'Nostalgic', 'Warm', 'Magical'],
+    instr: ['Sleigh bells', 'Glockenspiel', 'Big band brass', 'Strings', 'Piano', 'Celesta'],
+    vox:   ['Crooner male vocals', 'Warm female vocals', 'Choir', 'Group sing-along'],
+    prod:  ['Wall of sound', 'Vintage warmth', 'Lush arrangement', 'Big festive finale'],
+    bpm:   ['72 BPM', '96 BPM', '120 BPM', '140 BPM'] }),
+  f('grime', 'Grime / UK Rap', 'Urban', {
+    genre: ['Grime', 'UK Rap', 'Eskibeat', 'UK Grime'],
+    mood:  ['Aggressive', 'Raw', 'Gritty', 'Energetic', 'Confrontational'],
+    instr: ['Square-wave bass', 'Eski synths', 'Sparse drums', 'Sub bass', 'Staccato strings', 'Gunshot FX'],
+    vox:   ['Fast UK male rap', 'London accent rap', 'MC hype vocals', 'Female UK rap'],
+    prod:  ['Raw lo-fi grit', 'Sparse dark mix', 'Pirate-radio energy', 'Hard-hitting low end'],
+    bpm:   ['138 BPM', '140 BPM', '142 BPM'] }),
+  f('spoken', 'Spoken Word / Poetry', 'Acoustic', {
+    genre: ['Spoken Word', 'Poetry Reading', 'Slam Poetry', 'Narrated Story'],
+    mood:  ['Intimate', 'Reflective', 'Intense', 'Raw', 'Cinematic'],
+    instr: ['Ambient pads', 'Soft piano', 'Upright bass', 'Minimal beat', 'Cello', 'Field recordings'],
+    vox:   ['Spoken male voice', 'Spoken female voice', 'Narrator voice', 'Whispered delivery'],
+    prod:  ['Voice-forward mix', 'Sparse underscore', 'Close-mic intimacy', 'Cinematic swells'],
+    bpm:   ['70 BPM', '80 BPM', '90 BPM'] }),
 ];
 
 export const genreById = id => GENRES.find(g => g.id === id) || null;

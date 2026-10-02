@@ -3,6 +3,7 @@ import { user } from './auth.js';
 import { settings } from './settings.js';
 import { song } from './song.js';
 import { limits, buildLyrics } from './suno.js';
+import { activeArtist, artistPayload } from './artists.js';
 
 /** true while a generation is streaming (any mode) */
 export const busy = writable(false);
@@ -20,13 +21,16 @@ export async function generate(fields, onDelta, { signal } = {}) {
   if (!u) throw Object.assign(new Error('unauthorized'), { code: 'unauthorized' });
   const s = get(settings);
   const cur = get(song);
+  const art = get(activeArtist);
+  const tag = (art?.tag || '').trim() || (s.producerTag || '').trim();
   const body = {
     model: s.aiModel === 'fast' ? 'fast' : 'quality',
     limit: limits(s.sunoVersion).lyrics,
     title: cur.title,
     style: fields.style ?? cur.style,
     lyrics: fields.lyrics ?? buildLyrics(cur),
-    producerTag: s.producerTagOn && s.producerTag && s.producerTag.trim() ? s.producerTag.trim() : '',
+    producerTag: s.producerTagOn && tag ? tag : '',
+    artist: artistPayload(art),
     ...fields,
   };
 

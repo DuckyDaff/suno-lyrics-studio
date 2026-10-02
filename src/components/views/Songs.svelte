@@ -10,10 +10,13 @@
   import Button from '../ui/Button.svelte';
 
   let q = $state('');
+  let byArtist = $state('');   // '' = all, '-' = no artist, else artist id
   let openVersions = $state(null);   // song id whose versions are expanded
 
   const norm = s => (s || '').toLowerCase();
+  const artistsInLib = $derived([...new Map($songList.filter(s => s.artist?.id).map(s => [s.artist.id, s.artist])).values()]);
   const list = $derived($songList.filter(s => {
+    if (byArtist === '-' ? s.artist?.id : byArtist && s.artist?.id !== byArtist) return false;
     if (!q.trim()) return true;
     const k = norm(q);
     return norm(s.title).includes(k) || norm(s.style).includes(k) || (s.sections || []).some(x => norm(x.text).includes(k));
@@ -50,6 +53,14 @@
     <Button variant="ghost" icon="upload" onclick={() => modal.set('import')}>{$t('import')}</Button>
   </div>
 
+  {#if artistsInLib.length}
+    <div class="afilter">
+      <button class:on={!byArtist} onclick={() => (byArtist = '')}>{$t('arAll')}</button>
+      {#each artistsInLib as a (a.id)}<button class:on={byArtist === a.id} onclick={() => (byArtist = a.id)}>{a.emoji || '🎧'} {a.name}</button>{/each}
+      <button class:on={byArtist === '-'} onclick={() => (byArtist = '-')}>{$t('arNoArtist')}</button>
+    </div>
+  {/if}
+
   {#if !list.length}
     <div class="empty">
       <Icon name="music" size={26} />
@@ -64,7 +75,7 @@
         <button class="main" onclick={() => open(s.id)}>
           {#if s.coverPath}<img class="ic cov" src={mediaUrl(s.coverPath)} alt="" />{:else}<div class="ic"><Icon name="music" size={20} /></div>{/if}
           <div class="info">
-            <div class="name">{s.title || $t('untitled')} {#if cur}<span class="tag">{$t('currentSong')}</span>{/if}</div>
+            <div class="name">{s.title || $t('untitled')} {#if cur}<span class="tag">{$t('currentSong')}</span>{/if}{#if s.artist?.name}<span class="atag">{s.artist.emoji || '🎧'} {s.artist.name}</span>{/if}</div>
             <div class="meta faint">{(s.sections || []).length} {$t('sectionsN')} · {words(s)} {$t('wordsN')} · {$t('edited')} {when(s.updatedAt)}{#if (s.versions || []).length} · {s.versions.length} {$t('versionsN')}{/if}</div>
             {#if s.coverOf}<div class="meta faint">🎤 {$t('cvCoverOf')} {s.coverOf.title || ''}</div>{/if}
             {#if s.style}<div class="style faint">{s.style.slice(0, 120)}</div>{/if}
@@ -129,4 +140,8 @@
   .vt { font-family: var(--font-mono); direction: ltr; }
   .vn { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px 16px; color: var(--tx2); text-align: center; font-size: var(--fs-sm); line-height: 1.6; }
+  .afilter { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 12px; }
+  .afilter button { padding: 4px 11px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 700; color: var(--tx1); background: var(--bg2); border: 1px solid var(--line); }
+  .afilter button.on { color: var(--accent); background: var(--accent-bg); border-color: var(--accent-bd); }
+  .atag { margin-inline-start: 6px; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-bd); vertical-align: middle; }
 </style>

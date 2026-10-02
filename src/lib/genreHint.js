@@ -1,10 +1,12 @@
 /** Map a free-text form ("tech house", "UK garage / 2-step") to the closest randomizer family and
  *  return a short vocabulary hint the writer can draw on for the Style prompt. */
-import { GENRES } from './data/genres.js';
+import { GENRES, genreById } from './data/genres.js';
+import { FORM_FAMILY } from './data/forms.js';
 
 const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9& -]+/g, ' ').replace(/\s+/g, ' ').trim();
 
 export function familyForForm(form) {
+  if (FORM_FAMILY[form]) return genreById(FORM_FAMILY[form]);
   const parts = String(form || '').split('/').map(norm).filter(p => p.length > 1);
   if (!parts.length) return null;
   let best = null, bestScore = 0;

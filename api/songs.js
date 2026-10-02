@@ -42,7 +42,9 @@ module.exports = async function handler(req, res) {
   let user;
   try { user = verifyToken((req.headers.authorization || '').replace(/^Bearer\s+/i, '')); }
   catch { return json(401, { ok: false, error: 'unauthorized' }); }
-  const key = `songs:${String(user.username).toLowerCase()}`;
+  // ?type=artists keeps the user's artists ("hats") in their own hash, same rules as songs
+  const type = (req.query || {}).type === 'artists' ? 'artists' : 'songs';
+  const key = `${type}:${String(user.username).toLowerCase()}`;
 
   try {
     if (req.method === 'GET') {
@@ -64,7 +66,7 @@ module.exports = async function handler(req, res) {
         try { const e = JSON.parse(existing); if ((e.updatedAt || 0) > (s.updatedAt || 0)) return json(200, { ok: true, kept: 'remote', song: e }); } catch {}
       } else {
         const n = await kv('HLEN', key);
-        if (n >= MAX_SONGS) return json(429, { ok: false, error: 'too_many' });
+        if (n >= (type === 'artists' ? 200 : MAX_SONGS)) return json(429, { ok: false, error: 'too_many' });
       }
       await kv('HSET', key, s.id, raw);
       return json(200, { ok: true, kept: 'local' });

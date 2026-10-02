@@ -13,6 +13,9 @@
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
   import CoverGen from './CoverGen.svelte';
+  import StyleBox from './StyleBox.svelte';
+  import ArtistBar from './ArtistBar.svelte';
+  import { activeArtist, tagSong } from '../../lib/artists.js';
 
   import { FORM_GROUPS } from '../../lib/data/forms.js';
   import { genreHint } from '../../lib/genreHint.js';
@@ -126,21 +129,27 @@
     return { mix: { ...$g.mix, cast }, blend: true };
   }
 
+  /** the payload every generation shares (lyrics, Style, titles, cover) */
+  function buildFields(mode) {
+    const s = $g;
+    const fields = {
+      mode, idea: s.idea, form: s.form, language: s.language, rhyme: s.rhyme, persona: s.persona, length: s.length, extra: s.extra,
+      style: s.useStyle || mode === 'style' ? $song.style : '',
+      structure: s.useStructure ? $song.sections.map(x => x.name) : null,
+      ...mixPayload(),
+      ...musicPayload(),
+    };
+    if (s.form && s.form !== 'auto') { const h = genreHint(s.form); if (h) fields.genreHint = h; }
+    return fields;
+  }
+
   async function run(mode) {
     if ($busy) { genAbort.current?.abort(); return; }
     error = ''; errorDetail = '';
     setGen({ output: '', outMode: mode, usage: null });
     const ctrl = new AbortController(); genAbort.current = ctrl;
-    const s = $g;
-    const fields = {
-      mode, idea: s.idea, form: s.form, language: s.language, rhyme: s.rhyme, persona: s.persona, length: s.length, extra: s.extra,
-      style: s.useStyle ? $song.style : '',
-      structure: s.useStructure ? $song.sections.map(x => x.name) : null,
-      ...mixPayload(),
-      ...musicPayload(),
-    };
+    const fields = buildFields(mode);
     if (mode === 'style') fields.limit = lim.style;
-    if (s.form && s.form !== 'auto') { const h = genreHint(s.form); if (h) fields.genreHint = h; }
     try {
       const r = await generate(fields, (_, full) => setGen({ output: full }), { signal: ctrl.signal });
       let text = r.text;
@@ -162,12 +171,13 @@
     if (replace) actions.replaceAll(secs, $g.outMode === 'wild' && wild.style ? wild.style : null);
     else secs.forEach(x => actions.add(x.name, x.text));
     if ($g.outMode === 'wild' && wild.title) actions.setTitle(wild.title);
+    tagSong();
     toast($t('toastAppliedLyrics', { n: secs.length }), 'success');
   }
   function applyStyle() {
     const st = $g.outMode === 'wild' ? wild.style : $g.output.trim();
     if (!st) return;
-    actions.setStyle(st); toast($t('aiApplyStyle'), 'success');
+    actions.setStyle(st); tagSong(); toast($t('aiApplyStyle'), 'success');
   }
   function applyTitle(tt) { actions.setTitle(tt); toast(tt, 'success'); }
   async function copyOut() { (await copyText($g.output)) ? toast($t('toastAllCopied'), 'success') : toast($t('toastCopyFail'), 'error'); }
@@ -178,6 +188,7 @@
 
 <div class="tab" class:wide={wide}>
   <section class="brief">
+    <ArtistBar />
     <div class="ideaHd">
       <label for="ai-idea">{$t('aiIdea')}</label>
       <button class="ideaBtn" onclick={suggestIdeas} disabled={ideasBusy || $busy} title={$t('aiIdeasTitle')}>
@@ -205,6 +216,10 @@
           <option value="short">{$t('aiShort')}</option><option value="normal">{$t('aiNormal')}</option><option value="long">{$t('aiLong')}</option>
         </select></label>
     </div>
+
+    <StyleBox {buildFields} />
+
+    <div class="lyrHd">📝 {$t('aiLyricsBox')}</div>
     <input class="field" bind:value={$g.persona} placeholder={$t('aiPersonaPh')} />
     <input class="field" bind:value={$g.extra} placeholder={$t('aiExtraPh')} />
 
@@ -278,13 +293,13 @@
     </div>
 
     <div class="opts">
-      <label class="chk"><input type="checkbox" bind:checked={$g.useStyle} /> {$t('aiUseStyle')} <span class="faint mono">{$song.style ? $song.style.slice(0, 40) + ($song.style.length > 40 ? '…' : '') : '—'}</span></label>
       <label class="chk"><input type="checkbox" bind:checked={$g.useStructure} /> {$t('aiUseStructure')} <span class="faint mono">{$song.sections.map(x => x.name).join(' · ')}</span></label>
       <label class="chk"><input type="checkbox" checked={$settings.autoNikud} onchange={e => setSetting('autoNikud', e.target.checked)} /> {$t('aiAutoNikud')}</label>
       <label class="chk"><input type="checkbox" checked={$settings.producerTagOn} onchange={e => setSetting('producerTagOn', e.target.checked)} /> {$t('aiTag')}
+        {#if $activeArtist?.tag}<span class="artTag mono" dir="ltr">{$activeArtist.tag}</span><span class="faint">{$t('arTagFrom', { name: $activeArtist.name })}</span>{:else}
         <input class="field tagIn" value={$settings.producerTag} oninput={e => setSetting('producerTag', e.target.value)} placeholder="It's a Denver Production" dir="ltr" />
-        <button class="tagSave" type="button" onclick={saveTag} disabled={!($settings.producerTag || '').trim() || savedTags.includes(($settings.producerTag || '').trim())} title={$t('aiTagSaveTitle')}>💾</button></label>
-      {#if savedTags.length}
+        <button class="tagSave" type="button" onclick={saveTag} disabled={!($settings.producerTag || '').trim() || savedTags.includes(($settings.producerTag || '').trim())} title={$t('aiTagSaveTitle')}>💾</button>{/if}</label>
+      {#if savedTags.length && !$activeArtist?.tag}
         <div class="tagList">
           {#each savedTags as tg (tg)}
             <span class="tagChip" class:on={tg === ($settings.producerTag || '').trim()}>
@@ -304,7 +319,6 @@
     <div class="actions">
       <Button variant="primary" icon={$busy ? 'x' : 'sparkles'} size="lg" onclick={() => run('song')}>{$busy ? $t('aiStop') : $t('aiWriteSong')}</Button>
       <Button icon="dice" onclick={() => run('wild')} disabled={$busy}>{$t('aiWild')}</Button>
-      <Button variant="ghost" icon="sliders" onclick={() => run('style')} disabled={$busy}>{$t('aiStyleOnly')}</Button>
       <Button variant="ghost" icon="pen" onclick={() => run('titles')} disabled={$busy}>{$t('aiTitles')}</Button>
       <Button variant="ghost" onclick={() => run('cover')} disabled={$busy} title={$t('aiCoverTitle')}>🎨 {$t('aiCover')}</Button>
     </div>
@@ -411,6 +425,8 @@
   .chk.big { font-size: var(--fs-sm); color: var(--tx0); }
   .chk span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
   .chk input { accent-color: var(--accent); }
+  .lyrHd { margin-top: 6px; font-size: var(--fs-sm); font-weight: 800; color: var(--tx0); padding-bottom: 2px; border-bottom: 1px solid var(--line); }
+  .artTag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-bd); }
   .tagIn { flex: 1; padding: 4px 8px; font-size: 11px; font-family: var(--font-mono); min-width: 0; }
   .tagSave { font-size: 13px; padding: 2px 6px; border-radius: var(--r1); border: 1px solid var(--line); background: var(--bg2); }
   .tagSave:disabled { opacity: .35; }

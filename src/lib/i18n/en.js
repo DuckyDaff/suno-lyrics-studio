@@ -148,4 +148,19 @@ export default {
   loginTitle: 'Sign in', registerTitle: 'Sign up', username: 'Username', password: 'Password', email: 'Email',
   loginBtn: 'Sign in', registerBtn: 'Sign up', noAccount: 'No account?', haveAccount: 'Have an account?',
   loginError: 'Sign in failed',
+  // Style box inside Create
+  sbAi: 'Write Style with AI', sbRoll: 'Roll in', sbSurprise: 'Surprise me', sbSurpriseTitle: 'A random style from the list (the Create form follows)',
+  sbHint: 'Same style list as Create: the form you picked also drives the Style.', sbBefore: 'Before the change', sbSig: 'includes {name} signature',
+  aiLyricsBox: 'Lyrics', cancel: 'Cancel',
+  // artists ("hats")
+  arTitle: 'Artist', arNone: 'None', arNew: 'New artist', arEdit: 'Edit', arAll: 'All artists', arNoArtist: 'No artist',
+  arIntro: 'Create an artist (a hat) with a fixed sound, voice and signature. Every song under it sounds like the same DJ. You can keep several artists.',
+  arDescPh: 'Describe the artist in your words, e.g. a dark melodic techno DJ with oriental touches and a deep male voice',
+  arAi: 'Build with AI', arAiBusy: 'Building…', arAiDone: 'Artist filled in, review and save', arFromSong: 'From current song', arFromSongTitle: 'Build the identity from the open song\'s Style and lyrics',
+  arName: 'Artist name', arEmoji: 'Icon', arForm: 'Home style', arFormAny: 'Not fixed',
+  arSound: 'Signature sound (opens every Style)', arSoundHint: 'English tags. This is the fingerprint: the same words, in the same order, in every song.',
+  arVoice: 'Signature voice', arWriting: 'Writing identity', arWritingPh: 'Themes, point of view, slang, a recurring motif…',
+  arTag: 'Intro signature (ad-lib)', arExclude: 'Never (Exclude)', arLook: 'Cover visual identity', arNotes: 'Notes',
+  arNotesPh: 'e.g. the artist\'s Persona name in Suno', arSave: 'Save artist', arNameNeeded: 'The artist needs a name',
+  arConfirmDelete: 'Delete the artist "{name}"? Its songs stay.', arTagFrom: '({name})',
 };

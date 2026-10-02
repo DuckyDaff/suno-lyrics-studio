@@ -162,6 +162,23 @@ function producerTag(b) {
   return `PRODUCER TAG (mandatory, every time): the song must open with an [Intro] whose FIRST line is the spoken ad-lib "(${tag})" — exactly this text, in parentheses, as its own line. Keep it even when the intro is instrumental (then it is the only line under the [Intro] tag). If the structure has no intro, add a short [Intro] just for it.`;
 }
 
+/** The active artist ("hat"): keeps every song of one artist recognisable as the same act. */
+const STYLE_MODES = new Set(['style', 'wild', 'coverSong']);
+const WORD_MODES = new Set(['song', 'wild', 'coverSong', 'ideas', 'titles', 'section']);
+function artistText(b) {
+  const a = b.artist;
+  if (!a || typeof a !== 'object') return '';
+  const name = clean(a.name, 60) || 'this artist';
+  const L = [];
+  if (STYLE_MODES.has(b.mode) && a.sound) L.push(`- Signature sound, it must open every Style in this wording: ${clean(a.sound, 500)}. If the chosen form is another genre, make it ${name}'s take on that form: keep the signature voice, key sounds and production, and bring the new genre in around them.`);
+  if ((STYLE_MODES.has(b.mode) || WORD_MODES.has(b.mode)) && a.voice) L.push(`- Signature voice: ${clean(a.voice, 200)}${STYLE_MODES.has(b.mode) ? ' (name it in the Style)' : ' (write for this voice)'}.`);
+  if (WORD_MODES.has(b.mode) && a.writing) L.push(`- Writing identity (themes, point of view, vocabulary, motifs): ${clean(a.writing, 600)}. Use it as a voice, not a template: never reuse whole lines from other songs, at most one recurring signature motif per song.`);
+  if (b.mode === 'cover' && a.look) L.push(`- Visual identity shared by all ${name} covers (keep it, so the releases look like one catalogue): ${clean(a.look, 400)}`);
+  if (STYLE_MODES.has(b.mode) && a.exclude) L.push(`- ${name} never uses: ${clean(a.exclude, 300)} (keep these out of the Style).`);
+  if (!L.length) return '';
+  return [`ARTIST IDENTITY: this song is released under the recurring artist "${name}". Every release must be recognisable as the same act (one DJ / producer's catalogue), while each song is still new.`, ...L].join('\n');
+}
+
 function songContext(b) {
   const lines = [];
   if (b.title) lines.push(`Song title: ${clean(b.title, 200)}`);
@@ -201,6 +218,7 @@ function buildUser(b) {
         b.length === 'short' ? 'Length: short (about 12–20 lines).' : b.length === 'long' ? 'Length: long (a full 3-verse song).' : 'Length: normal (about 24–36 lines).',
         structure,
         producerTag(b),
+        artistText(b),
         clubRule(b),
         musicText(b),
         blendText(b),
@@ -217,6 +235,7 @@ function buildUser(b) {
         `Language for lyrics: ${lang}.`,
         b.form && b.form !== 'auto' ? `Form: ${b.form}.` : 'Pick whichever form fits the concept best (pop, rap, opera, musical, ballad, mizrahi, punk, children…).',
         producerTag(b),
+        artistText(b),
         clubRule(b),
         musicText(b),
         blendText(b) || (b.blend ? 'Make it a GENRE / VOICE BLEND: choose two or three contrasting styles and performers for different sections (e.g. rap verses with an operatic chorus, a female rapper and a male cantor) and follow the blend rules.' : ''),
@@ -234,6 +253,7 @@ function buildUser(b) {
         `Maximum ${b.limit || 900} characters.`,
         b.form && b.form !== 'auto' ? `GENRE / FORM: ${clean(b.form, 80)} — this decides the genre. Build the whole Style for it: the exact sub-genre name first, then its real tempo and signature sounds. If the current style below belongs to a different genre, do NOT keep it; only reuse what still fits (mood, vocal gender, language).` : '',
         b.genreHint ? `Vocabulary that fits this genre (choose and combine, do not copy all): ${clean(b.genreHint, 700)}` : '',
+        artistText(b),
         musicText(b) ? 'Respect the chosen tempo and time signature:\n' + musicText(b) : '',
         `Brief: ${clean(b.idea, 2000) || '(infer from the lyrics)'}`,
         blendText(b) ? blendText(b) + '\nThe style prompt must name each blended style and each voice.' : '',
@@ -248,6 +268,7 @@ function buildUser(b) {
         b.form && b.form !== 'auto' ? `Form: ${b.form} — shape the ideas for it (a rap idea has attitude and a scene; a lullaby is gentle; a parody has a joke).` : '',
         b.idea ? `Optional seed from the writer (riff on it, or go elsewhere if it is empty): ${clean(b.idea, 400)}` : '',
         b.persona ? `Speaker / persona: ${clean(b.persona, 200)}.` : '',
+        artistText(b),
       ].filter(Boolean).join('\n');
     }
     case 'coverSong': {
@@ -263,6 +284,7 @@ function buildUser(b) {
         clubRule({ form: `${b.target || ''} ${b.recipe || ''}` }),
         b.notes ? `Writer's notes: ${clean(b.notes, 1200)}` : '',
         producerTag(b),
+        artistText(b),
         blendText(b),
         `Rules: never put artist or band names in the STYLE (describe the sound instead). Keep Suno formatting. Write section tags that make the new arrangement explicit (e.g. [Intro: piano], [Drop], [Verse 1: rap], [Chorus: both], [Bridge: niggun]). If the original has a title, the new title is the original title plus the cover flavour in parentheses, e.g. "שם השיר (גרסת רגאטון)".`,
         `ORIGINAL SONG${b.srcTitle ? ` — "${clean(b.srcTitle, 150)}"` : ''}${b.srcStyle ? ` (original style: ${clean(b.srcStyle, 300)})` : ''}:\n${src || '(no lyrics given — work from the title and notes)'}`,
@@ -296,6 +318,7 @@ function buildUser(b) {
         `TEXT: <title and artist line to place on the cover afterwards, in the song's language, plus a one-line typography suggestion>`,
         `Song idea / brief: ${clean(b.idea, 2000)}`,
         b.form && b.form !== 'auto' ? `Form / genre: ${b.form}` : '',
+        artistText(b),
         songContext(b),
       ].filter(Boolean).join('\n');
     }
@@ -303,7 +326,25 @@ function buildUser(b) {
       return [
         `Suggest 8 song titles, one per line, no numbering, no quotes. Language: ${lang}. Mix literal, poetic and hook-based titles.`,
         `Brief: ${clean(b.idea, 2000)}`,
+        artistText(b),
         songContext(b),
+      ].filter(Boolean).join('\n');
+    }
+    case 'artist': {
+      return [
+        `Design a recurring music ARTIST / DJ identity: a "hat" the writer releases many songs under on Suno, so all of them sound like the same act. Make it specific and ownable, not generic.`,
+        `Output EXACTLY these labels, one line each, nothing else:`,
+        `NAME: <artist / DJ name, Latin letters, short and memorable, never a real artist's name>`,
+        `EMOJI: <one emoji>`,
+        `FORM: <the home genre, copied exactly from this list: ${clean(b.formList, 2600)}>`,
+        `SOUND: <the signature sound core as English Suno tags, 6–10 comma-separated tags, 120–220 characters: exact sub-genre, 2–3 signature instruments or sound-design elements, a production fingerprint, the typical BPM. This line is pasted at the start of every Style, so it must work with any song of the artist. No artist names.>`,
+        `VOICE: <the signature vocal in English, 4–10 words, e.g. "deep male baritone, half-spoken, dark reverb">`,
+        `WRITING: <in ${lang}: themes, point of view, vocabulary and one or two recurring motifs, 1–2 sentences>`,
+        `TAG: <a short spoken intro ad-lib signature in Latin letters, like "It's a Denver Production">`,
+        `LOOK: <the visual identity for every cover, in English: palette, medium, recurring symbol, 1 sentence>`,
+        `EXCLUDE: <English Suno exclude tags that would break this identity, comma-separated, 3–6 tags>`,
+        `Description from the writer: ${clean(b.idea, 1500) || '(none — invent a distinctive act)'}`,
+        b.fromSong ? `Base the identity on this existing song, so the artist sounds like it:\n${songContext(b)}` : '',
       ].filter(Boolean).join('\n');
     }
     case 'section': {
@@ -326,6 +367,7 @@ function buildUser(b) {
         musicText(b),
         b.bars ? `This section is ${parseInt(b.bars, 10)} bars — match the line count to the bars using the line mapping.` : '',
         b.idea ? `Guidance: ${clean(b.idea, 1000)}` : '',
+        artistText(b),
         songContext({ ...b, lyrics: b.lyrics }),
         b.rhyme === 'free verse' ? '' : 'Keep a clear end-rhyme scheme on stressed syllables in the new text (match the song\'s scheme if it has one).',
         `Return only the section text (no tag).`,
@@ -346,6 +388,10 @@ function stripPreamble(text, mode) {
   if (mode === 'wild' || mode === 'coverSong') {
     const i = text.search(/^\s*TITLE:/mi);
     return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
+  }
+  if (mode === 'artist') {
+    const i = text.search(/^\s*NAME:/mi);
+    if (i > 0) return text.slice(i).replace(/^\s+/, '');
   }
   if (mode === 'cover') {
     const i = text.search(/^\s*MAIN:/mi);
