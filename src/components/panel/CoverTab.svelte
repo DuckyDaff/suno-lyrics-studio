@@ -2,7 +2,7 @@
   /** 🎤 Cover: take an existing song (library / pasted / idea) and re-imagine it. */
   import { song, actions } from '../../lib/song.js';
   import { songList, songs, newSong, openSong } from '../../lib/songs.js';
-  import { settings } from '../../lib/settings.js';
+  import { settings, setSetting } from '../../lib/settings.js';
   import { coverState as cv, setCover } from '../../lib/coverState.js';
   import { RECIPES, TOUCH, COVER_LANGS, recipe as getRecipe, touch as getTouch } from '../../lib/coverRecipes.js';
   import { GENRES, GENRE_GROUPS } from '../../lib/data/genres.js';
@@ -14,6 +14,8 @@
   import { toast } from '../../lib/toast.js';
   import { t } from '../../lib/i18n.js';
   import { homographs } from '../../lib/ui.js';
+  import SunoFixPanel from './SunoFixPanel.svelte';
+  import { runSunoFix } from '../../lib/sunoFix.js';
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
 
@@ -43,7 +45,7 @@
       idea: $cv.source === 'idea' ? $cv.idea : '',
       srcTitle, srcLyrics, srcStyle: srcSong?.style || '',
       secondTitle: r.needsSecond ? secondSong?.title || '' : '', secondLyrics: r.needsSecond && secondSong ? buildLyrics(secondSong) : '',
-      recipe: r.prompt, target, touchRule: tc.prompt,
+      recipe: r.prompt, target, touchRule: tc.prompt, keepWords: $cv.touch === 'keep',
       targetLanguage: r.needsLang ? $cv.language : ($cv.language !== 'Hebrew' ? $cv.language : ''),
       language: $cv.language, topic: r.needsTopic ? $cv.topic : '', notes: $cv.notes,
       // the server's default context (current song lyrics) must not leak into the cover
@@ -53,11 +55,16 @@
   async function run() {
     if ($busy) { ctrl?.abort(); return; }
     if (!hasSource) return toast($t('cvNoSource'), 'error');
-    error = ''; setCover({ output: '', outMode: 'cover' });
+    error = ''; setCover({ output: '', outMode: 'cover', fix: null });
     ctrl = new AbortController();
     try {
       const r = await generate(fields('coverSong'), (_, full) => setCover({ output: full }), { signal: ctrl.signal });
       let text = r.text;
+      if ($settings.autoSunoFix && HEBREW_RE.test(text) && !ctrl.signal.aborted) {
+        setCover({ output: text });
+        try { text = await fixCover(text, ctrl.signal); }
+        catch (e) { if (e.code !== 'aborted') toast($t('fxFail'), 'error', 5000); }
+      }
       if ($settings.autoNikud && HEBREW_RE.test(text)) { nikudBusy = true; try { text = await nikudLyrics(text); } catch {} nikudBusy = false; }
       setCover({ output: text });
     } catch (e) { if (e.code !== 'aborted') error = ($t('aiErr_' + e.code) !== 'aiErr_' + e.code ? $t('aiErr_' + e.code) : $t('aiErr_api_error')) + (e.detail ? ' — ' + e.detail : ''); }
@@ -71,6 +78,32 @@
     catch (e) { if (e.code !== 'aborted') toast($t('aiErr_api_error'), 'error'); }
     finally { ideasBusy = false; }
   }
+  /* ── 🗣 prepare for Suno: spelling for Suno, and the original song's line lengths ── */
+  let fixBusy = $state(false);
+  async function fixCover(full, signal) {
+    const w = parseWild(full);
+    fixBusy = true;
+    try {
+      const r = await runSunoFix(w.lyrics || full, {
+        keepWords: $cv.touch === 'keep', srcLyrics: $cv.touch === 'rewrite' ? '' : srcLyrics,
+        style: w.style, form: '', language: $cv.language,
+      }, { signal });
+      setCover({ fix: { before: full, changes: r.changes } });
+      return `TITLE: ${w.title}\nSTYLE: ${w.style}\n\n${r.lyrics}`;
+    } finally { fixBusy = false; }
+  }
+  async function fixOut() {
+    if ($busy || fixBusy) return;
+    ctrl = new AbortController();
+    try {
+      let text = await fixCover($cv.output, ctrl.signal);
+      if ($settings.autoNikud && HEBREW_RE.test(text)) { nikudBusy = true; try { text = await nikudLyrics(text); } catch {} nikudBusy = false; }
+      setCover({ output: text });
+      toast($t('fxDone'), 'success');
+    } catch (e) { if (e.code !== 'aborted') toast($t('fxFail'), 'error', 5000); }
+    finally { ctrl = null; }
+  }
+  function revertFix() { if (!$cv.fix?.before) return; setCover({ output: $cv.fix.before, fix: null }); }
   function useIdea(line) { setCover({ recipe: 'free', notes: line, outMode: '', output: '' }); toast($t('cvUseIdea'), 'success'); }
 
   function applyNew() {
@@ -155,6 +188,7 @@
       <p class="faint small">{$t('cvHint')}</p>
     </div>
 
+    <label class="fxchk" title={$t('fxTitle')}><input type="checkbox" checked={$settings.autoSunoFix} onchange={e => setSetting('autoSunoFix', e.target.checked)} /> 🗣 {$t('fxAutoCover')}</label>
     <div class="actions">
       <Button variant={$busy ? 'danger' : 'primary'} icon="sparkles" onclick={run}>{$busy ? $t('aiStop') : $t('cvRun')}</Button>
       <Button variant="ghost" onclick={suggest} disabled={ideasBusy || $busy}>💡 {ideasBusy ? $t('cvIdeasBusy') : $t('cvIdeas')}</Button>
@@ -166,7 +200,7 @@
     {#if $cv.output || $busy || ideasBusy}
       <section class="out">
         <div class="hd">
-          <span class="lbl">{$t('cvResult')} {#if nikudBusy}<span class="ph">{$t('aiNikud')}</span>{:else if $busy || ideasBusy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $t('aiConnecting')}</span>{/if}</span>
+          <span class="lbl">{$t('cvResult')} {#if fixBusy}<span class="ph">🗣 {$t('fxBusy')}</span>{:else if nikudBusy}<span class="ph">{$t('aiNikud')}</span>{:else if $busy || ideasBusy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $t('aiConnecting')}</span>{/if}</span>
           {#if bare}<button class="nkBtn" onclick={vocalize}>נ׳ {$t('aiNikudAll')} <span class="n">{bare}</span></button>{/if}
           <Button size="sm" variant="ghost" icon="copy" title={$t('copy')} onclick={copyOut} />
           <Button size="sm" variant="ghost" icon="x" title={$t('clear')} onclick={() => setCover({ output: '', outMode: '' })} disabled={$busy} />
@@ -180,7 +214,9 @@
               {#if wild.style}<div class="wstyle mono">{wild.style}</div>{/if}
             </div>
           {/if}
-          <pre class="box" class:dim={nikudBusy} dir="auto">{wild.lyrics || $cv.output}</pre>
+          <pre class="box" class:dim={nikudBusy || fixBusy} dir="auto">{wild.lyrics || $cv.output}</pre>
+          {#if fixBusy}<SunoFixPanel busy={true} />
+          {:else if !$busy && !nikudBusy && wild.lyrics}<SunoFixPanel info={$cv.fix} text={wild.lyrics} onRun={fixOut} onRevert={revertFix} />{/if}
           {#if !$busy && wild.lyrics}
             <div class="apply">
               <Button variant="primary" icon="check" onclick={applyNew}>{$t('cvSaveNew')}</Button>
@@ -237,4 +273,6 @@
   .ideas button:hover { border-color: var(--accent); }
   .ideas .n { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; background: var(--bg3); color: var(--tx1); }
   .placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 16px; color: var(--tx2); text-align: center; font-size: var(--fs-sm); border: 1px dashed var(--line); border-radius: var(--r3); }
+  .fxchk { display: flex; align-items: center; gap: 6px; font-size: var(--fs-xs); font-weight: 600; color: var(--tx1); cursor: pointer; }
+  .fxchk input { accent-color: var(--accent); }
 </style>

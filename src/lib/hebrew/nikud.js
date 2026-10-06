@@ -166,6 +166,12 @@ export function buildNikudText(rawData, choices) {
 export function unvocalizedWords(text) {
   return String(text || '').split(/\s+/).filter(w => /[א-ת]{2,}/.test(w) && !NIKUD_RE.test(w));
 }
+/** keep words that already carry nikud (user picks, deliberate fixes); take Dicta's version for bare ones */
+function keepVocalized(orig, voc) {
+  const a = orig.split(/(\s+)/), b = String(voc || '').split(/(\s+)/);
+  if (a.length !== b.length) return voc || orig;
+  return a.map((w, i) => (NIKUD_RE.test(w) || !/[א-ת]/.test(w) ? w : b[i])).join('');
+}
 const lineNeedsNikud = l => !/^\s*\[/.test(l) && !/^\s*(TITLE|STYLE):/i.test(l) && unvocalizedWords(l).length > 0;
 
 async function nakdanLineRetry(line) {
@@ -190,16 +196,16 @@ export async function nikudLyrics(text, onProgress) {
   if (!idx.length) return text;
   onProgress?.(0, idx.length);
   try {
-    const raw = await nakdanRaw(idx.map(i => lines[i]).join('\n'));
+    const raw = await nakdanRaw(idx.map(i => stripNikud(lines[i])).join('\n'));
     const out = buildNikudText(raw, null).split('\n');
-    if (out.length === idx.length) idx.forEach((i, k) => { lines[i] = out[k]; });
+    if (out.length === idx.length) idx.forEach((i, k) => { lines[i] = keepVocalized(lines[i], out[k]); });
   } catch {}
   // pass 2: whatever is still bare, line by line
   const left = idx.filter(i => lineNeedsNikud(lines[i]));
   onProgress?.(idx.length - left.length, idx.length);
   let k = 0;
   for (const i of left) {
-    try { lines[i] = await nakdanLineRetry(lines[i]); } catch {}
+    try { lines[i] = keepVocalized(lines[i], await nakdanLineRetry(stripNikud(lines[i]))); } catch {}
     onProgress?.(idx.length - left.length + (++k), idx.length);
   }
   return lines.join('\n');

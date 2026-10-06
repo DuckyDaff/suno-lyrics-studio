@@ -179,6 +179,31 @@ function artistText(b) {
   return [`ARTIST IDENTITY: this song is released under the recurring artist "${name}". Every release must be recognisable as the same act (one DJ / producer's catalogue), while each song is still new.`, ...L].join('\n');
 }
 
+/* ── Suno delivery: how the text must be WRITTEN so Suno sings it right ─────────────────── */
+const SUNO_HE = `SUNO HEBREW PRONUNCIATION. Suno reads the text literally: it guesses the sound from the spelling, usually ignores the geresh (צ׳ ג׳ ז׳), misreads ambiguous unvocalized words, and mangles slang, loanwords, acronyms and numbers. Write every word so it can only be read one way. Use the lightest tool that works, in this order:
+1. Nikud on ambiguous words: homographs and gender forms (אַתָּה / אַתְּ, סֵפֶר / סַפָּר, בֹּקֶר / בָּקָר), and a final patach genuva (רוּחַ, יָדוּעַ).
+2. Full spelling (כתיב מלא): add ו for o/u and י for i so the vowel is visible (צפור → ציפור, תכף → תיכף, שמים → שמיים, אזן → אוזן).
+3. Geresh sounds, which Suno drops: צ׳ (ch) becomes טש in Hebrew letters (ביצ׳ית → ביטשית, צ׳יפס → טשיפס, צ׳כצ׳כ → טשיק-טשאק). ג׳ (j) and ז׳ (zh) have no safe Hebrew spelling: write that one word in Latin letters with its Hebrew syllables (ג׳ינג׳י → jinji, ג׳ורה → jora).
+4. Slang and loanwords Suno may not know (תכלס, סחבק, חפיף, סבבה, יאללה, וואלה, מאמי, אחשלי): spell them phonetically with full spelling and nikud, or split them by syllable with hyphens (תכ-לס), or, if Hebrew letters still fail, write that single word in Latin letters spelled to be read by English rules with the Hebrew syllables (tachles, sababa, yalla; use kh for ח, tz for צ). Latin only for single words, never for whole lines.
+5. English words inside Hebrew lyrics are written in Latin letters (baby, party, OK), never in Hebrew letters (בייבי).
+6. Acronyms, numbers and symbols are written as they are said (צה״ל → צָהַל, 2026 → אַלְפַּיִים עֶשְׂרִים וָשֵׁשׁ, % → אָחוּז, ת״א → תֵּל אָבִיב).
+7. Names, rare words and words with unusual stress: split by syllable with hyphens only when needed (נְ-תַנְ-יָה).
+Never over-correct: common words that Suno sings well stay as they are. Never change what is said.`;
+
+const SUNO_RHYTHM = `SUNO RHYTHM AND STRUCTURE. Suno follows the shape of the text, so the shape must be musical:
+- One line = one musical phrase. Break run-on lines at the phrase; never end a line in the middle of a phrase.
+- Inside a section the lines carry a similar syllable count. Parallel lines in repeated sections (Verse 1 / Verse 2, every Chorus) match within ±1 syllable, so the melody can repeat.
+- A repeated chorus is written identically every time (same words, same spelling, same line breaks), so Suno reuses the melody.
+- Keep sections compact (verse 4–8 lines, pre-chorus 2–4, chorus 4–6) unless a structure is given. Overlong sections get rushed or skipped.
+- Punctuation is breath: a comma is a short pause, the line end is a breath. No ellipses, no emojis, no stray symbols. Parentheses only for backing vocals and ad-libs.
+- Section tags on their own line, one blank line between sections, no text outside a tagged section.`;
+
+/** rules for every lyrics-writing mode; the Hebrew part only when Hebrew is in play */
+function sunoDelivery(b) {
+  const he = /hebrew/i.test(`${b.language || ''} ${b.targetLanguage || ''}`) || /[\u05d0-\u05ea]/.test(`${b.fixText || ''}${b.srcLyrics || ''}`);
+  return [SUNO_RHYTHM, he ? SUNO_HE : ''].filter(Boolean).join('\n');
+}
+
 function songContext(b) {
   const lines = [];
   if (b.title) lines.push(`Song title: ${clean(b.title, 200)}`);
@@ -222,6 +247,7 @@ function buildUser(b) {
         clubRule(b),
         musicText(b),
         blendText(b),
+        sunoDelivery(b),
         b.style ? `Match the lyrics to this Suno style prompt: ${clean(b.style, 1200)}` : '',
         b.extra ? `Additional instructions: ${clean(b.extra, 1000)}` : '',
         limit,
@@ -238,6 +264,7 @@ function buildUser(b) {
         artistText(b),
         clubRule(b),
         musicText(b),
+        sunoDelivery(b),
         blendText(b) || (b.blend ? 'Make it a GENRE / VOICE BLEND: choose two or three contrasting styles and performers for different sections (e.g. rap verses with an operatic chorus, a female rapper and a male cantor) and follow the blend rules.' : ''),
         `Output format, exactly:`,
         `TITLE: <song title in the lyrics language>`,
@@ -286,6 +313,8 @@ function buildUser(b) {
         producerTag(b),
         artistText(b),
         blendText(b),
+        sunoDelivery(b),
+        b.keepWords ? 'Even when the original words are kept, you may and should change their SPELLING for Suno (the toolkit above): the words stay, the way they are written changes. Keep the original line count per section and each line\'s syllable count (±1) so the original melody still fits.' : '',
         `Rules: never put artist or band names in the STYLE (describe the sound instead). Keep Suno formatting. Write section tags that make the new arrangement explicit (e.g. [Intro: piano], [Drop], [Verse 1: rap], [Chorus: both], [Bridge: niggun]). If the original has a title, the new title is the original title plus the cover flavour in parentheses, e.g. "שם השיר (גרסת רגאטון)".`,
         `ORIGINAL SONG${b.srcTitle ? ` — "${clean(b.srcTitle, 150)}"` : ''}${b.srcStyle ? ` (original style: ${clean(b.srcStyle, 300)})` : ''}:\n${src || '(no lyrics given — work from the title and notes)'}`,
         second ? `SECOND SONG${b.secondTitle ? ` — "${clean(b.secondTitle, 150)}"` : ''}:\n${second}` : '',
@@ -330,6 +359,31 @@ function buildUser(b) {
         songContext(b),
       ].filter(Boolean).join('\n');
     }
+    case 'sunofix': {
+      const text = clean(b.fixText, 9000);
+      if (!text) throw Object.assign(new Error('no text'), { status: 400 });
+      return [
+        `You are a top Suno producer preparing finished lyrics so Suno SINGS them correctly: every word pronounced right and the rhythm holding its shape. This is a careful production pass, NOT a rewrite.`,
+        b.keepWords
+          ? 'The WORDS must stay exactly the same (an existing song or a cover): change only how they are WRITTEN (spelling, nikud, hyphens, Latin letters for single words, line breaks), never what is said.'
+          : 'Keep the words and the meaning. Change spelling first; change a word only when no spelling can make it singable, and then use the closest equivalent that keeps rhyme and meaning.',
+        sunoDelivery(b),
+        b.srcLyrics ? `ORIGINAL SONG (the melody this version follows). Keep each section's line count, and each line's syllable count within ±1 of the matching original line:\n${clean(b.srcLyrics, 6000)}` : '',
+        b.style ? `Style of the track: ${clean(b.style, 600)}` : '',
+        b.form ? `Form: ${clean(b.form, 80)}` : '',
+        musicText(b),
+        `Never add, remove, rename or reorder section tags. Keep every ad-lib and backing line, including a spoken intro tag in parentheses.`,
+        `Nikud: keep existing nikud exactly on every word you do not change. On a word you change, add nikud only where the nikud itself is the fix; otherwise leave it bare (nikud is added automatically afterwards).`,
+        `Output EXACTLY this format and nothing else:`,
+        `LYRICS:`,
+        `<the complete lyrics, every section tag and every line, in order>`,
+        `CHANGES:`,
+        `- sound | <the word as it was> | <how you wrote it> | <reason in Hebrew, up to 10 words>`,
+        `- rhythm | <[Section] line N> | <what you did> | <reason in Hebrew, up to 10 words>`,
+        `List every change, one per line. If nothing needed a change, write "- none" under CHANGES:.`,
+        `TEXT TO PREPARE:\n${text}`,
+      ].filter(Boolean).join('\n');
+    }
     case 'artist': {
       return [
         `Design a recurring music ARTIST / DJ identity: a "hat" the writer releases many songs under on Suno, so all of them sound like the same act. Make it specific and ownable, not generic.`,
@@ -368,6 +422,7 @@ function buildUser(b) {
         b.bars ? `This section is ${parseInt(b.bars, 10)} bars — match the line count to the bars using the line mapping.` : '',
         b.idea ? `Guidance: ${clean(b.idea, 1000)}` : '',
         artistText(b),
+        sunoDelivery(b),
         songContext({ ...b, lyrics: b.lyrics }),
         b.rhyme === 'free verse' ? '' : 'Keep a clear end-rhyme scheme on stressed syllables in the new text (match the song\'s scheme if it has one).',
         `Return only the section text (no tag).`,
@@ -388,6 +443,10 @@ function stripPreamble(text, mode) {
   if (mode === 'wild' || mode === 'coverSong') {
     const i = text.search(/^\s*TITLE:/mi);
     return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
+  }
+  if (mode === 'sunofix') {
+    const i = text.search(/^\s*LYRICS:/mi);
+    if (i > 0) return text.slice(i).replace(/^\s+/, '');
   }
   if (mode === 'artist') {
     const i = text.search(/^\s*NAME:/mi);

@@ -14,6 +14,8 @@
   import Icon from '../ui/Icon.svelte';
   import CoverGen from './CoverGen.svelte';
   import StyleBox from './StyleBox.svelte';
+  import SunoFixPanel from './SunoFixPanel.svelte';
+  import { runSunoFix } from '../../lib/sunoFix.js';
   import ArtistBar from './ArtistBar.svelte';
   import { activeArtist, tagSong } from '../../lib/artists.js';
 
@@ -35,6 +37,7 @@
   let errorDetail = $state('');
   let presetId = $state('');
   let nikudBusy = $state(false);
+  let fixBusy = $state(false);
   /* saved intro signatures */
   const savedTags = $derived(Array.isArray($settings.producerTags) ? $settings.producerTags : []);
   function saveTag() {
@@ -151,13 +154,18 @@
   async function run(mode) {
     if ($busy) { genAbort.current?.abort(); return; }
     error = ''; errorDetail = '';
-    setGen({ output: '', outMode: mode, usage: null });
+    setGen({ output: '', outMode: mode, usage: null, fix: null });
     const ctrl = new AbortController(); genAbort.current = ctrl;
     const fields = buildFields(mode);
     if (mode === 'style') fields.limit = lim.style;
     try {
       const r = await generate(fields, (_, full) => setGen({ output: full }), { signal: ctrl.signal });
       let text = r.text;
+      if ((mode === 'song' || mode === 'wild') && $settings.autoSunoFix && HEBREW_RE.test(text) && !ctrl.signal.aborted) {
+        setGen({ output: text });
+        try { text = await fixText(text, mode, ctrl.signal); }
+        catch (e) { if (e.code !== 'aborted') toast($t('fxFail'), 'error', 5000); }
+      }
       if ((mode === 'song' || mode === 'wild') && $settings.autoNikud && HEBREW_RE.test(text)) {
         text = await vocalize(text);
         const left = unvocalizedWords(text).length;
@@ -169,6 +177,31 @@
       if (e.code !== 'aborted') { error = e.code || 'api_error'; errorDetail = (e.detail || (e.code === 'api_error' ? e.message : '') || '').slice(0, 160); if (e.partial) setGen({ output: e.partial }); }
     } finally { if (genAbort.current === ctrl) genAbort.current = null; }
   }
+
+  /* ── 🗣 prepare for Suno ─────────────────────────────────────── */
+  async function fixText(full, mode, signal) {
+    const w = mode === 'wild' ? parseWild(full) : null;
+    fixBusy = true;
+    try {
+      const r = await runSunoFix(w ? w.lyrics : full, {
+        keepWords: false, style: w ? w.style : $song.style, form: $g.form, language: $g.language, music: musicPayload().music,
+      }, { signal });
+      setGen({ fix: { before: full, changes: r.changes } });
+      return w ? `TITLE: ${w.title}\nSTYLE: ${w.style}\n\n${r.lyrics}` : r.lyrics;
+    } finally { fixBusy = false; }
+  }
+  async function fixOut() {
+    if ($busy || fixBusy) return;
+    const ctrl = new AbortController(); genAbort.current = ctrl;
+    try {
+      let text = await fixText($g.output, $g.outMode, ctrl.signal);
+      if ($settings.autoNikud && unvocalizedWords(text).length) text = await vocalize(text);
+      setGen({ output: text });
+      toast($t('fxDone'), 'success');
+    } catch (e) { if (e.code !== 'aborted') toast($t('fxFail'), 'error', 5000); }
+    finally { if (genAbort.current === ctrl) genAbort.current = null; }
+  }
+  function revertFix() { if (!$g.fix?.before) return; setGen({ output: $g.fix.before, fix: null }); }
 
   function applyLyrics(replace) {
     const secs = parseLyrics(shown);
@@ -304,6 +337,7 @@
     <div class="opts">
       <label class="chk"><input type="checkbox" bind:checked={$g.useStructure} /> {$t('aiUseStructure')} <span class="faint mono">{$song.sections.map(x => x.name).join(' · ')}</span></label>
       <label class="chk"><input type="checkbox" checked={$settings.autoNikud} onchange={e => setSetting('autoNikud', e.target.checked)} /> {$t('aiAutoNikud')}</label>
+      <label class="chk" title={$t('fxTitle')}><input type="checkbox" checked={$settings.autoSunoFix} onchange={e => setSetting('autoSunoFix', e.target.checked)} /> 🗣 {$t('fxAuto')}</label>
       <label class="chk"><input type="checkbox" checked={$settings.producerTagOn} onchange={e => setSetting('producerTagOn', e.target.checked)} /> {$t('aiTag')}
         {#if $activeArtist?.tag}<span class="artTag mono" dir="ltr">{$activeArtist.tag}</span><span class="faint">{$t('arTagFrom', { name: $activeArtist.name })}</span>{:else}
         <input class="field tagIn" value={$settings.producerTag} oninput={e => setSetting('producerTag', e.target.value)} placeholder="It's a Denver Production" dir="ltr" />
@@ -345,7 +379,7 @@
   {#if $g.output || $busy}
     <section class="out">
       <div class="hd">
-        <span class="lbl">{$t('aiResult')} {#if nikudBusy}<span class="ph">{$t('aiNikud')}</span><span class="dots">●●●</span>{:else if $busy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $phase === 'fixing' ? $t('aiFixing') : $phase === 'retry' ? $t('aiRetry') : $phase === 'connecting' ? $t('aiConnecting') : $t('aiThinking')}</span><span class="dots">●●●</span>{/if}</span>
+        <span class="lbl">{$t('aiResult')} {#if fixBusy}<span class="ph">🗣 {$t('fxBusy')}</span><span class="dots">●●●</span>{:else if nikudBusy}<span class="ph">{$t('aiNikud')}</span><span class="dots">●●●</span>{:else if $busy}<span class="ph">{$phase === 'writing' ? $t('aiWriting') : $phase === 'fixing' ? $t('aiFixing') : $phase === 'retry' ? $t('aiRetry') : $phase === 'connecting' ? $t('aiConnecting') : $t('aiThinking')}</span><span class="dots">●●●</span>{/if}</span>
         {#if $g.usage}<span class="counter">{$g.usage.out} tok</span>{/if}
         {#if bare}<button class="nkBtn" title={$t('aiNikudAllTitle', { n: bare })} onclick={vocalizeOut}>נ׳ {$t('aiNikudAll')} <span class="n">{bare}</span></button>{/if}
         <Button size="sm" variant="ghost" icon="copy" title={$t('copy')} onclick={copyOut} />
@@ -382,6 +416,12 @@
         </div>
       {/if}
 
+      {#if !$busy && !nikudBusy && $g.output && ($g.outMode === 'song' || $g.outMode === 'wild')}
+        <SunoFixPanel info={$g.fix} busy={fixBusy} text={shown} onRun={fixOut} onRevert={revertFix} />
+      {/if}
+      {#if fixBusy}
+        <SunoFixPanel busy={true} />
+      {/if}
       {#if !$busy && $g.output}
         <div class="apply">
           {#if $g.outMode === 'song' || $g.outMode === 'wild'}

@@ -164,4 +164,11 @@ export default {
   arNotesPh: 'e.g. the artist\'s Persona name in Suno', arSave: 'Save artist', arNameNeeded: 'The artist needs a name',
   arConfirmDelete: 'Delete the artist "{name}"? Its songs stay.', arTagFrom: '({name})',
   aiIdeaClearTitle: 'Clear the whole brief', aiIdeaRestore: 'Restore',
+  // prepare for Suno
+  fxRun: 'Prepare for Suno', fxAgain: 'Check again for Suno', fxBusy: 'Preparing for Suno…',
+  fxTitle: 'A producer pass: respells words Suno would misread (geresh sounds, slang, loanwords, acronyms, numbers) and evens out the rhythm',
+  fxSummary: '{s} pronunciation · {r} rhythm fixes', fxNone: 'Nothing needed fixing', fxRevert: 'Undo fixes',
+  fxRhythm: 'Rhythm', fxRhythmHint: 'Estimated syllables per line. An orange number stands out from its section, and Suno may rush or stretch it.',
+  fxDone: 'Text prepared for Suno', fxFail: 'Preparing for Suno failed, the text is unchanged',
+  fxAuto: 'Prepare for Suno automatically (pronunciation and rhythm)', fxAutoCover: 'Prepare for Suno automatically: spelling Suno reads right, line lengths like the original',
 };

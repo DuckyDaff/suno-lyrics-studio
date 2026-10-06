@@ -12,6 +12,7 @@ export const genState = persisted('melodraft_v2_gen', {
   mixOn: false, mix: blankMix(),
   musicOn: false, music: { bpm: '', sig: '4/4', linesPerBar: 'auto', bars: [] },
   output: '', outMode: '', usage: null,
+  fix: null,            // last "prepare for Suno" pass: { before, changes }
 });
 
 export function setGen(patch) { genState.update(s => ({ ...s, ...patch })); }

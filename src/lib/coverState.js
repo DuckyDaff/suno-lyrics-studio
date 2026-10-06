@@ -17,5 +17,6 @@ export const coverState = persisted('melodraft_v2_cover', {
   notes: '',
   output: '',
   outMode: '',            // 'cover' | 'ideas'
+  fix: null,              // last "prepare for Suno" pass: { before, changes }
 });
 export function setCover(patch) { coverState.update(s => ({ ...s, ...patch })); }
