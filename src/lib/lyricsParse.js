@@ -15,7 +15,8 @@ export function parseLyrics(text) {
     cur.lines.push(raw);
   }
   return out.map(s => ({ name: s.name, text: s.lines.join('\n').replace(/^\n+|\n+$/g, '') }))
-            .filter(s => s.text || out.length === 1);
+            // an empty section is kept: it is an instrumental part (a drop, a solo) and its tag matters to Suno
+            .filter(s => s.text || s.name);
 }
 
 /** Wild-mode output: "TITLE: …\nSTYLE: …\n\n<lyrics>" → { title, style, lyrics } */

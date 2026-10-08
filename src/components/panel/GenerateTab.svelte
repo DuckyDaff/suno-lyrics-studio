@@ -9,11 +9,12 @@
   import { genState as g, setGen, blankMix, genAbort } from '../../lib/genState.js';
   import { parseLyrics, parseWild, parseLines, parseCover } from '../../lib/lyricsParse.js';
   import { copyText } from '../../lib/clipboard.js';
-  import { STRUCTURE_PRESETS, TIME_SIGS, SECTION_NAMES, estimateSeconds } from '../../lib/data/structures.js';
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
   import CoverGen from './CoverGen.svelte';
   import StyleBox from './StyleBox.svelte';
+  import StructureBuilder from './StructureBuilder.svelte';
+  import { enforceStructure, sunoTag } from '../../lib/structure.js';
   import SunoFixPanel from './SunoFixPanel.svelte';
   import { runSunoFix } from '../../lib/sunoFix.js';
   import ArtistBar from './ArtistBar.svelte';
@@ -35,7 +36,6 @@
   let { wide = false } = $props();
   let error = $state('');
   let errorDetail = $state('');
-  let presetId = $state('');
   let nikudBusy = $state(false);
   let fixBusy = $state(false);
   /* saved intro signatures */
@@ -84,30 +84,11 @@
 
   /* ── musical structure ───────────────────────────────────────── */
   const styleBpm = $derived(($song.style.match(/(\d{2,3})\s*BPM/i) || [])[1] || '');
-  const music = $derived($g.music);
-  const totalBars = $derived(music.bars.reduce((n, r) => n + (parseInt(r.bars, 10) || 0), 0));
-  const seconds = $derived(estimateSeconds(music.bars, music.sig, music.bpm || styleBpm));
-  function setMusic(patch) { setGen({ music: { ...$g.music, ...patch } }); }
-  function setRow(i, patch) { setMusic({ bars: $g.music.bars.map((r, j) => j === i ? { ...r, ...patch } : r) }); }
-  function addRow() { setMusic({ bars: [...$g.music.bars, { name: 'Verse', bars: 8, kind: 'lyrics' }] }); }
-  function delRow(i) { setMusic({ bars: $g.music.bars.filter((_, j) => j !== i) }); }
-  function moveRow(i, d) {
-    const a = [...$g.music.bars], j = i + d; if (j < 0 || j >= a.length) return;
-    [a[i], a[j]] = [a[j], a[i]]; setMusic({ bars: a });
-  }
-  function applyPreset(id) {
-    presetId = id;
-    if (id === 'sections') {
-      setMusic({ bars: $song.sections.map(x => ({ name: x.name, bars: 8, kind: /intro|outro|solo|instrumental|drop|interlude/i.test(x.name) ? 'instrumental' : 'lyrics' })) });
-      return;
-    }
-    const p = STRUCTURE_PRESETS.find(x => x.id === id); if (!p) return;
-    setMusic({ sig: p.sig, linesPerBar: p.linesPerBar, bars: p.rows.map(r => ({ ...r })) });
-  }
   function musicPayload() {
     if (!$g.musicOn) return {};
     const m = $g.music;
-    return { music: { bpm: m.bpm || styleBpm, sig: m.sig, linesPerBar: m.linesPerBar === 'auto' ? '' : m.linesPerBar, bars: m.bars.filter(r => r.name) } };
+    return { music: { bpm: m.bpm || styleBpm, sig: m.sig, linesPerBar: m.linesPerBar === 'auto' ? '' : m.linesPerBar,
+      bars: m.bars.filter(r => r.name && r.name.trim()).map(r => ({ ...r, tag: sunoTag(r) })) } };
   }
 
   const lim = $derived(limits($settings.sunoVersion));
@@ -161,6 +142,11 @@
     try {
       const r = await generate(fields, (_, full) => setGen({ output: full }), { signal: ctrl.signal });
       let text = r.text;
+      if ((mode === 'song' || mode === 'wild') && $g.musicOn && $g.music.bars.length) {
+        if (mode === 'wild') { const w = parseWild(text); text = `TITLE: ${w.title}\nSTYLE: ${w.style}\n\n${enforceStructure(w.lyrics, $g.music.bars)}`; }
+        else text = enforceStructure(text, $g.music.bars);
+        setGen({ output: text });
+      }
       if ((mode === 'song' || mode === 'wild') && $settings.autoSunoFix && HEBREW_RE.test(text) && !ctrl.signal.aborted) {
         setGen({ output: text });
         try { text = await fixText(text, mode, ctrl.signal); }
@@ -265,47 +251,7 @@
     <input class="field" bind:value={$g.persona} placeholder={$t('aiPersonaPh')} />
     <input class="field" bind:value={$g.extra} placeholder={$t('aiExtraPh')} />
 
-    <!-- musical structure -->
-    <div class="mix" class:on={$g.musicOn}>
-      <div class="mixhd">
-        <label class="chk big"><input type="checkbox" bind:checked={$g.musicOn} /> 🎼 {$t('aiMusic')}</label>
-        {#if $g.musicOn && music.bars.length}
-          <span class="tot mono">{$t('aiTotal')} {totalBars} {$t('aiBars')}{#if seconds} · {$t('aiApprox')}{Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, '0')}{/if}</span>
-        {/if}
-      </div>
-      {#if $g.musicOn}
-        <p class="faint hint">{$t('aiMusicHint')}</p>
-        <div class="mrow3">
-          <label class="f"><span>{$t('aiBpm')}</span><input class="field" inputmode="numeric" placeholder={styleBpm ? `${styleBpm} (${$t('aiBpmPh')})` : '—'} value={music.bpm} oninput={e => setMusic({ bpm: e.target.value.replace(/\D/g, '') })} /></label>
-          <label class="f"><span>{$t('aiSig')}</span><select class="field" value={music.sig} onchange={e => setMusic({ sig: e.target.value })}>{#each TIME_SIGS as sg}<option value={sg}>{sg}</option>{/each}</select></label>
-          <label class="f"><span>{$t('aiLpb')}</span><select class="field" value={music.linesPerBar} onchange={e => setMusic({ linesPerBar: e.target.value })}>
-            <option value="auto">{$t('aiLpbAuto')}</option><option value="1">{$t('aiLpb1')}</option><option value="0.5">{$t('aiLpbHalf')}</option><option value="2">{$t('aiLpb2')}</option>
-          </select></label>
-        </div>
-        <div class="mrow3">
-          <label class="f wide"><span>{$t('aiPreset')}</span>
-            <select class="field" value={presetId} onchange={e => applyPreset(e.target.value)}>
-              <option value="">{$t('aiPresetPick')}</option>
-              <option value="sections">{$t('aiFromSections')}</option>
-              {#each STRUCTURE_PRESETS as pr}<option value={pr.id}>{pr.label} · {pr.sig}</option>{/each}
-            </select></label>
-        </div>
-        {#each music.bars as r, i}
-          <div class="brow">
-            <input class="field name" list="secnames" value={r.name} oninput={e => setRow(i, { name: e.target.value })} />
-            <input class="field bars" inputmode="numeric" value={r.bars} oninput={e => setRow(i, { bars: e.target.value.replace(/\D/g, '') })} />
-            <select class="field kind" value={r.kind} onchange={e => setRow(i, { kind: e.target.value })}>
-              <option value="lyrics">{$t('aiKindLyrics')}</option><option value="instrumental">{$t('aiKindInstr')}</option><option value="backing">{$t('aiKindBacking')}</option>
-            </select>
-            <button class="ib" onclick={() => moveRow(i, -1)} disabled={i === 0}><Icon name="arrowUp" size={13} /></button>
-            <button class="ib" onclick={() => moveRow(i, 1)} disabled={i === music.bars.length - 1}><Icon name="arrowDown" size={13} /></button>
-            <button class="ib del" onclick={() => delRow(i)}><Icon name="x" size={13} /></button>
-          </div>
-        {/each}
-        <datalist id="secnames">{#each SECTION_NAMES as n}<option value={n}></option>{/each}</datalist>
-        <button class="linkBtn" onclick={addRow}>+ {$t('aiAddRow')}</button>
-      {/if}
-    </div>
+    <StructureBuilder {styleBpm} />
 
     <div class="mix" class:on={$g.mixOn}>
       <div class="mixhd">

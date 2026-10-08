@@ -145,12 +145,14 @@ function musicText(b) {
   if (lpb) lines.push(`- Line mapping: ${lpb}`);
   if (Array.isArray(m.bars) && m.bars.length) {
     lines.push('- Sections, in order, with exact bar counts:');
-    for (const r of m.bars.slice(0, 24)) {
-      const name = clean(r.name, 40), n = parseInt(r.bars, 10) || 0;
-      const kind = r.kind === 'instrumental' ? 'instrumental — tag only, no lyrics' : r.kind === 'backing' ? 'backing vocals only (parentheses lines)' : 'lyrics';
-      if (name) lines.push(`  - [${name}] ${n ? n + ' bars' : ''} — ${kind}`);
+    for (const r of m.bars.slice(0, 32)) {
+      const name = clean(r.name, 40), n = parseInt(r.bars, 10) || 0, note = clean(r.note, 100), tag = clean(r.tag, 160);
+      const kind = r.kind === 'instrumental' ? 'INSTRUMENTAL: the tag alone on its line, NO lyric lines (a short ad-lib in parentheses at most)'
+        : r.kind === 'backing' ? 'backing vocals / chant only (every line in parentheses)'
+        : r.kind === 'rap' ? 'rapped lyrics' : 'sung lyrics';
+      if (name) lines.push(`  - ${tag || `[${name}]`} — ${n ? n + ' bars, ' : ''}${kind}${note ? ` — producer note: ${note}` : ''}`);
     }
-    lines.push('  Match these bar counts exactly with the line mapping above; do not add sections that are not listed.');
+    lines.push('  Use exactly these sections in exactly this order, and write each tag exactly as shown (same name and the same words after the colon). Match the bar counts exactly with the line mapping above. Do not add, merge or skip sections; an instrumental section still appears, as its tag alone.');
   }
   if (!lines.length) return '';
   return ['MUSICAL STRUCTURE (binding):', ...lines].join('\n');
@@ -476,7 +478,7 @@ function lineIssues(text, b) {
   for (const raw of text.split('\n')) {
     const l = raw.trim();
     const tag = l.match(/^\[([^\]]{1,80})\]$/);
-    if (tag) { flush(); cur = tag[1].split(/[-–:]/)[0].trim().toLowerCase(); count = 0; continue; }
+    if (tag) { flush(); cur = tag[1].split(/:|\s[-–]\s/)[0].trim().toLowerCase(); count = 0; continue; }
     if (l && cur) count++;
   }
   flush();

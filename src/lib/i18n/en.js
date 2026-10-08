@@ -171,4 +171,9 @@ export default {
   fxRhythm: 'Rhythm', fxRhythmHint: 'Estimated syllables per line. An orange number stands out from its section, and Suno may rush or stretch it.',
   fxDone: 'Text prepared for Suno', fxFail: 'Preparing for Suno failed, the text is unchanged',
   fxAuto: 'Prepare for Suno automatically (pronunciation and rhythm)', fxAutoCover: 'Prepare for Suno automatically: spelling Suno reads right, line lengths like the original',
+  // structure builder
+  stTitle: 'Structure & bars', stLines: 'lines', stHint: 'Each part goes to Suno as a tag with its bar count, kind and note, e.g. [Drop: instrumental, 16 bars]. Lyric lines follow the bars, and an instrumental part stays without lyrics.',
+  stTimelineTitle: 'The song timeline. Click a part to select it', stAdd: 'Add:', stKindRap: 'Rap', stLinesTitle: 'How many lyric lines this part gets',
+  stNotePh: 'Producer note for this part, e.g. heavy bass, no vocals, piano only', stToEditor: 'To editor', stToEditorTitle: 'Create the parts in the editor with their tags, empty for writing by hand',
+  stToEditorConfirm: 'Replace the editor sections with this structure? (Undo works)', stToEditorDone: '{n} parts created in the editor',
 };
