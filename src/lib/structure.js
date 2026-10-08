@@ -72,7 +72,12 @@ export function enforceStructure(text, rows) {
     const row = rows[j]; ri = j + 1;
     const extra = s.tag.includes(':') ? s.tag.slice(s.tag.indexOf(':') + 1).split(',').map(x => x.trim()) : [];
     let lines = s.lines;
-    if (row.kind === 'instrumental') lines = lines.filter(l => /^\s*\(.*\)\s*$/.test(l));
+    if (row.kind === 'instrumental') {
+      // only ad-lib lines in parentheses; none at all when the note says "no vocals"
+      // (the first section keeps its lines: that is where the producer's intro tag lives)
+      const silent = /no\s*(vocals?|vox|voice)|instrumental only/i.test(row.note || '') && out.length > 0;
+      lines = silent ? [] : lines.filter(l => /^\s*\(.*\)\s*$/.test(l));
+    }
     out.push({ tag: emit(row, extra), lines });
   }
   for (let k = ri; k < rows.length; k++) if (rows[k].kind === 'instrumental') out.push({ tag: sunoTag(rows[k]), lines: [] });

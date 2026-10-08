@@ -147,7 +147,7 @@ function musicText(b) {
     lines.push('- Sections, in order, with exact bar counts:');
     for (const r of m.bars.slice(0, 32)) {
       const name = clean(r.name, 40), n = parseInt(r.bars, 10) || 0, note = clean(r.note, 100), tag = clean(r.tag, 160);
-      const kind = r.kind === 'instrumental' ? 'INSTRUMENTAL: the tag alone on its line, NO lyric lines (a short ad-lib in parentheses at most)'
+      const kind = r.kind === 'instrumental' ? 'INSTRUMENTAL: the tag alone on its line, NO lyric lines (a short ad-lib in parentheses at most, and none at all when the note says no vocals)'
         : r.kind === 'backing' ? 'backing vocals / chant only (every line in parentheses)'
         : r.kind === 'rap' ? 'rapped lyrics' : 'sung lyrics';
       if (name) lines.push(`  - ${tag || `[${name}]`} — ${n ? n + ' bars, ' : ''}${kind}${note ? ` — producer note: ${note}` : ''}`);
