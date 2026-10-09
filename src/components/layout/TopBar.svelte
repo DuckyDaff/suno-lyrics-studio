@@ -38,7 +38,7 @@
         let out;
         if (kind === 'nikud') {
           const r = await nikudWithHomographs(s.text); out = r.text;
-          homographs.update(m => { const nm = new Map(m); r.ambiguous.length ? nm.set(s.id, r.ambiguous.map(a => ({ ...a, current: a.masc, gender: 'masc' }))) : nm.delete(s.id); return nm; });
+          homographs.update(m => { const nm = new Map(m); r.ambiguous.length ? nm.set(s.id, r.ambiguous) : nm.delete(s.id); return nm; });
         } else if (kind === 'latin') { let src = s.text; try { src = await nakdan(s.text); } catch {} out = latinize(src); }
         else out = phonetic(s.text);
         actions.setText(s.id, out);

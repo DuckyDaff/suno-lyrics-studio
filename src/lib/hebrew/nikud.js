@@ -2,6 +2,11 @@
  * Nikud via the Dicta Nakdan API (proxied by /api/nikud) + homograph (gender) handling.
  * Ported from the legacy app.
  */
+import { get } from 'svelte/store';
+import { song } from '../song.js';
+/** the open song's "who sings to whom" ('' when not set) */
+export const songVoice = () => get(song)?.voice || '';
+
 const NAKDAN_BODY = t => ({ task: 'nakdan', data: t, genre: 'modern', addmorph: false });
 
 export const HEBREW_RE = /[א-ת]/;
@@ -19,8 +24,8 @@ export async function nakdanRaw(text) {
 }
 
 /** Text with nikud (first option per word). */
-export async function nakdan(text) {
-  return buildNikudText(await nakdanRaw(text), null) || text;
+export async function nakdan(text, voice = songVoice()) {
+  return buildNikudText(await nakdanRaw(text), null, voice) || text;
 }
 
 /* ── homographs: same spelling, different nikud for masc / fem ───────────── */
@@ -143,23 +148,106 @@ export function findGenderAmbiguous(rawData) {
 }
 
 /** Rebuild the text from the raw response. choices: Map<originalWord, chosenNikud> */
-export function buildNikudText(rawData, choices) {
-  if (!Array.isArray(rawData)) return typeof rawData === 'string' ? rawData : '';
-  const parts = [];
-  for (const item of rawData) {
-    if (typeof item === 'string') { parts.push(item); continue; }
-    if (!item || typeof item !== 'object') continue;
-    if (item.sep) { parts.push(item.word ?? ''); continue; }
-    const chosen = choices?.get(item.word);
-    if (chosen) { parts.push(chosen); continue; }
-    const dict = HOMOGRAPH_DICT[item.word ?? ''];
-    if (dict) { parts.push(dict.masc); continue; }
-    if (item.options?.length) parts.push(String(item.options[0]).replace(/\|/g, ''));
-    else if (item.nakdan)      parts.push(item.nakdan);
-    else if (item.withNikud)   parts.push(item.withNikud);
-    else                       parts.push(item.word ?? '');
+/* ── who sings to whom: picks masculine / feminine forms by context ─────────── */
+/** voice: 'm>f' | 'm>m' | 'f>m' | 'f>f' | '' — singer's gender > listener's gender */
+export const VOICES = ['m>f', 'm>m', 'f>m', 'f>f'];
+const parseVoice = v => (/^[mf]>[mf]$/.test(v || '') ? { from: v[0], to: v[2] } : null);
+
+/** a clear masculine / feminine pair from two Dicta options, or null (only real gender endings count) */
+// gender endings; mark order differs between sources (ת + dagesh + qamats or ת + qamats + dagesh)
+const M_END = /ת[ָּ]{1,2}$|ִיתָ$|ך[ָּ]{1,2}$|ֶה$/;           // הָלַכְתָּ, רָאִיתָ, שֶׁלְּךָ, רוֹצֶה
+const F_END = /ת[ְּ]{1,2}$|ִית$|[ֵָ]ךְ$|ָה$|ֶת$/;            // הָלַכְתְּ, רָאִית, שֶׁלָּךְ / בִּשְׁבִילֵךְ, רוֹצָה
+const SECOND = /ת[ָּ]{1,2}$|ִיתָ$|ך[ָּ]{1,2}$/;              // "you did", "your", "to you"
+
+/** the masculine / feminine pair among Dicta's first options (same letters), or null */
+function genderPair(opts) {
+  if (!opts || opts.length < 2) return null;
+  const list = opts.slice(0, 8).map(o => String(o).replace(/\|/g, ''));
+  const a = list[0], base = stripNikud(a);
+  const other = re => list.find(o => o !== a && stripNikud(o) === base && re.test(o));
+  if (M_END.test(a)) { const f = other(F_END); if (f) return { masc: a, fem: f }; }
+  if (F_END.test(a)) { const m = other(M_END); if (m) return { masc: m, fem: a }; }
+  return null;
+}
+/** Dicta sometimes offers only the masculine "you did" (חָזַרְתָּ / רָאִיתָ): derive the feminine form */
+function pastPair(opts) {
+  const a = opts && opts.length ? String(opts[0]).replace(/\|/g, '') : '';
+  if (/ִיתָ$/.test(a)) return { masc: a, fem: a.replace(/ָ$/, '') };
+  if (/ת[ָּ]{2}$/.test(a) && stripNikud(a).length >= 3 && stripNikud(a) !== 'את') return { masc: a, fem: a.replace(/ת[ָּ]{2}$/, 'תְּ') };
+  return null;
+}
+/** 2nd person (past "you did", "your", "you" suffixes) agrees with the listener */
+const secondPerson = p => SECOND.test(p.masc);
+const PRON = { 'אני': 'from', 'אנוכי': 'from', 'אתה': 'm', 'את': 'f', 'הוא': 'm', 'היא': 'f' };
+
+/** 'masc' | 'fem' for a gendered word, from the voice and the pronoun just before it in the line */
+function chooseGender(pair, prev, v) {
+  if (secondPerson(pair)) return v.to === 'f' ? 'fem' : 'masc';
+  for (let k = prev.length - 1; k >= Math.max(0, prev.length - 3); k--) {
+    const who = PRON[stripNikud(prev[k])];
+    if (!who) continue;
+    const g = who === 'from' ? v.from : who;
+    return g === 'f' ? 'fem' : 'masc';
   }
-  return parts.join('').trim();
+  return v.from === 'f' ? 'fem' : 'masc';         // songs speak in the first person by default
+}
+
+/** tokens with a flag for words whose form depends on gender */
+function buildTokens(rawData, choices, voice) {
+  const v = parseVoice(voice);
+  const out = [];
+  let prev = [];
+  for (const item of rawData) {
+    if (typeof item === 'string') { out.push({ t: item }); if (item.includes('\n')) prev = []; continue; }
+    if (!item || typeof item !== 'object') continue;
+    if (item.sep) { const w = item.word ?? ''; out.push({ t: w }); if (w.includes('\n')) prev = []; continue; }
+    const word = item.word ?? '';
+    const chosen = choices?.get(word);
+    if (chosen) { out.push({ t: chosen }); prev.push(word); continue; }
+    const pair = HOMOGRAPH_DICT[word] || genderPair(item.options) || (v ? pastPair(item.options) : null);
+    if (pair && v) { out.push({ t: chooseGender(pair, prev, v) === 'fem' ? pair.fem : pair.masc, g: true }); prev.push(word); continue; }
+    if (pair) { out.push({ t: HOMOGRAPH_DICT[word] ? pair.masc : String(item.options[0]).replace(/\|/g, ''), g: true }); prev.push(word); continue; }
+    let t;
+    if (item.options?.length) t = String(item.options[0]).replace(/\|/g, '');
+    else if (item.nakdan)      t = item.nakdan;
+    else if (item.withNikud)   t = item.withNikud;
+    else                       t = word;
+    out.push({ t }); prev.push(word);
+  }
+  return out;
+}
+
+export function buildNikudText(rawData, choices, voice = '') {
+  if (!Array.isArray(rawData)) return typeof rawData === 'string' ? rawData : '';
+  return buildTokens(rawData, choices, voice).map(x => x.t).join('').trim();
+}
+
+/**
+ * Re-vocalize only the gendered words of a text for a new "who sings to whom", keeping every
+ * other word exactly as it is (the user's own nikud included). Returns { text, changed }.
+ */
+export async function regenderLyrics(text, voice) {
+  const lines = String(text || '').replace(/\r/g, '').split('\n');
+  const idx = [];
+  lines.forEach((l, i) => { if (HEBREW_RE.test(l) && !/^\s*\[/.test(l) && !/^\s*(TITLE|STYLE):/i.test(l)) idx.push(i); });
+  if (!idx.length) return { text, changed: 0 };
+  const raw = await nakdanRaw(idx.map(i => stripNikud(lines[i])).join('\n'));
+  if (!Array.isArray(raw)) return { text, changed: 0 };
+  const MARK = '\u0001';
+  const marked = buildTokens(raw, null, voice).map(x => (x.g ? MARK + x.t : x.t)).join('').split('\n');
+  if (marked.length !== idx.length) return { text, changed: 0 };
+  let changed = 0;
+  idx.forEach((li, k) => {
+    const a = lines[li].split(/(\s+)/), b = marked[k].split(/(\s+)/);
+    if (a.length !== b.length) return;
+    lines[li] = a.map((w, j) => {
+      if (!b[j].includes(MARK)) return w;
+      const nw = b[j].replace(MARK, '');
+      if (nw !== w) changed++;
+      return nw;
+    }).join('');
+  });
+  return { text: lines.join('\n'), changed };
 }
 
 /** Hebrew words (2+ letters) that carry no nikud at all */
@@ -174,9 +262,9 @@ function keepVocalized(orig, voc) {
 }
 const lineNeedsNikud = l => !/^\s*\[/.test(l) && !/^\s*(TITLE|STYLE):/i.test(l) && unvocalizedWords(l).length > 0;
 
-async function nakdanLineRetry(line) {
+async function nakdanLineRetry(line, voice) {
   for (let i = 0; i < 2; i++) {
-    try { const r = await nakdan(line); if (r && !unvocalizedWords(r).length) return r; if (i === 1 && r) return r; }
+    try { const r = await nakdan(line, voice); if (r && !unvocalizedWords(r).length) return r; if (i === 1 && r) return r; }
     catch (e) { if (i === 1) throw e; }
     await new Promise(r => setTimeout(r, 400));
   }
@@ -189,7 +277,7 @@ async function nakdanLineRetry(line) {
  * pass 2 re-runs (sequentially, with a retry) any line that still has bare Hebrew words,
  * so a hiccup at Dicta cannot leave half a song unvocalized. onProgress(done, total).
  */
-export async function nikudLyrics(text, onProgress) {
+export async function nikudLyrics(text, onProgress, voice = songVoice()) {
   const lines = String(text || '').replace(/\r/g, '').split('\n');
   const idx = [];
   lines.forEach((l, i) => { if (lineNeedsNikud(l)) idx.push(i); });
@@ -197,7 +285,7 @@ export async function nikudLyrics(text, onProgress) {
   onProgress?.(0, idx.length);
   try {
     const raw = await nakdanRaw(idx.map(i => stripNikud(lines[i])).join('\n'));
-    const out = buildNikudText(raw, null).split('\n');
+    const out = buildNikudText(raw, null, voice).split('\n');
     if (out.length === idx.length) idx.forEach((i, k) => { lines[i] = keepVocalized(lines[i], out[k]); });
   } catch {}
   // pass 2: whatever is still bare, line by line
@@ -205,14 +293,18 @@ export async function nikudLyrics(text, onProgress) {
   onProgress?.(idx.length - left.length, idx.length);
   let k = 0;
   for (const i of left) {
-    try { lines[i] = keepVocalized(lines[i], await nakdanLineRetry(stripNikud(lines[i]))); } catch {}
+    try { lines[i] = keepVocalized(lines[i], await nakdanLineRetry(stripNikud(lines[i]), voice)); } catch {}
     onProgress?.(idx.length - left.length + (++k), idx.length);
   }
   return lines.join('\n');
 }
 
 /** Nikud a text; returns { text, ambiguous } */
-export async function nikudWithHomographs(text) {
+export async function nikudWithHomographs(text, voice = songVoice()) {
   const raw = await nakdanRaw(text);
-  return { text: buildNikudText(raw, null) || text, ambiguous: findGenderAmbiguous(raw) };
+  const out = buildNikudText(raw, null, voice) || text;
+  // which form each ambiguous word got, so the per-word gender bar starts on the right button
+  const fem = a => out.includes(a.fem) && !out.includes(a.masc);
+  const ambiguous = findGenderAmbiguous(raw).map(a => ({ ...a, current: fem(a) ? a.fem : a.masc, gender: fem(a) ? 'fem' : 'masc' }));
+  return { text: out, ambiguous };
 }

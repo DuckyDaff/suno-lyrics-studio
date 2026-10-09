@@ -206,6 +206,15 @@ function sunoDelivery(b) {
   return [SUNO_RHYTHM, he ? SUNO_HE : ''].filter(Boolean).join('\n');
 }
 
+/** who sings to whom: every gendered form must agree (and the nikud follows it) */
+function voiceText(b) {
+  const m = /^([mf])>([mf])$/.exec(b.voice || '');
+  if (!m) return '';
+  const g = x => (x === 'f' ? 'a woman' : 'a man');
+  const he = x => (x === 'f' ? 'feminine' : 'masculine');
+  return `VOICES (binding): the singer is ${g(m[1])}, singing to ${g(m[2])}. Every gendered form must agree: the singer's own verbs, adjectives and "I" forms are ${he(m[1])} (אני ${m[1] === 'f' ? 'רוֹצָה, הוֹלֶכֶת, מוּכָנָה' : 'רוֹצֶה, הוֹלֵךְ, מוּכָן'}); everything addressed to the listener is ${he(m[2])} (${m[2] === 'f' ? 'אַתְּ, שֶׁלָּךְ, אוֹתָךְ, הָלַכְתְּ, תִּשְׁאֲרִי' : 'אַתָּה, שֶׁלְּךָ, אוֹתְךָ, הָלַכְתָּ, תִּשָּׁאֵר'}). Where a word is spelled the same for both genders, add the nikud that shows the right one.`;
+}
+
 function songContext(b) {
   const lines = [];
   if (b.title) lines.push(`Song title: ${clean(b.title, 200)}`);
@@ -246,6 +255,7 @@ function buildUser(b) {
         structure,
         producerTag(b),
         artistText(b),
+        voiceText(b),
         clubRule(b),
         musicText(b),
         blendText(b),
@@ -264,6 +274,7 @@ function buildUser(b) {
         b.form && b.form !== 'auto' ? `Form: ${b.form}.` : 'Pick whichever form fits the concept best (pop, rap, opera, musical, ballad, mizrahi, punk, children…).',
         producerTag(b),
         artistText(b),
+        voiceText(b),
         clubRule(b),
         musicText(b),
         sunoDelivery(b),
@@ -314,6 +325,7 @@ function buildUser(b) {
         b.notes ? `Writer's notes: ${clean(b.notes, 1200)}` : '',
         producerTag(b),
         artistText(b),
+        voiceText(b),
         blendText(b),
         sunoDelivery(b),
         b.keepWords ? 'Even when the original words are kept, you may and should change their SPELLING for Suno (the toolkit above): the words stay, the way they are written changes. Keep the original line count per section and each line\'s syllable count (±1) so the original melody still fits.' : '',
@@ -370,6 +382,7 @@ function buildUser(b) {
           ? 'The WORDS must stay exactly the same (an existing song or a cover): change only how they are WRITTEN (spelling, nikud, hyphens, Latin letters for single words, line breaks), never what is said.'
           : 'Keep the words and the meaning. Change spelling first; change a word only when no spelling can make it singable, and then use the closest equivalent that keeps rhyme and meaning.',
         sunoDelivery(b),
+        voiceText(b) ? voiceText(b) + (b.keepWords ? ' The words stay; only fix the nikud of gendered words to match.' : '') : '',
         b.srcLyrics ? `ORIGINAL SONG (the melody this version follows). Keep each section's line count, and each line's syllable count within ±1 of the matching original line:\n${clean(b.srcLyrics, 6000)}` : '',
         b.style ? `Style of the track: ${clean(b.style, 600)}` : '',
         b.form ? `Form: ${clean(b.form, 80)}` : '',
@@ -424,6 +437,7 @@ function buildUser(b) {
         b.bars ? `This section is ${parseInt(b.bars, 10)} bars — match the line count to the bars using the line mapping.` : '',
         b.idea ? `Guidance: ${clean(b.idea, 1000)}` : '',
         artistText(b),
+        voiceText(b),
         sunoDelivery(b),
         songContext({ ...b, lyrics: b.lyrics }),
         b.rhyme === 'free verse' ? '' : 'Keep a clear end-rhyme scheme on stressed syllables in the new text (match the song\'s scheme if it has one).',

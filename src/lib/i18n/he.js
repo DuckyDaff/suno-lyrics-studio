@@ -185,4 +185,8 @@ export default {
   stTimelineTitle: 'ציר הזמן של השיר. לחיצה על חלק מסמנת אותו', stAdd: 'הוסף:', stKindRap: 'ראפ', stLinesTitle: 'כמה שורות מילים ייכתבו לחלק הזה',
   stNotePh: 'הערת מפיק לחלק (באנגלית), למשל: heavy bass, no vocals, piano only', stToEditor: 'לעורך', stToEditorTitle: 'צור את החלקים בעורך עם התגים, ריקים לכתיבה ידנית',
   stToEditorConfirm: 'להחליף את הסקשנים בעורך במבנה הזה? (אפשר לבטל עם ביטול פעולה)', stToEditorDone: 'נוצרו {n} חלקים בעורך',
+  // who sings to whom
+  vpLabel: 'מי שר למי', vpMF: 'גבר ← לאישה', vpMM: 'גבר ← לגבר', vpFM: 'אישה ← לגבר', vpFF: 'אישה ← לאישה',
+  vpTitle: 'קובע את הניקוד ואת הלשון: מה שהזמר אומר על עצמו לפי המין שלו, ומה שנאמר למי ששומע לפי המין שלו',
+  vpFixed: 'עודכן ניקוד ב-{n} מילים לפי מי שר למי', vpNothing: 'אין מילים שתלויות במין לעדכן',
 };

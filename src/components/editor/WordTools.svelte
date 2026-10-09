@@ -51,7 +51,7 @@
       if (kind === 'nikud') {
         homographs.update(m => {
           const nm = new Map(m);
-          if (ambiguous.length) nm.set(sec.id, ambiguous.map(a => ({ ...a, current: a.masc, gender: 'masc' })));
+          if (ambiguous.length) nm.set(sec.id, ambiguous);
           else nm.delete(sec.id);
           return nm;
         });

@@ -31,6 +31,7 @@ export async function generate(fields, onDelta, { signal } = {}) {
     lyrics: fields.lyrics ?? buildLyrics(cur),
     producerTag: s.producerTagOn && tag ? tag : '',
     artist: artistPayload(art),
+    voice: cur.voice || '',
     ...fields,
   };
 

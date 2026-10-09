@@ -83,6 +83,8 @@ export const actions = {
   setExclude: v => mutate(s => { s.exclude = v; }, { typing: true }),
   setCoverPrompt: v => mutate(s => { s.coverPrompt = v; }),
   setCover: v => mutate(s => { s.coverPath = v; }),
+  /** who sings to whom: 'm>f' | 'm>m' | 'f>m' | 'f>f' | '' (decides gendered nikud and wording) */
+  setVoice: v => mutate(s => { s.voice = v || ''; }),
   /** which artist ("hat") the song is released under: { id, name, emoji } or null */
   setArtist: a => mutate(s => { s.artist = a ? { id: a.id, name: a.name, emoji: a.emoji || '🎧' } : null; }),
   setText:    (id, v) => mutate(s => { const x = s.sections.find(q => q.id === id); if (x) x.text = v; }, { typing: true }),

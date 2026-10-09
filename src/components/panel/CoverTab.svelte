@@ -9,11 +9,12 @@
   import { generate, busy, phase } from '../../lib/ai.js';
   import { parseLyrics, parseWild, parseLines } from '../../lib/lyricsParse.js';
   import { buildLyrics } from '../../lib/suno.js';
-  import { nikudLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
+  import { nikudLyrics, regenderLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
   import { copyText } from '../../lib/clipboard.js';
   import { toast } from '../../lib/toast.js';
   import { t } from '../../lib/i18n.js';
   import { homographs } from '../../lib/ui.js';
+  import VoicePick from '../ui/VoicePick.svelte';
   import SunoFixPanel from './SunoFixPanel.svelte';
   import { runSunoFix } from '../../lib/sunoFix.js';
   import Button from '../ui/Button.svelte';
@@ -103,13 +104,22 @@
     } catch (e) { if (e.code !== 'aborted') toast($t('fxFail'), 'error', 5000); }
     finally { ctrl = null; }
   }
+  let vBusy = $state(false);
+  async function regenderOut(v) {
+    if (!$cv.output || !HEBREW_RE.test($cv.output) || $cv.outMode !== 'cover' || $busy) return;
+    vBusy = true;
+    try { const r = await regenderLyrics($cv.output, v); if (r.changed) { setCover({ output: r.text }); toast($t('vpFixed', { n: r.changed }), 'success'); } }
+    catch {} finally { vBusy = false; }
+  }
   function revertFix() { if (!$cv.fix?.before) return; setCover({ output: $cv.fix.before, fix: null }); }
   function useIdea(line) { setCover({ recipe: 'free', notes: line, outMode: '', output: '' }); toast($t('cvUseIdea'), 'success'); }
 
   function applyNew() {
     const secs = parseLyrics(wild.lyrics); if (!secs.length) return toast($t('toastNothing'), 'error');
     const of = srcSong ? { id: srcSong.id, title: srcSong.title } : srcTitle ? { title: srcTitle } : null;
+    const voice = $song.voice || '';
     newSong(); homographs.set(new Map());
+    if (voice) actions.setVoice(voice);
     actions.replaceAll(secs, wild.style || null);
     actions.setTitle(wild.title || (srcTitle ? `${srcTitle} (${rec.he})` : ''));
     if (of) song.update(s => ({ ...s, coverOf: of }));
@@ -188,6 +198,7 @@
       <p class="faint small">{$t('cvHint')}</p>
     </div>
 
+    <VoicePick onChange={regenderOut} busy={vBusy} compact />
     <label class="fxchk" title={$t('fxTitle')}><input type="checkbox" checked={$settings.autoSunoFix} onchange={e => setSetting('autoSunoFix', e.target.checked)} /> 🗣 {$t('fxAutoCover')}</label>
     <div class="actions">
       <Button variant={$busy ? 'danger' : 'primary'} icon="sparkles" onclick={run}>{$busy ? $t('aiStop') : $t('cvRun')}</Button>

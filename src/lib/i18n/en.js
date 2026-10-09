@@ -176,4 +176,8 @@ export default {
   stTimelineTitle: 'The song timeline. Click a part to select it', stAdd: 'Add:', stKindRap: 'Rap', stLinesTitle: 'How many lyric lines this part gets',
   stNotePh: 'Producer note for this part, e.g. heavy bass, no vocals, piano only', stToEditor: 'To editor', stToEditorTitle: 'Create the parts in the editor with their tags, empty for writing by hand',
   stToEditorConfirm: 'Replace the editor sections with this structure? (Undo works)', stToEditorDone: '{n} parts created in the editor',
+  // who sings to whom
+  vpLabel: 'Who sings to whom', vpMF: 'Man → to a woman', vpMM: 'Man → to a man', vpFM: 'Woman → to a man', vpFF: 'Woman → to a woman',
+  vpTitle: 'Sets nikud and wording: what the singer says about themself follows their gender, what is said to the listener follows the listener’s',
+  vpFixed: 'Nikud updated in {n} words for who sings to whom', vpNothing: 'No gender-dependent words to update',
 };

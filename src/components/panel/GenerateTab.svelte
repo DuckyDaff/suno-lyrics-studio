@@ -5,7 +5,8 @@
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
   import { generate, busy, phase } from '../../lib/ai.js';
-  import { nikudLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
+  import { nikudLyrics, regenderLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
+  import VoicePick from '../ui/VoicePick.svelte';
   import { genState as g, setGen, blankMix, genAbort } from '../../lib/genState.js';
   import { parseLyrics, parseWild, parseLines, parseCover } from '../../lib/lyricsParse.js';
   import { copyText } from '../../lib/clipboard.js';
@@ -187,6 +188,13 @@
     } catch (e) { if (e.code !== 'aborted') toast($t('fxFail'), 'error', 5000); }
     finally { if (genAbort.current === ctrl) genAbort.current = null; }
   }
+  let vBusy = $state(false);
+  async function regenderOut(v) {
+    if (!$g.output || !HEBREW_RE.test($g.output) || !($g.outMode === 'song' || $g.outMode === 'wild') || $busy) return;
+    vBusy = true;
+    try { const r = await regenderLyrics($g.output, v); if (r.changed) { setGen({ output: r.text }); toast($t('vpFixed', { n: r.changed }), 'success'); } }
+    catch {} finally { vBusy = false; }
+  }
   function revertFix() { if (!$g.fix?.before) return; setGen({ output: $g.fix.before, fix: null }); }
 
   function applyLyrics(replace) {
@@ -248,6 +256,7 @@
     <StyleBox {buildFields} />
 
     <div class="lyrHd">📝 {$t('aiLyricsBox')}</div>
+    <VoicePick onChange={regenderOut} busy={vBusy} compact />
     <input class="field" bind:value={$g.persona} placeholder={$t('aiPersonaPh')} />
     <input class="field" bind:value={$g.extra} placeholder={$t('aiExtraPh')} />
 
