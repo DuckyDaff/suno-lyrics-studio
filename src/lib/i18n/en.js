@@ -168,7 +168,7 @@ export default {
   fxRun: 'Prepare for Suno', fxAgain: 'Check again for Suno', fxBusy: 'Preparing for Suno…',
   fxTitle: 'A producer pass: respells words Suno would misread (geresh sounds, slang, loanwords, acronyms, numbers) and evens out the rhythm',
   fxSummary: '{s} pronunciation · {r} rhythm fixes', fxNone: 'Nothing needed fixing', fxRevert: 'Undo fixes',
-  fxRhythm: 'Rhythm', fxRhythmHint: 'Estimated syllables per line. An orange number stands out from its section, and Suno may rush or stretch it.',
+  fxRhythm: 'Rhythm', fxRhythmHint: 'Estimated syllables per line. An orange number stands out from its section. A red number is too long for one breath (over 12 syllables sung, 16 rapped).',
   fxDone: 'Text prepared for Suno', fxFail: 'Preparing for Suno failed, the text is unchanged',
   fxAuto: 'Prepare for Suno automatically (pronunciation and rhythm)', fxAutoCover: 'Prepare for Suno automatically: spelling Suno reads right, line lengths like the original',
   // structure builder
@@ -180,4 +180,5 @@ export default {
   vpLabel: 'Who sings to whom', vpMF: 'Man → to a woman', vpMM: 'Man → to a man', vpFM: 'Woman → to a man', vpFF: 'Woman → to a woman',
   vpTitle: 'Sets nikud and wording: what the singer says about themself follows their gender, what is said to the listener follows the listener’s',
   vpFixed: 'Nikud updated in {n} words for who sings to whom', vpNothing: 'No gender-dependent words to update',
+  fxLong: '{n} lines with no breath', fxLongTitle: 'Too long for one breath: Suno sings it without a pause. "Prepare for Suno" splits it at the breath point',
 };

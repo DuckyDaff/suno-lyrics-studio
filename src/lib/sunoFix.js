@@ -66,19 +66,26 @@ export function syllables(line) {
   return String(line).replace(/\([^)]*\)/g, ' ').split(/[\s\-–]+/).reduce((n, w) => n + wordSyllables(w), 0);
 }
 
-/** [{ name, counts: [n…], odd: [bool…] }] — odd = more than 2 away from the section's median */
+/** breath limit per sung line: rap sections may run longer */
+const limitFor = tag => (/rap|drill|trap|hip.?hop/i.test(tag) ? 16 : 12);
+
+/** [{ name, counts, odd, long, limit }] — odd = more than 2 away from the section's median,
+ *  long = over the breath limit (Suno sings it without a breath) */
 export function rhythmProfile(text) {
   const out = []; let cur = null;
   for (const raw of String(text || '').split('\n')) {
     const l = raw.trim();
     const m = l.match(/^\[([^\]]+)\]$/);
-    if (m) { cur = { name: m[1].split(':')[0].trim(), counts: [] }; out.push(cur); continue; }
+    if (m) { cur = { name: m[1].split(':')[0].trim(), counts: [], limit: limitFor(m[1]) }; out.push(cur); continue; }
     if (!l || /^\(.*\)$/.test(l)) continue;           // blank or a backing-only line
-    if (!cur) { cur = { name: '', counts: [] }; out.push(cur); }
+    if (!cur) { cur = { name: '', counts: [], limit: 12 }; out.push(cur); }
     cur.counts.push(syllables(l));
   }
   return out.filter(s => s.counts.length).map(s => {
     const sorted = [...s.counts].sort((a, b) => a - b), med = sorted[Math.floor(sorted.length / 2)];
-    return { ...s, odd: s.counts.map(c => Math.abs(c - med) > 2) };
+    return { ...s, odd: s.counts.map(c => Math.abs(c - med) > 2), long: s.counts.map(c => c > s.limit) };
   });
 }
+
+/** how many sung lines are over the breath limit */
+export const breathless = text => rhythmProfile(text).reduce((n, s) => n + s.long.filter(Boolean).length, 0);

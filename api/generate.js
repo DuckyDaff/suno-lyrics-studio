@@ -61,7 +61,7 @@ You write in Hebrew and English (and other languages when asked). If you have a 
 OUTPUT RULES (strict):
 - Output ONLY the requested text. No explanations, no preamble, no markdown, no code fences, no notes.
 - Use Suno formatting: section tags in square brackets on their own line, e.g. [Intro], [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Final Chorus], [Outro]. Tag names in English even when lyrics are Hebrew.
-- Backing vocals, ad-libs and crowd parts go in parentheses on their own line or inline: (oh-oh), (yeah), (choir: ...). Use them sparingly and musically.
+- Backing vocals, ad-libs and crowd parts go in parentheses on their own line or inline: (oh-oh), (yeah), (choir: ...). Use them sparingly and musically. The ad-libs must sound like a real artist of this genre on a real record: short vocal reactions and echoes (yeah, oh, אה, יאללה, הֵיי used rarely, a word echoed from the line before, a name or a place), call-and-response with the crowd, a held "oh-oh" in a pop hook. NEVER cartoon onomatopoeia or sound effects (וְרוּם, ברום, בום, טיק-טק, פיו-פיו, vroom, boom, zoom): that sounds like a children's song. Sound effects are allowed only in a children's song. At most one ad-lib per four lines, never one on every line, and never an ad-lib that just names the scene.
 - One lyric line per text line. Blank line between sections. No line numbers, no bullet points.
 - Never write a title line unless a title is explicitly requested.
 - Respect the requested language exactly. Hebrew must be natural, modern and singable — not translated-sounding. Gender agreement must be consistent with the persona/speaker.
@@ -193,11 +193,13 @@ const SUNO_HE = `SUNO HEBREW PRONUNCIATION. Suno reads the text literally: it gu
 Never over-correct: common words that Suno sings well stay as they are. Never change what is said.`;
 
 const SUNO_RHYTHM = `SUNO RHYTHM AND STRUCTURE. Suno follows the shape of the text, so the shape must be musical:
-- One line = one musical phrase. Break run-on lines at the phrase; never end a line in the middle of a phrase.
+- One line = one musical phrase, sung in ONE BREATH. Suno does not breathe inside a line: a long line comes out as a breathless machine run, the clearest sign that a song is AI. Hard limits per line: sung lines (pop, ballad, mizrahi, rock, musical) 6–10 syllables, never more than 12; dance and club hooks 4–8; rap up to 16. A longer line is split at its natural breath point into two lines (the words stay the same; prefer the split between clauses, before a preposition or after the verb phrase), or, for a phrase that must stay together, gets a comma at the breath.
+- Break run-on lines at the phrase; never end a line in the middle of a phrase.
 - Inside a section the lines carry a similar syllable count. Parallel lines in repeated sections (Verse 1 / Verse 2, every Chorus) match within ±1 syllable, so the melody can repeat.
 - A repeated chorus is written identically every time (same words, same spelling, same line breaks), so Suno reuses the melody.
 - Keep sections compact (verse 4–8 lines, pre-chorus 2–4, chorus 4–6) unless a structure is given. Overlong sections get rushed or skipped.
 - Punctuation is breath: a comma is a short pause, the line end is a breath. No ellipses, no emojis, no stray symbols. Parentheses only for backing vocals and ad-libs.
+- Ad-libs: ad-libs must sound like a real artist of this genre on a real record: short vocal reactions and echoes (yeah, oh, אה, יאללה, הֵיי used rarely, a word echoed from the line before, a name or a place), call-and-response with the crowd, a held "oh-oh" in a pop hook. NEVER cartoon onomatopoeia or sound effects (וְרוּם, ברום, בום, טיק-טק, פיו-פיו, vroom, boom, zoom): that sounds like a children's song. Sound effects are allowed only in a children's song. At most one ad-lib per four lines, never one on every line, and never an ad-lib that just names the scene.
 - Section tags on their own line, one blank line between sections, no text outside a tagged section.`;
 
 /** rules for every lyrics-writing mode; the Hebrew part only when Hebrew is in play */
@@ -379,15 +381,16 @@ function buildUser(b) {
       return [
         `You are a top Suno producer preparing finished lyrics so Suno SINGS them correctly: every word pronounced right and the rhythm holding its shape. This is a careful production pass, NOT a rewrite.`,
         b.keepWords
-          ? 'The WORDS must stay exactly the same (an existing song or a cover): change only how they are WRITTEN (spelling, nikud, hyphens, Latin letters for single words, line breaks), never what is said.'
+          ? 'The WORDS must stay exactly the same (an existing song or a cover): change only how they are WRITTEN (spelling, nikud, hyphens, Latin letters for single words, line breaks), never what is said. Splitting a too-long line at its breath point is allowed and expected: it changes no words. Ad-lib lines in parentheses are not part of the song\'s words: replace a childish one (sound effects like וְרוּם, בום) with a real ad-lib or remove it, and list it under CHANGES.'
           : 'Keep the words and the meaning. Change spelling first; change a word only when no spelling can make it singable, and then use the closest equivalent that keeps rhyme and meaning.',
         sunoDelivery(b),
         voiceText(b) ? voiceText(b) + (b.keepWords ? ' The words stay; only fix the nikud of gendered words to match.' : '') : '',
-        b.srcLyrics ? `ORIGINAL SONG (the melody this version follows). Keep each section's line count, and each line's syllable count within ±1 of the matching original line:\n${clean(b.srcLyrics, 6000)}` : '',
+        b.srcLyrics ? `ORIGINAL SONG (the melody this version follows). Keep each section's lines and each line's syllable count within ±1 of the matching original line, except that a line over the breath limit is split in two at its breath point (the two halves together match the original line):\n${clean(b.srcLyrics, 6000)}` : '',
         b.style ? `Style of the track: ${clean(b.style, 600)}` : '',
         b.form ? `Form: ${clean(b.form, 80)}` : '',
         musicText(b),
-        `Never add, remove, rename or reorder section tags. Keep every ad-lib and backing line, including a spoken intro tag in parentheses.`,
+        `Never add, remove, rename or reorder section tags. Keep every backing line and the spoken intro tag in parentheses; fix ad-libs only as described above.`,
+        `Breath check: count the syllables of every sung line; any line over the limit must be split or get a comma, and each split is listed under CHANGES as rhythm.`,
         `Nikud: keep existing nikud exactly on every word you do not change. On a word you change, add nikud only where the nikud itself is the fix; otherwise leave it bare (nikud is added automatically afterwards).`,
         `Output EXACTLY this format and nothing else:`,
         `LYRICS:`,

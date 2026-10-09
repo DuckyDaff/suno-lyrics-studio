@@ -1,7 +1,7 @@
 <script>
   /** 🗣 Prepare for Suno: run button, the change list (sound / rhythm), revert, and a syllables-per-line view. */
   import { t } from '../../lib/i18n.js';
-  import { rhythmProfile } from '../../lib/sunoFix.js';
+  import { rhythmProfile, breathless } from '../../lib/sunoFix.js';
 
   /** info: { before, changes } | null — text: the lyrics shown now (for the rhythm view) */
   let { info = null, busy = false, disabled = false, text = '', onRun, onRevert } = $props();
@@ -11,6 +11,7 @@
   const sound = $derived((info?.changes || []).filter(c => c.kind === 'sound'));
   const rhythm = $derived((info?.changes || []).filter(c => c.kind === 'rhythm'));
   const profile = $derived(showRhythm ? rhythmProfile(text) : []);
+  const longN = $derived(text ? breathless(text) : 0);
 </script>
 
 <div class="fx" class:done={info}>
@@ -26,6 +27,7 @@
       {#if info.before}<button class="lnk" onclick={onRevert} disabled={busy}>↩ {$t('fxRevert')}</button>{/if}
     {/if}
     <span class="sp"></span>
+    {#if longN && !busy}<button class="warnChip" onclick={() => (showRhythm = true)} title={$t('fxLongTitle')}>💨 {$t('fxLong', { n: longN })}</button>{/if}
     {#if text}<button class="lnk" onclick={() => (showRhythm = !showRhythm)}>📏 {$t('fxRhythm')}</button>{/if}
   </div>
 
@@ -41,7 +43,7 @@
       <p class="faint">{$t('fxRhythmHint')}</p>
       {#each profile as sec}
         <div class="sec"><span class="nm">{sec.name || '—'}</span>
-          <span class="cn mono">{#each sec.counts as c, i}<span class:odd={sec.odd[i]}>{c}</span>{/each}</span></div>
+          <span class="cn mono">{#each sec.counts as c, i}<span class:odd={sec.odd[i]} class:long={sec.long[i]} title={sec.long[i] ? $t('fxLongTitle') : ''}>{c}</span>{/each}</span></div>
       {/each}
     </div>
   {/if}
@@ -73,6 +75,8 @@
   .cn { display: flex; flex-wrap: wrap; gap: 4px; direction: ltr; }
   .cn span { padding: 0 5px; border-radius: 4px; background: var(--bg1); border: 1px solid var(--line); }
   .cn span.odd { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 50%, transparent); }
+  .cn span.long { color: var(--err); border-color: color-mix(in srgb, var(--err) 55%, transparent); font-weight: 800; }
+  .warnChip { font-size: var(--fs-xs); font-weight: 700; color: var(--err); padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--err) 10%, transparent); border: 1px solid color-mix(in srgb, var(--err) 35%, transparent); }
   .spin { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--accent); border-top-color: transparent; animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
