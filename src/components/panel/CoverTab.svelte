@@ -15,6 +15,7 @@
   import { t } from '../../lib/i18n.js';
   import { homographs } from '../../lib/ui.js';
   import VoicePick from '../ui/VoicePick.svelte';
+  import { ORIGINAL } from '../../lib/data/languages.js';
   import SunoFixPanel from './SunoFixPanel.svelte';
   import { runSunoFix } from '../../lib/sunoFix.js';
   import Button from '../ui/Button.svelte';
@@ -47,8 +48,10 @@
       srcTitle, srcLyrics, srcStyle: srcSong?.style || '',
       secondTitle: r.needsSecond ? secondSong?.title || '' : '', secondLyrics: r.needsSecond && secondSong ? buildLyrics(secondSong) : '',
       recipe: r.prompt, target, touchRule: tc.prompt, keepWords: $cv.touch === 'keep',
-      targetLanguage: r.needsLang ? $cv.language : ($cv.language !== 'Hebrew' ? $cv.language : ''),
-      language: $cv.language, topic: r.needsTopic ? $cv.topic : '', notes: $cv.notes,
+      // "Original language" = keep whatever the song is written in, no translation
+      targetLanguage: $cv.language === ORIGINAL ? 'the same language as the original song (do not translate; keep its dialect and slang)'
+        : r.needsLang ? $cv.language : ($cv.language !== 'Hebrew' ? $cv.language : ''),
+      language: $cv.language === ORIGINAL ? 'the language of the original song' : $cv.language, topic: r.needsTopic ? $cv.topic : '', notes: $cv.notes,
       // the server's default context (current song lyrics) must not leak into the cover
       lyrics: srcLyrics, title: srcTitle, style: '',
     };
@@ -87,7 +90,7 @@
     try {
       const r = await runSunoFix(w.lyrics || full, {
         keepWords: $cv.touch === 'keep', srcLyrics: $cv.touch === 'rewrite' ? '' : srcLyrics,
-        style: w.style, form: '', language: $cv.language,
+        style: w.style, form: '', language: $cv.language === ORIGINAL ? '' : $cv.language,
       }, { signal });
       setCover({ fix: { before: full, changes: r.changes } });
       return `TITLE: ${w.title}\nSTYLE: ${w.style}\n\n${r.lyrics}`;

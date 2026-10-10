@@ -202,10 +202,13 @@ const SUNO_RHYTHM = `SUNO RHYTHM AND STRUCTURE. Suno follows the shape of the te
 - Ad-libs: ad-libs must sound like a real artist of this genre on a real record: short vocal reactions and echoes (yeah, oh, אה, יאללה, הֵיי used rarely, a word echoed from the line before, a name or a place), call-and-response with the crowd, a held "oh-oh" in a pop hook. NEVER cartoon onomatopoeia or sound effects (וְרוּם, ברום, בום, טיק-טק, פיו-פיו, vroom, boom, zoom): that sounds like a children's song. Sound effects are allowed only in a children's song. At most one ad-lib per four lines, never one on every line, and never an ad-lib that just names the scene.
 - Section tags on their own line, one blank line between sections, no text outside a tagged section.`;
 
+const SUNO_PATOIS = `JAMAICAN PATOIS: write real Patois the way Jamaican artists write it, phonetic and consistent (mi, yuh, unu, dem, nuh, cyaan, seh, gyal, likkle, pickney, wah gwaan, irie, bredda), never a parody or a stereotype. Suno reads it by English phonetics, so keep one spelling per word through the whole song. Dancehall and reggae ad-libs fit here (yow, big up, seen, bless). Lines the original sings in plain English stay English.`;
+
 /** rules for every lyrics-writing mode; the Hebrew part only when Hebrew is in play */
 function sunoDelivery(b) {
   const he = /hebrew/i.test(`${b.language || ''} ${b.targetLanguage || ''}`) || /[\u05d0-\u05ea]/.test(`${b.fixText || ''}${b.srcLyrics || ''}`);
-  return [SUNO_RHYTHM, he ? SUNO_HE : ''].filter(Boolean).join('\n');
+  const patois = /patois|jamaican/i.test(`${b.language || ''} ${b.targetLanguage || ''}`);
+  return [SUNO_RHYTHM, he ? SUNO_HE : '', patois ? SUNO_PATOIS : ''].filter(Boolean).join('\n');
 }
 
 /** who sings to whom: every gendered form must agree (and the nikud follows it) */

@@ -49,7 +49,7 @@ export const TOUCH = [
     prompt: 'LYRICS: write new lyrics on the same theme, characters and emotional arc, in the new form. Keep at most the title phrase; everything else is new.' },
 ];
 
-export const COVER_LANGS = ['Hebrew', 'English', 'Hebrew and English mixed', 'Spanish', 'Italian', 'French', 'Arabic', 'Russian', 'Yiddish'];
+export { COVER_LANGS } from './data/languages.js';
 
 export const recipe = id => RECIPES.find(r => r.id === id) || RECIPES[0];
 export const touch = id => TOUCH.find(r => r.id === id) || TOUCH[1];

@@ -23,7 +23,7 @@
 
   import { FORM_GROUPS } from '../../lib/data/forms.js';
   import { genreHint } from '../../lib/genreHint.js';
-  const LANGS = ['Hebrew', 'English', 'Hebrew and English mixed', 'Italian', 'Spanish', 'French', 'Arabic', 'Russian', 'Yiddish', 'Ladino', 'Aramaic'];
+  import { LANGS } from '../../lib/data/languages.js';
   const RHYMES = ['auto', 'AABB', 'ABAB', 'ABCB', 'AAAA', 'free verse'];
   const VOICES = ['male rapper', 'female rapper', 'two rappers trading bars', 'male singer', 'female singer', 'male & female duet',
     'male cantor (chazan)', 'female opera soprano', 'male opera tenor', 'children choir', 'gospel choir', 'kid singer',
