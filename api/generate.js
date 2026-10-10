@@ -344,7 +344,7 @@ function buildUser(b) {
     }
     case 'coverIdeas': {
       return [
-        `Suggest 4 different cover-version directions for this song, one per line, no numbering. Each line: "<direction in ${lang}> — <one-line Suno style in English> — <how the chorus would feel, 6–10 words in ${lang}>". Make the four clearly different (tempo, genre, mood, performer).`,
+        `Suggest 6 different cover-version directions for this song, one per line, no numbering. Each line: "<direction in ${lang}> — <one-line Suno style in English> — <how the chorus would feel, 6–10 words in ${lang}>". Make the six clearly different from each other (tempo, genre, mood, performer, era, language feel): no two in the same genre.`,
         `ORIGINAL SONG${b.srcTitle ? ` — "${clean(b.srcTitle, 150)}"` : ''}:\n${clean(b.srcLyrics, 4000) || clean(b.idea, 800)}`,
       ].filter(Boolean).join('\n');
     }

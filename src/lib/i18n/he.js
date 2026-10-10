@@ -19,7 +19,7 @@ export default {
   cvTitle: 'גרסת קאבר לשיר קיים', cvSource: 'השיר המקורי', cvSrcLibrary: 'מהספרייה', cvSrcPaste: 'הדבקה', cvSrcIdea: 'רק רעיון',
   cvPick: 'בחר שיר…', cvPickSecond: 'שיר שני למאשאפ…', cvPasteTitle: 'שם השיר המקורי', cvPasteLyrics: 'הדבק כאן את המילים (עם או בלי תגי [Verse])', cvIdeaPh: 'למשל: "קאבר טראנס לשיר יום הולדת שמח"',
   cvRecipe: 'סוג הקאבר', cvTarget: 'סגנון היעד', cvTargetFree: 'או תאר סגנון בעצמך…', cvTouch: 'מה עושים עם המילים', cvLang: 'שפת היעד', cvTopic: 'הנושא החדש לפרודיה', cvNotes: 'הנחיות נוספות (לא חובה)',
-  cvRun: 'צור קאבר', cvIdeas: '4 כיוונים', cvIdeasBusy: 'חושב…', cvUseIdea: 'קח את הכיוון הזה', cvResult: 'הקאבר',
+  cvRun: 'צור קאבר', cvIdeas: '6 כיוונים', cvIdeasBusy: 'חושב…', cvUseIdea: 'קח את הכיוון הזה', cvResult: 'הקאבר',
   cvSaveNew: 'שמור כשיר חדש', cvReplace: 'החלף בשיר הנוכחי', cvSaved: 'הקאבר נשמר כשיר חדש בספרייה', cvCoverOf: 'קאבר של',
   cvNoSource: 'צריך שיר מקור: בחר מהספרייה, הדבק מילים או כתוב רעיון', cvNoLyrics: 'לשיר שנבחר אין מילים',
   cvHint: 'סונו מסנן שמות אמנים ב-Style ולפעמים מילים מוגנות. לשירים של אחרים עדיף "להתאים" או "לכתוב מחדש".',

@@ -18,7 +18,7 @@ export default {
   cvTitle: 'Cover version of an existing song', cvSource: 'Original song', cvSrcLibrary: 'From library', cvSrcPaste: 'Paste', cvSrcIdea: 'Idea only',
   cvPick: 'Pick a song…', cvPickSecond: 'Second song for the mashup…', cvPasteTitle: 'Original title', cvPasteLyrics: 'Paste the lyrics here (with or without [Verse] tags)', cvIdeaPh: 'e.g. "a trance cover of Happy Birthday"',
   cvRecipe: 'Cover type', cvTarget: 'Target style', cvTargetFree: 'or describe a style yourself…', cvTouch: 'What happens to the lyrics', cvLang: 'Target language', cvTopic: 'New topic for the parody', cvNotes: 'Extra instructions (optional)',
-  cvRun: 'Make the cover', cvIdeas: '4 directions', cvIdeasBusy: 'Thinking…', cvUseIdea: 'Take this direction', cvResult: 'The cover',
+  cvRun: 'Make the cover', cvIdeas: '6 directions', cvIdeasBusy: 'Thinking…', cvUseIdea: 'Take this direction', cvResult: 'The cover',
   cvSaveNew: 'Save as a new song', cvReplace: 'Replace the current song', cvSaved: 'Cover saved as a new song in the library', cvCoverOf: 'Cover of',
   cvNoSource: 'Need a source: pick from the library, paste lyrics or write an idea', cvNoLyrics: 'The chosen song has no lyrics',
   cvHint: 'Suno filters artist names in the Style and sometimes protected lyrics. For other people\'s songs prefer "Adapt" or "Rewrite".',
