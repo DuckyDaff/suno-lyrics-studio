@@ -42,10 +42,39 @@ export async function runSynonyms(lyricsText, { language = '' } = {}, { signal }
   if (!p || !p.lyrics || tags(p.lyrics) !== tags(lyricsText) || lines(p.lyrics) !== lines(lyricsText)) {
     throw Object.assign(new Error('bad_syn'), { code: 'bad_syn' });
   }
-  const g = keepRhymes(lyricsText, p.lyrics);
-  // a "change" that only re-spelled or re-vocalized a word, or one the rhyme guard undid, is not a swap
-  const changes = p.changes.filter(c => base(c.before) !== base(c.after) && !g.undone.has(base(c.after)));
-  return { lyrics: g.text, changes };
+  const g = keepRhymes(lyricsText, syncRepeats(lyricsText, p.lyrics));
+  const text = syncRepeats(lyricsText, g.text);
+  // a "change" that only re-spelled or re-vocalized a word, or one the rhyme guard undid, is not a swap;
+  // a swap listed once per chorus repetition is one swap
+  const seen = new Set();
+  const changes = p.changes.filter(c => {
+    const k = base(c.before) + '|' + base(c.after);
+    if (base(c.before) === base(c.after) || g.undone.has(base(c.after)) || seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+  return { lyrics: text, changes };
+}
+
+/**
+ * Repeated parts stay identical: every group of lines that were the same in `before` (each
+ * chorus repetition, a refrain line) gets one version in `after` — the first one that was swapped.
+ */
+export function syncRepeats(before, after) {
+  const A = before.split('\n'), B = after.split('\n');
+  if (A.length !== B.length) return after;
+  const key = l => l.split(/\s+/).map(base).filter(Boolean).join(' ');
+  const groups = new Map();
+  A.forEach((l, i) => {
+    if (/^\s*\[[^\]]+\]\s*$/.test(l) || !key(l)) return;
+    const k = key(l);
+    groups.has(k) ? groups.get(k).push(i) : groups.set(k, [i]);
+  });
+  for (const [k, at] of groups) {
+    if (at.length < 2) continue;
+    const pick = at.find(i => key(B[i]) !== k) ?? at[0];
+    for (const i of at) B[i] = B[pick];
+  }
+  return B.join('\n');
 }
 
 /* ── word diff ─────────────────────────────────────────────────────────── */
