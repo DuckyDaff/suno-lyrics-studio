@@ -182,6 +182,8 @@ export default {
   synLevel: 'כמה לשנות', synLvWords: 'מילים', synLvSpelling: '+ כתיב', synLvPhrasing: '+ ניסוח',
   synLvWordsTitle: 'רק מילים נרדפות', synLvSpellingTitle: 'מילים נרדפות, וגם כתיב: מלא/חסר, צורה קצרה/ארוכה, אחידות',
   synLvPhrasingTitle: 'מילים נרדפות, כתיב, וגם ניסוח קל: חלק משורה או סדר מילים, בערך בשורה אחת מכל שלוש',
+  synLvSkeleton: 'שלד', synLvSkeletonTitle: 'שובר את השלד של כל סקשן: מבנה משפטים, סדר רעיונות ומילות חרוז חדשים. המסר, ההרגשה והמנגינה נשארים',
+  synKind_skeleton: 'שלד', synBusySkel: 'בונה שלד חדש… (דקה-שתיים)', synSkelKept: 'נשאר כמו שהיה: החרוז החדש לא החזיק',
   synKind_word: 'מילה נרדפת', synKind_spelling: 'כתיב', synKind_phrasing: 'ניסוח',
   synUndo: 'בטל', synRedo: 'החזר', synHide: 'הסתר סימון', synFail: 'ההחלפה לא הצליחה, הטקסט נשאר כמו שהיה',
   // prepare for Suno

@@ -414,6 +414,29 @@ function buildUser(b) {
       // targets from the song itself, so the model does not read "about one in three" as "at most one"
       const lyricLines = text.split('\n').filter(l => l.trim() && !/^\s*\[/.test(l) && !/^\s*\(.*\)\s*$/.test(l)).length;
       const stanzas = (text.match(/^\s*\[[^\]\n]+\]\s*$/gm) || []).length || 1;
+      // 'skeleton': every section is rebuilt from its message (new sentence structure, order and
+      // rhyme words), keeping the message, the feeling and the melody (line count, syllables)
+      if (b.level === 'skeleton') return [
+        `SKELETON pass over finished lyrics: break the skeleton of every section and build it again, keeping its soul. The words of a section may all change; what it SAYS and how it FEELS may not.`,
+        `For each section, before writing it, name to yourself: its message (what it says), its feeling (the emotion and its intensity), and its key image or images. Then write the section again with a NEW skeleton: different sentence structures, a different order of the ideas inside the section, other line openings, a different way into the image (the same image seen from another side, or an equivalent concrete image), and new rhyme words.`,
+        `No line may keep the structure of an original line, and no more than 2 original words in a row may survive anywhere.`,
+        `What stays: the message, the feeling and its intensity, the point of view and the voice, the register and the world of the song (its places, objects, time of day), the names and places. The melody stays too: the same number of lines in every section, each line within ±1 syllable of the original line in its position, the same stress pattern, and the same rhyme scheme (AABB stays AABB, ABAB stays ABAB) with new rhyme words.`,
+        `A repeated part is ONE unit: the chorus gets a new skeleton too, word for word the same in every repetition (Chorus, Final Chorus …), and every line that repeats anywhere stays identical in all its places. Keep the chorus chantable, and keep its hook image so the song is still about the same thing (the title phrase may be re-worded).`,
+        `Never change section tags. Never add, remove, merge or split lines. Lines in parentheses (backing vocals, ad-libs) may stay as they are.`,
+        voiceText(b),
+        sunoDelivery(b),
+        b.language ? `Language of the lyrics: ${clean(b.language, 40)}.` : '',
+        b.style ? `Style of the track: ${clean(b.style, 600)}` : '',
+        `Nikud: leave new words bare (nikud is added automatically afterwards).`,
+        `Output EXACTLY this format and nothing else. Plan FIRST, then write the lyrics:`,
+        `CHANGES:`,
+        `- skeleton | <the section tag, e.g. Verse 1> | <what you changed in its skeleton, in Hebrew, up to 12 words> | <the message and feeling you kept, in Hebrew, up to 10 words> | <the new rhyme pairs, in the original scheme, e.g. קִיר/עִיר, מִדַּי/לְבַדִּי>`,
+        `Rhyme comes first: for each section, find the original rhyme pairs (which lines rhyme with which), choose the NEW rhyme words for the same pairs while planning, and only then write the lines so they end on them. Every pair must truly rhyme: the same last stressed vowel and the same consonants after it. A section whose new pairs do not rhyme is not accepted.`,
+        `LYRICS:`,
+        `<the complete lyrics, every section tag and every line, in order>`,
+        `One CHANGES line per section (a repeated chorus once). While planning, check every new line: natural ${clean(b.language, 40) || 'Hebrew'}, gender and number agree, it sits on the same syllables as the original line, and its rhyme partner still rhymes with it.`,
+        `LYRICS TO REBUILD:\n${text}`,
+      ].filter(Boolean).join('\n');
       return [
         `Fresh-word pass over finished lyrics: the writer wants the song to feel new, so swap MANY words for synonyms or close equivalents. Start with the weak ones (a cliché, a flat or overused word, a word repeated nearby, a weak image), then go on to ordinary verbs, nouns and adjectives that can take a fresher synonym. This is NOT a rewrite: every word you do not swap stays exactly as it is.`,
         n ? `Replace about ${n} words (or short phrases of up to 3 words) across the whole song.` : `BREAK THE RUNS: EVERY lyric line gets at least one change, and no more than ${SYN_RUN} original words in a row may stay untouched anywhere in a line. A line of 6–8 words usually needs two changes, placed apart (one in the first half, one in the second). The rhyme-locked last word counts as untouched, so put a change shortly before it. No line is skipped, the chorus included (its repetitions get the same changes). Breaking a run never costs the meaning: every changed line must still be natural Hebrew that says the same thing as before (read it alone: if it sounds odd or says something else, pick another word in that run). Adding a filler word (כאן, פה, רק, לי, עוד, כבר) does not count as a change.`,
@@ -638,15 +661,19 @@ module.exports = async function handler(req, res) {
 
   // Adaptive thinking shares max_tokens with the answer. The budget is bounded on purpose
   // (worst case ≈ 12K tokens) so a run that over-plans cannot burn money in a loop.
+  // The skeleton pass rebuilds every section on the same syllables and new rhyme pairs: without a
+  // planning phase the model writes lines that miss its own planned rhymes, so it always thinks.
+  const mustThink = body.mode === 'synonyms' && body.level === 'skeleton';
   const attempt = async (effort) => {
     let got = 0;
     const stream = client.messages.stream({
       model,
-      max_tokens: 12000,
+      max_tokens: mustThink ? 16000 : 12000,
       // No thinking channel by default: even at low effort Opus planned for 60-90s before the first
       // line, which looks stuck. The system prompt already carries the craft rules. Set GEN_THINKING=adaptive
       // on the server to re-enable a (short) planning phase for the quality model.
-      ...(body.model !== 'fast' && process.env.GEN_THINKING === 'adaptive' ? { thinking: { type: 'adaptive' }, output_config: { effort } } : { thinking: { type: 'disabled' } }),
+      ...(mustThink ? { thinking: { type: 'adaptive' }, output_config: { effort: 'medium' } }
+        : body.model !== 'fast' && process.env.GEN_THINKING === 'adaptive' ? { thinking: { type: 'adaptive' }, output_config: { effort } } : { thinking: { type: 'disabled' } }),
       system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: userMsg }],
     });

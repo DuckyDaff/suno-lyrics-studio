@@ -3,18 +3,19 @@
   import { t } from '../../lib/i18n.js';
 
   /** info: { changes, on, marked } | null — on: the new words are in the text now; marked: the highlight shows
-   *  level: 'words' | 'spelling' | 'phrasing' — how far the pass goes */
+   *  level: 'words' | 'spelling' | 'phrasing' | 'skeleton' — how far the pass goes */
   let { info = null, busy = false, disabled = false, level = 'words', onLevel, onRun, onUndo, onRedo, onHide } = $props();
 
   let open = $state(false);
-  const LEVELS = [['words', 'synLvWords'], ['spelling', 'synLvSpelling'], ['phrasing', 'synLvPhrasing']];
-  const ICON = { word: '🔁', spelling: '✏️', phrasing: '💬' };
+  const LEVELS = [['words', 'synLvWords'], ['spelling', 'synLvSpelling'], ['phrasing', 'synLvPhrasing'], ['skeleton', 'synLvSkeleton']];
+  const made = $derived((info?.changes || []).filter(c => !c.kept).length);   // a skeleton section put back is not a change
+  const ICON = { word: '🔁', spelling: '✏️', phrasing: '💬', skeleton: '🦴' };
 </script>
 
 <div class="syn" class:done={info}>
   <div class="row">
     <button class="run" onclick={onRun} disabled={busy || disabled} title={$t('synTitle')}>
-      {#if busy}<span class="spin"></span> {$t('synBusy')}{:else}🔁 {info ? $t('synAgain') : $t('synRun')}{/if}
+      {#if busy}<span class="spin"></span> {$t(level === 'skeleton' ? 'synBusySkel' : 'synBusy')}{:else}🔁 {info ? $t('synAgain') : $t('synRun')}{/if}
     </button>
     <div class="lv" role="radiogroup" aria-label={$t('synLevel')}>
       {#each LEVELS as [v, k]}
@@ -23,7 +24,7 @@
     </div>
     {#if info}
       <button class="sum" onclick={() => (open = !open)}>
-        {#if info.changes.length}✓ {$t('synSummary', { n: info.changes.length })}{:else}✓ {$t('synNone')}{/if}
+        {#if made}✓ {$t('synSummary', { n: made })}{:else}✓ {$t('synNone')}{/if}
         <span class="car">{open ? '▴' : '▾'}</span>
       </button>
       {#if info.on}<button class="lnk" onclick={onUndo} disabled={busy}>↩ {$t('synUndo')}</button>
@@ -35,7 +36,7 @@
 
   {#if open && info?.changes.length}
     <ul class="list">
-      {#each info.changes as c}<li><span class="k" title={$t('synKind_' + c.kind)}>{ICON[c.kind] || '🔁'}</span><span class="b" dir="auto">{c.before}</span><span class="ar">←</span><span class="a" dir="auto">{c.after}</span>{#if c.why}<span class="why">{c.why}</span>{/if}</li>{/each}
+      {#each info.changes as c}<li><span class="k" title={$t('synKind_' + c.kind)}>{ICON[c.kind] || '🔁'}</span>{#if c.kind === 'skeleton'}<span class="sec">[{c.before}]</span>{#if c.kept}<span class="why">{$t('synSkelKept')}</span>{:else}<span class="a" dir="auto">{c.after}</span>{/if}{:else}<span class="b" dir="auto">{c.before}</span><span class="ar">←</span><span class="a" dir="auto">{c.after}</span>{/if}{#if c.why && !c.kept}<span class="why">{c.why}</span>{/if}</li>{/each}
     </ul>
   {/if}
 </div>
@@ -63,6 +64,7 @@
   .b { color: var(--tx2); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--err) 60%, transparent); }
   .a { color: var(--tx0); font-weight: 700; background: color-mix(in srgb, var(--accent) 18%, transparent); border-radius: 4px; padding: 0 4px; }
   .ar { color: var(--tx2); }
+  .sec { font-weight: 700; color: var(--tx1); direction: ltr; }
   .why { flex-basis: 100%; color: var(--tx2); font-size: 11px; }
   .spin { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--accent); border-top-color: transparent; animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }

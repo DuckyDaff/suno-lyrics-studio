@@ -87,7 +87,8 @@
       if (parseLyrics(text).length !== parseLyrics(before).length) throw Object.assign(new Error('bad_syn'), { code: 'bad_syn' });
       applySyn(text, before, true);
       syn = { before, after: text, changes: r.changes, songId, on: true };
-      toast(r.changes.length ? $t('synDone', { n: r.changes.length }) : $t('synNone'), 'success');
+      const made = r.changes.filter(c => !c.kept).length;
+      toast(made ? $t('synDone', { n: made }) : $t('synNone'), 'success');
     } catch (e) { if (e.code !== 'aborted') toast($t('synFail'), 'error', 5000); }
     finally { synBusy = false; }
   }

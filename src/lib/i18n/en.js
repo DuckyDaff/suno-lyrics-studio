@@ -173,6 +173,8 @@ export default {
   synLevel: 'How much to change', synLvWords: 'Words', synLvSpelling: '+ Spelling', synLvPhrasing: '+ Phrasing',
   synLvWordsTitle: 'Synonyms only', synLvSpellingTitle: 'Synonyms, plus spelling: full/defective, short/long forms, consistency',
   synLvPhrasingTitle: 'Synonyms, spelling, plus light rephrasing: part of a line or the word order, about one line in three',
+  synLvSkeleton: 'Skeleton', synLvSkeletonTitle: 'Breaks the skeleton of every section: new sentence structure, order of ideas and rhyme words. The message, the feeling and the melody stay',
+  synKind_skeleton: 'Skeleton', synBusySkel: 'Building a new skeleton… (a minute or two)', synSkelKept: 'Kept as it was: the new rhyme did not hold',
   synKind_word: 'Synonym', synKind_spelling: 'Spelling', synKind_phrasing: 'Phrasing',
   synUndo: 'Undo', synRedo: 'Redo', synHide: 'Hide highlight', synFail: 'Swapping failed, the text is unchanged',
   // prepare for Suno

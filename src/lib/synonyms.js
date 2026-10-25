@@ -10,7 +10,7 @@ import { generate } from './ai.js';
 /** { [sectionId]: { text, ranges: [[start, end]] } } — a section shows its marks only while its text is still `text` */
 export const synMarks = writable({});
 
-const KINDS = { word: 'word', spelling: 'spelling', phrasing: 'phrasing' };
+const KINDS = { word: 'word', spelling: 'spelling', phrasing: 'phrasing', skeleton: 'skeleton' };
 
 /** parse the model answer: LYRICS: … CHANGES: - kind | before | after | why (the kind may be missing) */
 export function parseSyn(text) {
@@ -38,8 +38,8 @@ export function parseSyn(text) {
 const tags = s => (String(s).match(/^\s*\[[^\]\n]+\]\s*$/gm) || []).length;
 const lines = s => String(s).split('\n').filter(l => l.trim() && !/^\s*\[/.test(l)).length;
 
-/** how far the pass may go: synonyms only, + spelling, + light rephrasing */
-export const SYN_LEVELS = ['words', 'spelling', 'phrasing'];
+/** how far the pass may go: synonyms only, + spelling, + light rephrasing, or a new skeleton for every section */
+export const SYN_LEVELS = ['words', 'spelling', 'phrasing', 'skeleton'];
 
 /**
  * Run the pass (style and voice come from the open song). level: one of SYN_LEVELS.
@@ -61,6 +61,13 @@ export async function runSynonyms(lyricsText, { language = '', level = 'words', 
   const src = tidy(lyricsText);
   let out = tidy(p.lyrics);
   if (vocalize) { try { const v = tidy(await vocalize(out)); if (v.split('\n').length === out.split('\n').length) out = v; } catch {} }
+  if (level === 'skeleton') {
+    // a rebuilt section is all or nothing: one broken rhyme puts the whole section back
+    const k = keepSections(src, syncRepeats(src, out));
+    const kept = new Set(k.kept.map(n => n.toLowerCase()));
+    const changes = p.changes.map(c => (kept.has(c.before.replace(/^\[|\]$/g, '').trim().toLowerCase()) ? { ...c, kept: true } : c));
+    return { lyrics: syncRepeats(src, k.text), changes };
+  }
   const g = keepRhymes(src, syncRepeats(src, out));
   const text = syncRepeats(src, g.text);
   // a "change" that only re-spelled or re-vocalized a word, or one the rhyme guard undid, is not a swap;
@@ -78,6 +85,28 @@ export async function runSynonyms(lyricsText, { language = '', level = 'words', 
     seen.add(k); return true;
   });
   return { lyrics: text, changes };
+}
+
+/**
+ * The skeleton guard: every section in which the rhyme guard would put back any line returns
+ * to its original text as a whole. Returns { text, kept: [section names that were put back] }.
+ */
+export function keepSections(before, after) {
+  const A = before.split('\n'), B = after.split('\n');
+  if (A.length !== B.length) return { text: after, kept: [] };
+  const G = keepRhymes(before, after).text.split('\n');
+  const isTag = l => /^\s*\[[^\]]+\]\s*$/.test(l);
+  const kept = [];
+  for (let s = 0; s < A.length;) {
+    let e = s + 1;
+    while (e < A.length && !isTag(A[e])) e++;
+    if (isTag(A[s]) && G.slice(s, e).some((l, i) => l !== B[s + i])) {
+      for (let i = s; i < e; i++) B[i] = A[i];
+      kept.push(A[s].trim().slice(1, -1).trim());
+    }
+    s = e;
+  }
+  return { text: B.join('\n'), kept };
 }
 
 /**
@@ -128,9 +157,11 @@ function soundKey(w) {
   let k = -1;
   for (let i = L.length - 1; i >= 0; i--) if (L[i].v) { k = i; break; }
   if (k < 0) return null;
+  // a furtive patah under a final ח / ע is sung "-ach" / "-a": the guttural belongs to the rhyme (מַפְתֵּחַ ≠ דַּקָּה)
+  if (k === L.length - 1 && /[חע]/.test(L[k].ch) && L[k].v === 'a' && k > 0) return 'a|' + L[k].ch;
   const tail = L.slice(k + 1).filter(x => x.ch !== 'א');                                   // a quiet aleph (כָּאן)
   if (tail.length && tail[0].ch === 'י' && /[ie]/.test(L[k].v)) tail.shift();            // a mater yod (שִׁירִי, רֵיק)
-  if (tail.length && /[הא]/.test(tail[tail.length - 1].ch)) tail.pop();                 // a silent final ה / א
+  if (tail.length && /[האע]/.test(tail[tail.length - 1].ch)) tail.pop();                // a silent final ה / א / ע (רֶגַע)
   return L[k].v + '|' + fin(tail.map(x => x.ch).join(''));
 }
 /** do two line-end words rhyme? by sound when both carry nikud, by their last letters otherwise */
