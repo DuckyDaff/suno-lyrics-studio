@@ -416,7 +416,7 @@ function buildUser(b) {
       const stanzas = (text.match(/^\s*\[[^\]\n]+\]\s*$/gm) || []).length || 1;
       return [
         `Fresh-word pass over finished lyrics: the writer wants the song to feel new, so swap MANY words for synonyms or close equivalents. Start with the weak ones (a cliché, a flat or overused word, a word repeated nearby, a weak image), then go on to ordinary verbs, nouns and adjectives that can take a fresher synonym. This is NOT a rewrite: every word you do not swap stays exactly as it is.`,
-        n ? `Replace about ${n} words (or short phrases of up to 3 words) across the whole song.` : `Replace about one word in EVERY lyric line (a long line may get two), in every section, so the total is close to the number of lyric lines. Skip only a line where every word is locked by the rules below.`,
+        n ? `Replace about ${n} words (or short phrases of up to 3 words) across the whole song.` : `BREAK THE RUNS: EVERY lyric line gets at least one change, and no more than ${SYN_RUN} original words in a row may stay untouched anywhere in a line. A line of 6–8 words usually needs two changes, placed apart (one in the first half, one in the second). The rhyme-locked last word counts as untouched, so put a change shortly before it. No line is skipped, the chorus included (its repetitions get the same changes). Breaking a run never costs the meaning: every changed line must still be natural Hebrew that says the same thing as before (read it alone: if it sounds odd or says something else, pick another word in that run). Adding a filler word (כאן, פה, רק, לי, עוד, כבר) does not count as a change.`,
         `Every replacement must keep: the meaning of the line, the register of the song, the same syllable count as the word it replaces (±1 at most), and the stress pattern so the line still sits on the melody.`,
         `Rhyme (the most important rule): first find the rhyme pairs of every stanza (AABB, ABAB …). The LAST word of a line that rhymes with another line is locked: replace it only if the new word ends in the same sound as its partner (the same last stressed vowel and the consonants after it, e.g. אָחוֹר / אוֹר, so חוֹר / סוֹר / אוֹר — never a word with another ending). When in doubt, choose a word in the middle of the line instead. Internal rhymes are locked the same way. A locked rhyme word stays even when it is one of the abstract "song words": in this pass the rhyme wins.`,
         `Grammar: keep gender, number and tense; in Hebrew keep the binyan and the attached prefixes and suffixes (ו, ה, ב, ל, מ, ש, כ, ־ך, ־נו …) unless the new word needs a different form. A swapped noun must have the same gender and number as the word it replaces, because the adjectives and verbs around it agree with it (and a rhyme word next to it is locked, so it cannot change to match): a masculine noun is replaced only by a masculine noun, a feminine one only by a feminine one.`,
@@ -528,6 +528,47 @@ function stripPreamble(text, mode) {
     return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
   }
   return text;
+}
+
+/* ── synonyms: "break the runs" check ──────────────────────────────────── */
+const SYN_RUN = 3;   // at most this many original words in a row may stay untouched in a line
+const synWord = w => w.replace(/[֑-ׇ]/g, '').replace(/[^\p{L}\p{N}]/gu, '').toLowerCase();
+const synLyricLines = t => String(t || '').replace(/\r/g, '').split('\n').map(l => l.trim())
+  .filter(l => l && !/^\[[^\]]+\]$/.test(l));
+/** longest run of words of `a` that `b` kept in the same order (LCS walk) */
+function keptRun(a, b) {
+  const A = a.split(/\s+/).map(synWord).filter(Boolean), B = b.split(/\s+/).map(synWord).filter(Boolean);
+  const L = Array.from({ length: A.length + 1 }, () => new Array(B.length + 1).fill(0));
+  for (let i = A.length - 1; i >= 0; i--) for (let j = B.length - 1; j >= 0; j--) {
+    L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  }
+  let run = 0, best = 0;
+  for (let i = 0, j = 0; i < A.length && j < B.length;) {
+    if (A[i] === B[j]) { run++; best = Math.max(best, run); i++; j++; }
+    else { run = 0; if (L[i + 1][j] >= L[i][j + 1]) i++; else j++; }
+  }
+  return { best, words: A.length };
+}
+/**
+ * Lines of the answer that still keep a long run of the original (or are unchanged):
+ * [{ was, now }]. A repeated line is checked once; lines in parentheses are skipped.
+ */
+function runIssues(answer, b) {
+  if (b.mode !== 'synonyms' || b.count) return [];
+  const li = answer.search(/^[ \t]*LYRICS:[ \t]*$/mi), ci = answer.search(/^[ \t]*CHANGES:[ \t]*$/mi);
+  if (li < 0) return [];
+  const now = synLyricLines(answer.slice(answer.indexOf('\n', li) + 1, ci > li ? ci : undefined));
+  const was = synLyricLines(b.fixText);
+  if (now.length !== was.length) return [];
+  const seen = new Set(), out = [];
+  was.forEach((w, i) => {
+    const k = w.split(/\s+/).map(synWord).join(' ');
+    if (seen.has(k) || /^\(.*\)$/.test(w)) return;
+    seen.add(k);
+    const r = keptRun(w, now[i]);
+    if (r.best === r.words || r.best > SYN_RUN) out.push({ was: w, now: now[i] });
+  });
+  return out;
 }
 
 /* Compare line counts per section with the requested bars; returns [{name, want, got}] */
@@ -650,6 +691,25 @@ module.exports = async function handler(req, res) {
         const fixed = stripPreamble((fix.content || []).filter(c => c.type === 'text').map(c => c.text).join(''), body.mode);
         if (fixed && lineIssues(fixed, body).length < issues.length) { cleaned = fixed; send({ replace: cleaned }); }
       } catch (e) { console.warn('fix pass failed', e && e.message); }
+    }
+    // synonyms: lines that still keep a long run of the original get one repair round
+    const runs = got ? runIssues(cleaned, body) : [];
+    if (runs.length) {
+      send({ status: 'fixing' });
+      const fixMsg = `These lines still keep more than ${SYN_RUN} original words in a row (or no change at all). Break each run with one more change inside it, following every rule above (rhyme words stay locked, same syllables, same gender, repeated lines identical). Keep every other change you made. Return the COMPLETE answer again in the same format (CHANGES with every change, then LYRICS), nothing else.\n` +
+        runs.map(r => `- ${r.now}`).join('\n');
+      try {
+        const fix = await client.messages.create({
+          model, max_tokens: 8000, thinking: { type: 'disabled' },
+          system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
+          messages: [{ role: 'user', content: userMsg }, { role: 'assistant', content: cleaned }, { role: 'user', content: fixMsg }],
+        });
+        const fixed = stripPreamble((fix.content || []).filter(c => c.type === 'text').map(c => c.text).join(''), body.mode);
+        const lyricsOf = t => { const i = t.search(/^[ \t]*LYRICS:[ \t]*$/mi), j = t.search(/^[ \t]*CHANGES:[ \t]*$/mi); return i < 0 ? [] : synLyricLines(t.slice(t.indexOf('\n', i) + 1, j > i ? j : undefined)); };
+        const sameShape = fixed && lyricsOf(fixed).length === synLyricLines(body.fixText).length;
+        if (sameShape && runIssues(fixed, body).length < runs.length) { cleaned = fixed; send({ replace: cleaned }); }
+        console.log('synonyms: run repair', runs.length, '→', sameShape ? runIssues(fixed, body).length : 'rejected');
+      } catch (e) { console.warn('run repair failed', e && e.message); }
     }
     if (!got && final.stop_reason === 'max_tokens') {
       console.warn('generate: thinking overflow', model, final.usage && final.usage.output_tokens);
