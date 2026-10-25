@@ -12,7 +12,7 @@
   import { letterAtCaret } from '../../lib/hebrew/letterNikud.js';
   import { NIKUD_RE } from '../../lib/hebrew/nikud.js';
   import { synMarks, markRuns } from '../../lib/synonyms.js';
-  import { runSectionOp } from '../../lib/sectionWrite.js';
+  import { runSectionOp, arrangeSection } from '../../lib/sectionWrite.js';
   import { busy } from '../../lib/ai.js';
   import { toast } from '../../lib/toast.js';
 
@@ -63,6 +63,20 @@
     } finally { writing = false; }
   }
 
+  /* 🧩 arrange: fix the section's structure (and split it into its real parts) */
+  let arranging = $state(false);
+  async function arrangeIt() {
+    if (arranging) return;
+    arranging = true;
+    try {
+      const r = await arrangeSection(sec);
+      toast(r.parts > 1 ? $t('arrSplit', { n: r.parts }) : $t('arrDone'), 'success');
+    } catch (e) {
+      if (e.code === 'changed') toast($t('arrChanged'), 'error', 5000);
+      else if (e.code !== 'aborted') toast($t('aiErr_' + e.code) !== 'aiErr_' + e.code ? $t('aiErr_' + e.code) : $t('aiErr_api_error'), 'error');
+    } finally { arranging = false; }
+  }
+
   function resize() {
     if (!ta) return;
     ta.style.height = 'auto';
@@ -81,6 +95,11 @@
       <button class="badge mono" onclick={() => (editingName = true)} title={sec.name}>[{sec.name}]</button>
     {/if}
     <span class="meta">{lines} {$t('lines')} · {(sec.text || '').length} {$t('chars')}</span>
+    {#if !empty || arranging}
+      <button class="arr" onclick={arrangeIt} disabled={arranging || $busy} title={$t('arrTitle')}>
+        {#if arranging}<span class="spin"></span> {$t('arrBusy')}{:else}🧩 {$t('arrRun')}{/if}
+      </button>
+    {/if}
     <div class="acts">
       <Button variant="ghost" size="sm" title={$t('dir')} onclick={() => actions.toggleDir(sec.id)}>
         <span class="mono dir">{sec.dir === 'ltr' ? 'LTR' : 'RTL'}</span>
@@ -138,6 +157,9 @@
   .card:hover .acts, .card.active .acts { opacity: 1; }
   .dir { font-size: 10px; font-weight: 700; }
   .tawrap { position: relative; }
+  .arr { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 800; color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-bd); }
+  .arr:hover:not(:disabled) { border-color: var(--accent); }
+  .arr:disabled { opacity: .6; }
   .write { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
   .wbtn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 800; color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-bd); }
   .wbtn:hover:not(:disabled) { border-color: var(--accent); }

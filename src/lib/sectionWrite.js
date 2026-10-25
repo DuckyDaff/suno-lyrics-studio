@@ -10,6 +10,7 @@ import { genState } from './genState.js';
 import { settings } from './settings.js';
 import { generate } from './ai.js';
 import { nikudLyrics } from './hebrew/nikud.js';
+import { parseLyrics } from './lyricsParse.js';
 
 /** the nearest section with words before / after `id` */
 function neighbours(sections, id) {
@@ -47,4 +48,30 @@ export async function runSectionOp(sec, op, { hint = '', signal, onNikud } = {})
     actions.setText(sec.id, out);
   }
   return out;
+}
+
+/**
+ * "Arrange": fix a section's structure (line breaks on phrases, meter, rhyme scheme, grammar, a
+ * clear hook) and split it when it is really two parts (a pre-chorus and a chorus). Every section
+ * with the same text (the other choruses) gets the same result. One undo step.
+ * Resolves to { parts, copies }: how many sections it became, and in how many places.
+ * Throws code 'changed' when the section was edited while Claude worked.
+ */
+export async function arrangeSection(sec, { signal } = {}) {
+  const was = sec.text;
+  const lang = /[א-ת]/.test(sec.text || '') ? 'Hebrew' : /[a-z]/i.test(sec.text || '') ? 'English' : '';
+  const r = await generate(
+    { mode: 'section', op: 'arrange', section: sec.name, section_text: was, ...(lang ? { language: lang } : {}) },
+    null, { signal }
+  );
+  let out = r.text.trim();
+  if (get(settings).autoNikud && /[א-ת]/.test(out)) { try { out = await nikudLyrics(out); } catch {} }
+  // split into parts when the answer carries tags; otherwise it is the section's new text
+  const parts = /^\s*\[[^\]\n]+\]\s*$/m.test(out) ? parseLyrics(out) : [{ name: sec.name, text: out }];
+  if (!parts.length || !parts.some(p => (p.text || '').trim())) throw Object.assign(new Error('bad_arrange'), { code: 'api_error' });
+  const cur = get(song);
+  if (cur.sections.find(s => s.id === sec.id)?.text !== was) throw Object.assign(new Error('changed'), { code: 'changed' });
+  const same = cur.sections.filter(s => s.text === was).map(s => s.id);
+  actions.replaceSections(same, parts);
+  return { parts: parts.length, copies: same.length };
 }

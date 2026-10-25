@@ -193,7 +193,7 @@ const SUNO_HE = `SUNO HEBREW PRONUNCIATION. Suno reads the text literally: it gu
 Never over-correct: common words that Suno sings well stay as they are. Never change what is said.`;
 
 const SUNO_RHYTHM = `SUNO RHYTHM AND STRUCTURE. Suno follows the shape of the text, so the shape must be musical:
-- One line = one musical phrase, sung in ONE BREATH. Suno does not breathe inside a line: a long line comes out as a breathless machine run, the clearest sign that a song is AI. Hard limits per line: sung lines (pop, ballad, mizrahi, rock, musical) 6–10 syllables, never more than 12; dance and club hooks 4–8; rap up to 16. A longer line is split at its natural breath point into two lines (the words stay the same; prefer the split between clauses, before a preposition or after the verb phrase), or, for a phrase that must stay together, gets a comma at the breath.
+- One line = one musical phrase, sung in ONE BREATH. Suno does not breathe inside a line: a long line comes out as a breathless machine run, the clearest sign that a song is AI. Hard limits per line: sung lines (pop, ballad, mizrahi, rock, musical) 6–10 syllables, never more than 12; dance and club hooks 4–8; rap up to 16. A longer line is split at its natural breath point into two lines (the words stay the same), or, for a phrase that must stay together, gets a comma at the breath. The breath point is where a speaker would pause: between two clauses, before a conjunction or a new clause (and, but, if, so, that, when / ו־, אֲבָל, אִם, כִּי, כְּשֶׁ־, שֶׁ־), or after a comma-like pause ("if you promised me now, | I'd be the only girl you see"). NEVER split between a verb and what completes it ("I'd be | the only girl", "אֲנִי רוֹצֶה | אוֹתָךְ"), between an adjective or a number and its noun, or right after a function word (the, a, to, of, my, I'd, I'm / אֶת, שֶׁל, עִם, הַ־); each half must be a phrase you could sing alone. If a line has no clean breath point, keep it whole with a comma at the best pause instead of a bad split.
 - Break run-on lines at the phrase; never end a line in the middle of a phrase.
 - Inside a section the lines carry a similar syllable count. Parallel lines in repeated sections (Verse 1 / Verse 2, every Chorus) match within ±1 syllable, so the melody can repeat.
 - A repeated chorus is written identically every time (same words, same spelling, same line breaks), so Suno reuses the melody.
@@ -393,7 +393,7 @@ function buildUser(b) {
         b.form ? `Form: ${clean(b.form, 80)}` : '',
         musicText(b),
         `Never add, remove, rename or reorder section tags. Keep every backing line and the spoken intro tag in parentheses; fix ad-libs only as described above.`,
-        `Breath check: count the syllables of every sung line; any line over the limit must be split or get a comma, and each split is listed under CHANGES as rhythm.`,
+        `Breath check: count the syllables of every sung line; any line over the limit must be split or get a comma, and each split is listed under CHANGES as rhythm. Split only at a real breath point (see the rules above): read both halves alone, and if either one stops on a word that needs the next line, move the split or use a comma instead.`,
         `Nikud: keep existing nikud exactly on every word you do not change. On a word you change, add nikud only where the nikud itself is the fix; otherwise leave it bare (nikud is added automatically afterwards).`,
         `Output EXACTLY this format and nothing else:`,
         `LYRICS:`,
@@ -492,7 +492,21 @@ function buildUser(b) {
         translate:`Translate the section [${b.section}] into ${b.targetLanguage || (lang === 'Hebrew' ? 'English' : 'Hebrew')} as singable lyrics (adapt rhyme and syllable count, do not translate literally).`,
         backing:  `Add backing vocals / ad-libs to the section [${b.section}] in parentheses at the musically right spots. Return the full section with the additions.`,
         polish:   `Polish the section [${b.section}]: fix awkward phrasing, meter and rhyme; keep the meaning and line count.`,
+        arrange:  `Arrange the section [${b.section}]: fix its STRUCTURE and keep its content. This is an editor's pass, not a rewrite: keep the words, the images, the meaning, the voice and the language, and change words only where the structure needs it.`,
       };
+      // arranging: the structural checklist, and permission to split a section that is really two parts
+      const arrange = b.op === 'arrange' ? [
+        `1. Line breaks: every line is ONE sung phrase. Never end a line in the middle of a phrase (a line that stops on "I'd be", "so you would", "שֶׁאֲנִי", "כְּמוֹ" belongs together with the next one); join or re-break the lines at the phrase boundaries.`,
+        `2. Meter: the lines of the section have a similar syllable count (within ±2), and parallel lines (the same position in repeated blocks) match.`,
+        `3. Rhyme: one clear, consistent scheme (AABB, ABAB, or ABA for three-line blocks), the same in parallel blocks. Give every line end a rhyme partner where the scheme wants one, with the smallest change (a synonym, a reordered phrase), never with filler.`,
+        `4. Grammar and phrasing: fix ungrammatical or clumsy wording (for English: "promised to me" → "promised me", "say to me" → "tell me", no double "would"), with the smallest change.`,
+        `5. Hook: a chorus has ONE clear hook line (the title phrase or the key image), whole on its own line, at the start or the end of the chorus, and repeated as is.`,
+        `6. Length and parts: a verse has 4–8 lines, a pre-chorus 2–4, a chorus 4–6. If the section is longer, or is really two parts (a build-up and a hook, or a block that repeats inside it), split it into its real sections, each with its own tag on its own line, in order (e.g. [Pre-Chorus], [Chorus], [Pre-Chorus 2], [Chorus]); a repeated part is written identically every time.`,
+        `No new content: do not add lines, ideas or images that are not in the original; the number of lines changes only where you join or re-break lines. Never pad a line with extra words to force a rhyme: a near rhyme that sings well (שֶׁקֶט / לְאַט, love / enough) is fine as it is.`,
+        `Fix only what is broken: a section that already passes every point above comes back exactly as it is, word for word.`,
+        `Before you answer, read every line alone: it must be a complete sung phrase. If one ends on a word that needs the next line ("I'd be", "that", "שֶׁ־"), move the break.`,
+        `Output: if you split, the parts with their tags; otherwise only the lines of the section, no tag. Nothing else: no notes and no explanation.`,
+      ] : [];
       // writing a section into an existing song: it must sit in the song as if it was always there
       const fit = b.op === 'write' ? [
         b.prev_name || b.next_name ? `Placement: this section comes${b.prev_name ? ` right after [${clean(b.prev_name, 60)}]` : ' at the start of the song'}${b.next_name ? ` and right before [${clean(b.next_name, 60)}]` : ' and ends the song'}. Continue naturally from what the section before it says, and lead into the next one, so the song flows as one story.` : '',
@@ -506,6 +520,7 @@ function buildUser(b) {
         ops[b.op] || ops.rewrite,
         `Language: ${lang}.`,
         ...fit,
+        ...arrange,
         b.section_text ? `Current text of [${b.section}]:\n${clean(b.section_text, 3000)}` : `The section is currently empty.`,
         musicText(b),
         b.bars ? `This section is ${parseInt(b.bars, 10)} bars — match the line count to the bars using the line mapping.` : '',
@@ -515,7 +530,7 @@ function buildUser(b) {
         sunoDelivery(b),
         songContext({ ...b, lyrics: b.lyrics }),
         b.rhyme === 'free verse' ? '' : 'Keep a clear end-rhyme scheme on stressed syllables in the new text (match the song\'s scheme if it has one).',
-        `Return only the section text (no tag).`,
+        b.op === 'arrange' ? '' : `Return only the section text (no tag).`,
       ].filter(Boolean).join('\n');
     }
     default:
@@ -664,7 +679,7 @@ module.exports = async function handler(req, res) {
   // The skeleton pass rebuilds every section on the same syllables and new rhyme pairs, and writing a
   // new section into a song has to fit its story, meter and Style: without a planning phase the model
   // misses its own rhymes and writes generic lines, so these two always think.
-  const mustThink = (body.mode === 'synonyms' && body.level === 'skeleton') || (body.mode === 'section' && body.op === 'write');
+  const mustThink = (body.mode === 'synonyms' && body.level === 'skeleton') || (body.mode === 'section' && (body.op === 'write' || body.op === 'arrange'));
   const attempt = async (effort) => {
     let got = 0;
     const stream = client.messages.stream({

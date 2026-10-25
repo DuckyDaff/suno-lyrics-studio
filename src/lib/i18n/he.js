@@ -173,6 +173,8 @@ export default {
   arNotesPh: 'למשל: שם הפרסונה של האמן בסונו', arSave: 'שמור אמן', arNameNeeded: 'צריך שם לאמן',
   arConfirmDelete: 'למחוק את האמן "{name}"? השירים שלו נשארים.', arTagFrom: '(של {name})',
   aiIdeaClearTitle: 'מחק את כל הטקסט ב״על מה השיר״', aiIdeaRestore: 'החזר',
+  arrRun: 'סדר', arrBusy: 'מסדר… (כחצי דקה)', arrDone: 'הסקשן סודר', arrSplit: 'הסקשן סודר וחולק ל-{n} חלקים',
+  arrChanged: 'הסקשן השתנה בזמן הסידור, לא שיניתי כלום', arrTitle: 'מסדר את המבנה: שבירת שורות לפי משפטים, משקל, חרוזים, דקדוק ו-hook ברור. אם זה בעצם שני חלקים (Pre-Chorus ו-Chorus), מחלק אותם. התוכן נשאר',
   secWrite: 'כתוב את הסקשן', secWriting: 'חושב וכותב… (כחצי דקה, לחץ לעצירה)', secWriteHint: 'על מה? (לא חובה)',
   secWriteTitle: 'Claude כותב את הסקשן כך שימשיך את השיר באופן טבעי, בסגנון של ה-Style',
   // fresh words (synonyms)

@@ -164,6 +164,8 @@ export default {
   arNotesPh: 'e.g. the artist\'s Persona name in Suno', arSave: 'Save artist', arNameNeeded: 'The artist needs a name',
   arConfirmDelete: 'Delete the artist "{name}"? Its songs stay.', arTagFrom: '({name})',
   aiIdeaClearTitle: 'Clear the whole brief', aiIdeaRestore: 'Restore',
+  arrRun: 'Arrange', arrBusy: 'Arranging… (about half a minute)', arrDone: 'Section arranged', arrSplit: 'Section arranged and split into {n} parts',
+  arrChanged: 'The section changed while arranging, nothing was changed', arrTitle: 'Fixes the structure: line breaks on phrases, meter, rhyme, grammar and a clear hook. If it is really two parts (Pre-Chorus and Chorus), splits them. The content stays',
   secWrite: 'Write this section', secWriting: 'Thinking and writing… (about half a minute, click to stop)', secWriteHint: 'About what? (optional)',
   secWriteTitle: 'Claude writes the section so it continues the song naturally, in the color of the Style',
   // fresh words (synonyms)

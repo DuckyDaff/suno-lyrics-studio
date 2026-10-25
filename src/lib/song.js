@@ -109,6 +109,15 @@ export const actions = {
     if (i < 0 || j < 0 || j >= s.sections.length) return;
     [s.sections[i], s.sections[j]] = [s.sections[j], s.sections[i]];
   }),
+  /** replace each of the sections `ids` with `parts` ([{ name, text }]), in one undo step */
+  replaceSections: (ids, parts) => mutate(s => {
+    for (const id of ids) {
+      const i = s.sections.findIndex(q => q.id === id);
+      if (i < 0) continue;
+      const dir = s.sections[i].dir;
+      s.sections.splice(i, 1, ...parts.map(p => ({ ...sec(p.name, p.text || ''), dir })));
+    }
+  }),
   replaceAll: (sections, style) => mutate(s => {
     s.sections = sections.map(x => sec(x.name, x.text || ''));
     if (style != null) s.style = style;
