@@ -15,13 +15,15 @@ const KINDS = { word: 'word', spelling: 'spelling', phrasing: 'phrasing' };
 /** parse the model answer: LYRICS: … CHANGES: - kind | before | after | why (the kind may be missing) */
 export function parseSyn(text) {
   const t = String(text || '').replace(/\r/g, '');
-  const li = t.search(/^\s*LYRICS:\s*$/mi);
-  const ci = t.search(/^\s*CHANGES:\s*$/mi);
+  // [ \t] not \s: a \s* would start the match on the blank line before the label
+  const li = t.search(/^[ \t]*LYRICS:[ \t]*$/mi);
+  const ci = t.search(/^[ \t]*CHANGES:[ \t]*$/mi);
   if (li < 0) return null;
+  // the changes are planned first (CHANGES: … LYRICS: …); an answer in the old order still parses
   const lyrics = t.slice(t.indexOf('\n', li) + 1, ci > li ? ci : undefined).trim();
   const changes = [];
-  if (ci > li) {
-    for (const raw of t.slice(ci).split('\n').slice(1)) {
+  if (ci >= 0) {
+    for (const raw of t.slice(ci, ci < li ? li : undefined).split('\n').slice(1)) {
       const l = raw.replace(/^\s*[-•*]\s*/, '').trim();
       if (!l || /^none$/i.test(l)) continue;
       const f = l.split('|').map(x => (x || '').trim());

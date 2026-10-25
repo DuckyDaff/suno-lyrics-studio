@@ -419,24 +419,24 @@ function buildUser(b) {
         n ? `Replace about ${n} words (or short phrases of up to 3 words) across the whole song.` : `Replace about one word in EVERY lyric line (a long line may get two), in every section, so the total is close to the number of lyric lines. Skip only a line where every word is locked by the rules below.`,
         `Every replacement must keep: the meaning of the line, the register of the song, the same syllable count as the word it replaces (±1 at most), and the stress pattern so the line still sits on the melody.`,
         `Rhyme (the most important rule): first find the rhyme pairs of every stanza (AABB, ABAB …). The LAST word of a line that rhymes with another line is locked: replace it only if the new word ends in the same sound as its partner (the same last stressed vowel and the consonants after it, e.g. אָחוֹר / אוֹר, so חוֹר / סוֹר / אוֹר — never a word with another ending). When in doubt, choose a word in the middle of the line instead. Internal rhymes are locked the same way. A locked rhyme word stays even when it is one of the abstract "song words": in this pass the rhyme wins.`,
-        `Grammar: keep gender, number and tense; in Hebrew keep the binyan and the attached prefixes and suffixes (ו, ה, ב, ל, מ, ש, כ, ־ך, ־נו …) unless the new word needs a different form.`,
+        `Grammar: keep gender, number and tense; in Hebrew keep the binyan and the attached prefixes and suffixes (ו, ה, ב, ל, מ, ש, כ, ־ך, ־נו …) unless the new word needs a different form. A swapped noun must have the same gender and number as the word it replaces, because the adjectives and verbs around it agree with it (and a rhyme word next to it is locked, so it cannot change to match): a masculine noun is replaced only by a masculine noun, a feminine one only by a feminine one.`,
         spell ? `SPELLING too: besides the synonyms, change how some words are written where it suits the song's register or makes it consistent: full or defective spelling (כתיב מלא / חסר), a short or long form of the same word (כש / כאשר, אני / אנכי, עכשיו / עתה, מה / מה ש־), literary or spoken forms, and one consistent spelling for a word that appears in several ways. A spelling change changes LETTERS (adding or dropping ו / י, a different form of the word); changing only nikud is not a spelling change. Never respell only to steer Suno's pronunciation (that is a separate pass), and never a spelling Suno would read wrong. Make at least ${Math.max(2, Math.round(stanzas * 0.7))} spelling changes (count a repeated chorus once).` : '',
         phrase ? `LIGHT REPHRASING too: rephrase ${Math.max(2, Math.round(lyricLines / 4))}–${Math.max(3, Math.round(lyricLines / 3))} lines (count a repeated chorus once): in each, reword a part of the line (2–4 words together, not a single-word synonym) or change the word order, so it reads fresher. The line keeps its meaning, its syllable count (±1) and its stress pattern, and its LAST word stays exactly as it is whenever that line rhymes with another. Never rephrase two lines in a row, and never a whole stanza.` : '',
         voiceText(b),
-        `The chorus and the hook get swaps too. A repeated part is ONE unit: every repetition of the chorus (Chorus, Final Chorus …) and every line that repeats anywhere in the song gets exactly the same swaps, word for word, so all repetitions stay identical.${b.title ? ` Keep the words of the song title (${clean(b.title, 120)}) as they are.` : ''}`,
+        `The chorus and the hook get swaps too. A repeated part is ONE unit: every repetition of the chorus (Chorus, Final Chorus …) and every line that repeats anywhere in the song gets exactly the same swaps, word for word, so all repetitions stay identical. The hook line itself (the line with the title phrase${b.title ? `, here "${clean(b.title, 120)}"` : ''}) gets at least one swap as well, and the title words may be among them: in this pass the hook does not have to keep the title wording. A swapped title word is swapped the same way everywhere it appears in the song.`,
         `Never touch section tags, names, places, or lines in parentheses. Never add, remove, merge or split lines. Outside the repeated parts, never swap the same word in two places, and never bring in a word that already appears near it.`,
         b.language ? `Language of the lyrics: ${clean(b.language, 40)}.` : '',
         b.style ? `Style of the track: ${clean(b.style, 600)}` : '',
         `Nikud: keep existing nikud exactly on every word you do not change; leave the new words bare (nikud is added automatically afterwards).`,
-        `Output EXACTLY this format and nothing else:`,
+        `Output EXACTLY this format and nothing else. Plan the changes FIRST, then write the lyrics with exactly those changes:`,
+        `CHANGES:`,
+        `- word | <the word as it was> | <the new word> | <for a noun: its gender before→after (ז→ז, נ→נ), then why, in Hebrew, up to 8 words>`,
+        spell ? `- spelling | <the word as it was written> | <how you wrote it> | <why, in Hebrew, up to 8 words>` : '',
+        phrase ? `- phrasing | <the part of the line as it was> | <the new wording> | <for a noun: its gender before→after, then why, in Hebrew, up to 8 words>` : '',
         `LYRICS:`,
         `<the complete lyrics, every section tag and every line, in order>`,
-        `CHANGES:`,
-        `- word | <the word as it was> | <the new word> | <why, in Hebrew, up to 8 words>`,
-        spell ? `- spelling | <the word as it was written> | <how you wrote it> | <why, in Hebrew, up to 8 words>` : '',
-        phrase ? `- phrasing | <the part of the line as it was> | <the new wording> | <why, in Hebrew, up to 8 words>` : '',
-        `List every replacement, one per line, and list a repeated part only once. If no word deserves a change, return the lyrics unchanged and write "- none" under CHANGES:.`,
-        `Before you answer, check every replacement that ends a line: read it next to its rhyme partner out loud; if the rhyme got weaker, undo that replacement.`,
+        `List every replacement, one per line, and list a repeated part only once. If no word deserves a change, write "- none" under CHANGES: and return the lyrics unchanged.`,
+        `While planning: a noun whose gender would change (ז→נ or נ→ז) is not allowed, choose another word; and read every replacement that ends a line next to its rhyme partner: if the rhyme got weaker, drop that replacement.`,
         `LYRICS TO REFRESH:\n${text}`,
       ].filter(Boolean).join('\n');
     }
@@ -501,7 +501,11 @@ function stripPreamble(text, mode) {
     const i = text.search(/^\s*TITLE:/mi);
     return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
   }
-  if (mode === 'sunofix' || mode === 'synonyms') {
+  if (mode === 'synonyms') {
+    const i = text.search(/^\s*(CHANGES|LYRICS):/mi);
+    if (i > 0) return text.slice(i).replace(/^\s+/, '');
+  }
+  if (mode === 'sunofix') {
     const i = text.search(/^\s*LYRICS:/mi);
     if (i > 0) return text.slice(i).replace(/^\s+/, '');
   }
