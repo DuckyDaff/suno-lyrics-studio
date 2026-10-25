@@ -408,10 +408,10 @@ function buildUser(b) {
     case 'synonyms': {
       const text = clean(b.fixText, 9000);
       if (!text) throw Object.assign(new Error('no text'), { status: 400 });
-      const n = parseInt(b.count, 10) > 0 ? Math.max(2, Math.min(16, parseInt(b.count, 10))) : null;
+      const n = parseInt(b.count, 10) > 0 ? Math.max(2, Math.min(40, parseInt(b.count, 10))) : null;
       return [
-        `Fresh-word pass over finished lyrics: choose the words where a synonym makes the song stronger (a cliché, a flat or overused word, a word repeated nearby, a weak image) and replace each with a synonym or a close equivalent. This is NOT a rewrite: every other word stays exactly as it is.`,
-        n ? `Replace about ${n} words (or short phrases of up to 3 words) across the whole song.` : `Replace about one word in every three to four lines, spread across the song (at least 3, at most 12).`,
+        `Fresh-word pass over finished lyrics: the writer wants the song to feel new, so swap MANY words for synonyms or close equivalents. Start with the weak ones (a cliché, a flat or overused word, a word repeated nearby, a weak image), then go on to ordinary verbs, nouns and adjectives that can take a fresher synonym. This is NOT a rewrite: every word you do not swap stays exactly as it is.`,
+        n ? `Replace about ${n} words (or short phrases of up to 3 words) across the whole song.` : `Replace about one word in EVERY lyric line (a long line may get two), in every section, so the total is close to the number of lyric lines. Skip only a line where every word is locked by the rules below.`,
         `Every replacement must keep: the meaning of the line, the register of the song, the same syllable count as the word it replaces (±1 at most), and the stress pattern so the line still sits on the melody.`,
         `Rhyme (the most important rule): first find the rhyme pairs of every stanza (AABB, ABAB …). The LAST word of a line that rhymes with another line is locked: replace it only if the new word ends in the same sound as its partner (the same last stressed vowel and the consonants after it, e.g. אָחוֹר / אוֹר, so חוֹר / סוֹר / אוֹר — never a word with another ending). When in doubt, choose a word in the middle of the line instead. Internal rhymes are locked the same way. A locked rhyme word stays even when it is one of the abstract "song words": in this pass the rhyme wins.`,
         `Grammar: keep gender, number and tense; in Hebrew keep the binyan and the attached prefixes and suffixes (ו, ה, ב, ל, מ, ש, כ, ־ך, ־נו …) unless the new word needs a different form.`,
