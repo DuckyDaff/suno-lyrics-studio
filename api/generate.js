@@ -405,6 +405,31 @@ function buildUser(b) {
         `TEXT TO PREPARE:\n${text}`,
       ].filter(Boolean).join('\n');
     }
+    case 'synonyms': {
+      const text = clean(b.fixText, 9000);
+      if (!text) throw Object.assign(new Error('no text'), { status: 400 });
+      const n = parseInt(b.count, 10) > 0 ? Math.max(2, Math.min(16, parseInt(b.count, 10))) : null;
+      return [
+        `Fresh-word pass over finished lyrics: choose the words where a synonym makes the song stronger (a cliché, a flat or overused word, a word repeated nearby, a weak image) and replace each with a synonym or a close equivalent. This is NOT a rewrite: every other word stays exactly as it is.`,
+        n ? `Replace about ${n} words (or short phrases of up to 3 words) across the whole song.` : `Replace about one word in every three to four lines, spread across the song (at least 3, at most 12).`,
+        `Every replacement must keep: the meaning of the line, the register of the song, the same syllable count as the word it replaces (±1 at most), and the stress pattern so the line still sits on the melody.`,
+        `Rhyme (the most important rule): first find the rhyme pairs of every stanza (AABB, ABAB …). The LAST word of a line that rhymes with another line is locked: replace it only if the new word ends in the same sound as its partner (the same last stressed vowel and the consonants after it, e.g. אָחוֹר / אוֹר, so חוֹר / סוֹר / אוֹר — never a word with another ending). When in doubt, choose a word in the middle of the line instead. Internal rhymes are locked the same way. A locked rhyme word stays even when it is one of the abstract "song words": in this pass the rhyme wins.`,
+        `Grammar: keep gender, number and tense; in Hebrew keep the binyan and the attached prefixes and suffixes (ו, ה, ב, ל, מ, ש, כ, ־ך, ־נו …) unless the new word needs a different form.`,
+        voiceText(b),
+        `Never touch section tags, the chorus hook / title phrase, names, places, or lines in parentheses. Never add, remove, merge or split lines. Do not replace the same word twice, and never bring in a word that already appears near it.`,
+        b.language ? `Language of the lyrics: ${clean(b.language, 40)}.` : '',
+        b.style ? `Style of the track: ${clean(b.style, 600)}` : '',
+        `Nikud: keep existing nikud exactly on every word you do not change; leave the new words bare (nikud is added automatically afterwards).`,
+        `Output EXACTLY this format and nothing else:`,
+        `LYRICS:`,
+        `<the complete lyrics, every section tag and every line, in order>`,
+        `CHANGES:`,
+        `- <the word as it was> | <the new word> | <why, in Hebrew, up to 8 words>`,
+        `List every replacement, one per line. If no word deserves a change, return the lyrics unchanged and write "- none" under CHANGES:.`,
+        `Before you answer, check every replacement that ends a line: read it next to its rhyme partner out loud; if the rhyme got weaker, undo that replacement.`,
+        `LYRICS TO REFRESH:\n${text}`,
+      ].filter(Boolean).join('\n');
+    }
     case 'artist': {
       return [
         `Design a recurring music ARTIST / DJ identity: a "hat" the writer releases many songs under on Suno, so all of them sound like the same act. Make it specific and ownable, not generic.`,
@@ -466,7 +491,7 @@ function stripPreamble(text, mode) {
     const i = text.search(/^\s*TITLE:/mi);
     return i > 0 ? text.slice(i).replace(/^\s+/, '') : text;
   }
-  if (mode === 'sunofix') {
+  if (mode === 'sunofix' || mode === 'synonyms') {
     const i = text.search(/^\s*LYRICS:/mi);
     if (i > 0) return text.slice(i).replace(/^\s+/, '');
   }

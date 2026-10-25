@@ -11,6 +11,7 @@
   import NikudPop from './NikudPop.svelte';
   import { letterAtCaret } from '../../lib/hebrew/letterNikud.js';
   import { NIKUD_RE } from '../../lib/hebrew/nikud.js';
+  import { synMarks, markRuns } from '../../lib/synonyms.js';
 
   let { sec, index, total } = $props();
   let ta = $state(null);
@@ -38,6 +39,8 @@
   const color = $derived(sectionColor(sec.name));
   const active = $derived($activeSectionId === sec.id);
   const lines = $derived((sec.text || '').split('\n').filter(l => l.trim()).length);
+  /* words swapped by "fresh words": shown while the text is still the one they were marked on */
+  const marks = $derived($synMarks[sec.id]?.text === sec.text ? markRuns(sec.text, $synMarks[sec.id].ranges) : null);
 
   function resize() {
     if (!ta) return;
@@ -67,12 +70,15 @@
     </div>
   </header>
 
-  <textarea bind:this={ta} data-sec={sec.id} rows="3" dir={sec.dir} value={sec.text}
-            placeholder={$t('lyricsPlaceholder')}
-            oninput={e => { actions.setText(sec.id, e.target.value); resize(); }}
-            onclick={onTaClick}
-            onkeydown={e => { if (pop && (e.key === 'Escape' || e.key.length === 1 || e.key === 'Backspace')) pop = null; }}
-            onfocus={() => activeSectionId.set(sec.id)}></textarea>
+  <div class="tawrap">
+    {#if marks}<div class="hl" dir={sec.dir} aria-hidden="true">{#each marks as r}{#if r.hit}<mark>{r.s}</mark>{:else}{r.s}{/if}{/each}</div>{/if}
+    <textarea bind:this={ta} data-sec={sec.id} rows="3" dir={sec.dir} value={sec.text}
+              placeholder={$t('lyricsPlaceholder')}
+              oninput={e => { actions.setText(sec.id, e.target.value); resize(); }}
+              onclick={onTaClick}
+              onkeydown={e => { if (pop && (e.key === 'Escape' || e.key.length === 1 || e.key === 'Backspace')) pop = null; }}
+              onfocus={() => activeSectionId.set(sec.id)}></textarea>
+  </div>
   {#if pop}<div bind:this={popNode}><NikudPop {ta} hit={pop} onclose={() => (pop = null)} /></div>{/if}
 
   <HomographBar {sec} />
@@ -99,11 +105,19 @@
   .acts { display: flex; gap: 0; opacity: .55; transition: opacity .12s; }
   .card:hover .acts, .card.active .acts { opacity: 1; }
   .dir { font-size: 10px; font-weight: 700; }
-  textarea {
-    width: 100%; background: transparent; border: none; outline: none;
-    font-size: 16px; line-height: 1.85; color: var(--tx0); padding: 4px 2px; min-height: 84px;
+  .tawrap { position: relative; }
+  textarea, .hl {
+    width: 100%; border: none;
+    font-size: 16px; line-height: 1.85; padding: 4px 2px; min-height: 84px;
     unicode-bidi: plaintext;
   }
+  textarea { position: relative; display: block; background: transparent; outline: none; color: var(--tx0); }
+  /* the highlight layer sits under the transparent textarea with the same text, so marks line up with the words */
+  .hl {
+    position: absolute; inset: 0; color: transparent; pointer-events: none;
+    white-space: pre-wrap; overflow-wrap: break-word; overflow: hidden;
+  }
+  .hl mark { color: transparent; background: color-mix(in srgb, var(--accent) 24%, transparent); border-radius: 4px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 24%, transparent); }
   @media (max-width: 768px) {
     .card { padding: 8px 10px 10px; }
     .meta { display: none; }

@@ -164,6 +164,11 @@ export default {
   arNotesPh: 'e.g. the artist\'s Persona name in Suno', arSave: 'Save artist', arNameNeeded: 'The artist needs a name',
   arConfirmDelete: 'Delete the artist "{name}"? Its songs stay.', arTagFrom: '({name})',
   aiIdeaClearTitle: 'Clear the whole brief', aiIdeaRestore: 'Restore',
+  // fresh words (synonyms)
+  synRun: 'Synonyms', synAgain: 'Swap words again', synBusy: 'Finding synonyms…',
+  synTitle: 'Claude picks words across the song and swaps them for synonyms without breaking rhyme or meter. The new words are highlighted',
+  synSummary: '{n} words swapped', synNone: 'No word worth swapping', synDone: '{n} words swapped',
+  synUndo: 'Undo', synRedo: 'Redo', synHide: 'Hide highlight', synFail: 'Swapping failed, the text is unchanged',
   // prepare for Suno
   fxRun: 'Prepare for Suno', fxAgain: 'Check again for Suno', fxBusy: 'Preparing for Suno…',
   fxTitle: 'A producer pass: respells words Suno would misread (geresh sounds, slang, loanwords, acronyms, numbers) and evens out the rhythm',
