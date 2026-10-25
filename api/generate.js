@@ -661,9 +661,10 @@ module.exports = async function handler(req, res) {
 
   // Adaptive thinking shares max_tokens with the answer. The budget is bounded on purpose
   // (worst case ≈ 12K tokens) so a run that over-plans cannot burn money in a loop.
-  // The skeleton pass rebuilds every section on the same syllables and new rhyme pairs: without a
-  // planning phase the model writes lines that miss its own planned rhymes, so it always thinks.
-  const mustThink = body.mode === 'synonyms' && body.level === 'skeleton';
+  // The skeleton pass rebuilds every section on the same syllables and new rhyme pairs, and writing a
+  // new section into a song has to fit its story, meter and Style: without a planning phase the model
+  // misses its own rhymes and writes generic lines, so these two always think.
+  const mustThink = (body.mode === 'synonyms' && body.level === 'skeleton') || (body.mode === 'section' && body.op === 'write');
   const attempt = async (effort) => {
     let got = 0;
     const stream = client.messages.stream({

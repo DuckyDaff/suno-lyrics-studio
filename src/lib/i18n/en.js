@@ -164,7 +164,7 @@ export default {
   arNotesPh: 'e.g. the artist\'s Persona name in Suno', arSave: 'Save artist', arNameNeeded: 'The artist needs a name',
   arConfirmDelete: 'Delete the artist "{name}"? Its songs stay.', arTagFrom: '({name})',
   aiIdeaClearTitle: 'Clear the whole brief', aiIdeaRestore: 'Restore',
-  secWrite: 'Write this section', secWriting: 'Writing… (click to stop)', secWriteHint: 'About what? (optional)',
+  secWrite: 'Write this section', secWriting: 'Thinking and writing… (about half a minute, click to stop)', secWriteHint: 'About what? (optional)',
   secWriteTitle: 'Claude writes the section so it continues the song naturally, in the color of the Style',
   // fresh words (synonyms)
   synRun: 'Synonyms', synAgain: 'Swap words again', synBusy: 'Finding synonyms…',
