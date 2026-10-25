@@ -1,7 +1,8 @@
 /**
  * "Fresh words": Claude picks words across the song and swaps them for synonyms that keep
- * rhyme and meter (api/generate.js mode 'synonyms'). The swapped words are found by a word
- * diff (not by trusting the model's list), so the editor can highlight exactly what changed.
+ * rhyme and meter (api/generate.js mode 'synonyms'), optionally also respelling words and
+ * lightly rephrasing lines. The changes are found by a word diff (not by trusting the model's
+ * list), so the editor can highlight exactly what changed.
  */
 import { writable } from 'svelte/store';
 import { generate } from './ai.js';
@@ -9,7 +10,9 @@ import { generate } from './ai.js';
 /** { [sectionId]: { text, ranges: [[start, end]] } } — a section shows its marks only while its text is still `text` */
 export const synMarks = writable({});
 
-/** parse the model answer: LYRICS: … CHANGES: - before | after | why */
+const KINDS = { word: 'word', spelling: 'spelling', phrasing: 'phrasing' };
+
+/** parse the model answer: LYRICS: … CHANGES: - kind | before | after | why (the kind may be missing) */
 export function parseSyn(text) {
   const t = String(text || '').replace(/\r/g, '');
   const li = t.search(/^\s*LYRICS:\s*$/mi);
@@ -21,8 +24,10 @@ export function parseSyn(text) {
     for (const raw of t.slice(ci).split('\n').slice(1)) {
       const l = raw.replace(/^\s*[-•*]\s*/, '').trim();
       if (!l || /^none$/i.test(l)) continue;
-      const [before, after, why] = l.split('|').map(x => (x || '').trim());
-      if (before && after) changes.push({ before, after, why: why || '' });
+      const f = l.split('|').map(x => (x || '').trim());
+      const kind = KINDS[f[0].toLowerCase()];
+      const [before, after, why] = kind ? f.slice(1) : f;
+      if (before && after) changes.push({ kind: kind || 'word', before, after, why: why || '' });
     }
   }
   return { lyrics, changes };
@@ -31,10 +36,16 @@ export function parseSyn(text) {
 const tags = s => (String(s).match(/^\s*\[[^\]\n]+\]\s*$/gm) || []).length;
 const lines = s => String(s).split('\n').filter(l => l.trim() && !/^\s*\[/.test(l)).length;
 
-/** Run the pass (style and voice come from the open song). Resolves to { lyrics, changes }; throws (with .code) on failure. */
-export async function runSynonyms(lyricsText, { language = '' } = {}, { signal } = {}) {
+/** how far the pass may go: synonyms only, + spelling, + light rephrasing */
+export const SYN_LEVELS = ['words', 'spelling', 'phrasing'];
+
+/**
+ * Run the pass (style and voice come from the open song). level: one of SYN_LEVELS.
+ * Resolves to { lyrics, changes: [{ kind, before, after, why }] }; throws (with .code) on failure.
+ */
+export async function runSynonyms(lyricsText, { language = '', level = 'words', vocalize = null } = {}, { signal } = {}) {
   const r = await generate({
-    mode: 'synonyms', fixText: lyricsText, language,
+    mode: 'synonyms', fixText: lyricsText, language, level,
     artist: null, producerTag: '',
   }, null, { signal });
   const p = parseSyn(r.text);
@@ -42,14 +53,26 @@ export async function runSynonyms(lyricsText, { language = '' } = {}, { signal }
   if (!p || !p.lyrics || tags(p.lyrics) !== tags(lyricsText) || lines(p.lyrics) !== lines(lyricsText)) {
     throw Object.assign(new Error('bad_syn'), { code: 'bad_syn' });
   }
-  const g = keepRhymes(lyricsText, syncRepeats(lyricsText, p.lyrics));
-  const text = syncRepeats(lyricsText, g.text);
+  // vocalize first (the model leaves new words bare), so the rhyme guard can hear them
+  // the guards compare line by line, so both sides get the same blank-line layout
+  const tidy = s => String(s).replace(/[ \t]+$/gm, '').replace(/\n{2,}/g, '\n\n').trim();
+  const src = tidy(lyricsText);
+  let out = tidy(p.lyrics);
+  if (vocalize) { try { const v = tidy(await vocalize(out)); if (v.split('\n').length === out.split('\n').length) out = v; } catch {} }
+  const g = keepRhymes(src, syncRepeats(src, out));
+  const text = syncRepeats(src, g.text);
   // a "change" that only re-spelled or re-vocalized a word, or one the rhyme guard undid, is not a swap;
   // a swap listed once per chorus repetition is one swap
   const seen = new Set();
+  // undone by the rhyme guard: every word the change brought in was put back
+  const reverted = c => {
+    const had = new Set(words(c.before).map(w => w.b));
+    const brought = words(c.after).filter(w => w.b && !had.has(w.b));
+    return brought.length > 0 && brought.every(w => g.undone.has(w.b));
+  };
   const changes = p.changes.filter(c => {
     const k = base(c.before) + '|' + base(c.after);
-    if (base(c.before) === base(c.after) || g.undone.has(base(c.after)) || seen.has(k)) return false;
+    if (base(c.before) === base(c.after) || reverted(c) || seen.has(k)) return false;
     seen.add(k); return true;
   });
   return { lyrics: text, changes };
@@ -83,8 +106,36 @@ const base = w => w.replace(/[֑-ׇ]/g, '').replace(/[^\p{L}\p{N}]/gu, '').toLow
 
 /* ── rhyme guard ───────────────────────────────────────────────────────── */
 const FINALS = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
-/** rough rhyme key: the last two letters of the bare word (final letters normalized) */
-const ending = w => base(w).replace(/[ךםןףץ]/g, c => FINALS[c]).slice(-2);
+const fin = s => s.replace(/[ךםןףץ]/g, c => FINALS[c]);
+/** letter key: the last two letters of the bare word (final letters normalized) */
+const letterKey = w => fin(base(w)).slice(-2);
+/* nikud vowel classes: a · e · i · o · u */
+const VOWEL = { 'ֲ': 'a', 'ַ': 'a', 'ָ': 'a', 'ֱ': 'e', 'ֵ': 'e', 'ֶ': 'e', 'ִ': 'i', 'ֹ': 'o', 'ֺ': 'o', 'ֳ': 'o', 'ׇ': 'o', 'ֻ': 'u' };
+/**
+ * sound key of a vocalized Hebrew word: its last vowel and the consonants sung after it
+ * (יִשְׁתַּנֶּה and מְחַכֶּה → "e|", מֵאָחוֹר and הָאוֹר → "o|ר"). null for a word without nikud.
+ */
+function soundKey(w) {
+  const L = [];
+  for (const ch of String(w)) {
+    if (/[א-ת]/.test(ch)) L.push({ ch, v: '' });
+    else if (L.length && VOWEL[ch]) L[L.length - 1].v = VOWEL[ch];
+    else if (L.length && ch === 'ּ' && L[L.length - 1].ch === 'ו' && !L[L.length - 1].v) L[L.length - 1].u = true;
+  }
+  L.forEach(x => { if (x.u && !x.v) x.v = 'u'; });        // shuruk
+  let k = -1;
+  for (let i = L.length - 1; i >= 0; i--) if (L[i].v) { k = i; break; }
+  if (k < 0) return null;
+  const tail = L.slice(k + 1).filter(x => x.ch !== 'א');                                   // a quiet aleph (כָּאן)
+  if (tail.length && tail[0].ch === 'י' && /[ie]/.test(L[k].v)) tail.shift();            // a mater yod (שִׁירִי, רֵיק)
+  if (tail.length && /[הא]/.test(tail[tail.length - 1].ch)) tail.pop();                 // a silent final ה / א
+  return L[k].v + '|' + fin(tail.map(x => x.ch).join(''));
+}
+/** do two line-end words rhyme? by sound when both carry nikud, by their last letters otherwise */
+function rhymes(x, y) {
+  const a = soundKey(x), b = soundKey(y);
+  return a && b ? a === b || letterKey(x) === letterKey(y) : letterKey(x) === letterKey(y);
+}
 const lastWord = l => (l.replace(/\([^)]*\)/g, ' ').match(/(\S+)\s*$/) || [])[1] || '';
 
 /**
@@ -105,11 +156,19 @@ export function keepRhymes(before, after) {
     while (s > 0 && !isTag(A[s - 1])) s--;
     while (e < A.length - 1 && !isTag(A[e + 1])) e++;
     const partners = [];
-    for (let j = s; j <= e; j++) if (j !== i && A[j].trim()) partners.push(ending(lastWord(B[j])));
-    if (partners.includes(ending(ow)) && !partners.includes(ending(nw))) {
-      const k = B[i].lastIndexOf(nw);
-      B[i] = B[i].slice(0, k) + ow + B[i].slice(k + nw.length);
-      undone.add(base(nw));
+    for (let j = s; j <= e; j++) if (j !== i && A[j].trim()) partners.push(lastWord(B[j]), lastWord(A[j]));
+    if (partners.some(p => rhymes(ow, p)) && !partners.some(p => rhymes(nw, p))) {
+      const rest = l => words(l).slice(0, -1).map(w => w.b).join(' ');
+      if (rest(A[i]) !== rest(B[i])) {
+        // a rephrased line: putting back only its last word could leave it broken, so restore the line
+        const had = new Set(words(A[i]).map(w => w.b));
+        words(B[i]).forEach(w => { if (!had.has(w.b)) undone.add(w.b); });
+        B[i] = A[i];
+      } else {
+        const k = B[i].lastIndexOf(nw);
+        B[i] = B[i].slice(0, k) + ow + B[i].slice(k + nw.length);
+        undone.add(base(nw));
+      }
     }
   }
   return { text: B.join('\n'), undone };
@@ -136,6 +195,28 @@ export function changedRanges(before, after) {
     const last = out[out.length - 1];
     if (last && !kept.has(j - 1) && j > 0 && !/\n/.test(after.slice(last[1], w.i))) last[1] = w.end;
     else out.push([w.i, w.end]);
+  });
+  return out;
+}
+
+/**
+ * Highlight ranges for one section: the changed words, line by line; a rephrased line
+ * (3+ changed words, or a different word count) is marked whole.
+ */
+export function markRanges(before, after) {
+  const A = before.split('\n'), B = after.split('\n');
+  if (A.length !== B.length) return changedRanges(before, after);
+  const out = []; let at = 0;
+  B.forEach((l, i) => {
+    const r = changedRanges(A[i], l);
+    if (r.length) {
+      const changed = words(l).filter(w => r.some(([s, e]) => w.i >= s && w.end <= e)).length;
+      if (changed >= 3 || words(A[i]).length !== words(l).length) {
+        const s = l.search(/\S/), e = l.trimEnd().length;
+        out.push([at + s, at + e]);
+      } else r.forEach(([s, e]) => out.push([at + s, at + e]));
+    }
+    at += l.length + 1;
   });
   return out;
 }

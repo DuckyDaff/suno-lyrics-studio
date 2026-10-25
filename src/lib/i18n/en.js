@@ -167,7 +167,11 @@ export default {
   // fresh words (synonyms)
   synRun: 'Synonyms', synAgain: 'Swap words again', synBusy: 'Finding synonyms…',
   synTitle: 'Claude picks words across the song and swaps them for synonyms without breaking rhyme or meter. The new words are highlighted',
-  synSummary: '{n} words swapped', synNone: 'No word worth swapping', synDone: '{n} words swapped',
+  synSummary: '{n} changes', synNone: 'No word worth swapping', synDone: '{n} changes made',
+  synLevel: 'How much to change', synLvWords: 'Words', synLvSpelling: '+ Spelling', synLvPhrasing: '+ Phrasing',
+  synLvWordsTitle: 'Synonyms only', synLvSpellingTitle: 'Synonyms, plus spelling: full/defective, short/long forms, consistency',
+  synLvPhrasingTitle: 'Synonyms, spelling, plus light rephrasing: part of a line or the word order, about one line in three',
+  synKind_word: 'Synonym', synKind_spelling: 'Spelling', synKind_phrasing: 'Phrasing',
   synUndo: 'Undo', synRedo: 'Redo', synHide: 'Hide highlight', synFail: 'Swapping failed, the text is unchanged',
   // prepare for Suno
   fxRun: 'Prepare for Suno', fxAgain: 'Check again for Suno', fxBusy: 'Preparing for Suno…',

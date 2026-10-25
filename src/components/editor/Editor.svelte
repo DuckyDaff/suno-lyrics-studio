@@ -14,7 +14,7 @@
   import AddSection from './AddSection.svelte';
   import SunoFixPanel from '../panel/SunoFixPanel.svelte';
   import SynonymPanel from '../panel/SynonymPanel.svelte';
-  import { runSynonyms, changedRanges, synMarks } from '../../lib/synonyms.js';
+  import { runSynonyms, markRanges, synMarks, SYN_LEVELS } from '../../lib/synonyms.js';
   import { get } from 'svelte/store';
 
   const lyrics = $derived(buildLyrics($song));
@@ -62,12 +62,15 @@
   let syn = $state(null);          // { before, after, changes, songId, on }
   let synBusy = $state(false);
   const marked = $derived(Object.keys($synMarks).length > 0);
+  /* how far the pass goes (words / + spelling / + phrasing), remembered on this device */
+  let synLevel = $state((() => { try { const v = localStorage.getItem('melodraft_syn_level'); return SYN_LEVELS.includes(v) ? v : 'words'; } catch { return 'words'; } })());
+  function setSynLevel(v) { synLevel = v; try { localStorage.setItem('melodraft_syn_level', v); } catch {} }
   /** put `text` in the editor; with `marks`, highlight every word that differs from `before` */
   function applySyn(text, before, marks) {
     actions.replaceAll(parseLyrics(text), null);
     const old = parseLyrics(before), out = {};
     if (marks) get(song).sections.forEach((x, i) => {
-      const ranges = changedRanges(old[i]?.text || '', x.text);
+      const ranges = markRanges(old[i]?.text || '', x.text);
       if (ranges.length) out[x.id] = { text: x.text, ranges };
     });
     synMarks.set(out);
@@ -77,9 +80,9 @@
     synBusy = true;
     const before = lyrics, songId = $song.id;
     try {
-      const r = await runSynonyms(before, { language: HEBREW_RE.test(before) ? 'Hebrew' : '' });
-      let text = r.lyrics;
-      if ($settings.autoNikud && HEBREW_RE.test(text)) { try { text = await nikudLyrics(text); } catch {} }
+      const he = HEBREW_RE.test(before);
+      const r = await runSynonyms(before, { language: he ? 'Hebrew' : '', level: synLevel, vocalize: $settings.autoNikud && he ? nikudLyrics : null });
+      const text = r.lyrics;
       if ($song.id !== songId) return;
       if (parseLyrics(text).length !== parseLyrics(before).length) throw Object.assign(new Error('bad_syn'), { code: 'bad_syn' });
       applySyn(text, before, true);
@@ -105,7 +108,7 @@
   {#if hasText}
     <SunoFixPanel info={fix && fix.songId === $song.id ? fix : null} busy={fixBusy} disabled={$busy} text={lyrics} onRun={run} onRevert={revert} />
     <SynonymPanel info={syn && syn.songId === $song.id ? { ...syn, marked } : null} busy={synBusy} disabled={$busy}
-                  onRun={runSyn} onUndo={synUndo} onRedo={synRedo} onHide={() => synMarks.set({})} />
+                  level={synLevel} onLevel={setSynLevel} onRun={runSyn} onUndo={synUndo} onRedo={synRedo} onHide={() => synMarks.set({})} />
   {/if}
   {#each $song.sections as sec, i (sec.id)}
     <SectionCard {sec} index={i} total={$song.sections.length} />

@@ -176,7 +176,11 @@ export default {
   // fresh words (synonyms)
   synRun: 'מילים נרדפות', synAgain: 'החלף מילים שוב', synBusy: 'מחפש מילים נרדפות…',
   synTitle: 'Claude בוחר מילים בנקודות שונות בשיר ומחליף אותן במילים נרדפות, בלי לשבור חרוז ומשקל. המילים החדשות מסומנות בצבע',
-  synSummary: '{n} מילים הוחלפו', synNone: 'לא נמצאו מילים שכדאי להחליף', synDone: 'הוחלפו {n} מילים',
+  synSummary: '{n} שינויים', synNone: 'לא נמצאו מילים שכדאי להחליף', synDone: 'בוצעו {n} שינויים',
+  synLevel: 'כמה לשנות', synLvWords: 'מילים', synLvSpelling: '+ כתיב', synLvPhrasing: '+ ניסוח',
+  synLvWordsTitle: 'רק מילים נרדפות', synLvSpellingTitle: 'מילים נרדפות, וגם כתיב: מלא/חסר, צורה קצרה/ארוכה, אחידות',
+  synLvPhrasingTitle: 'מילים נרדפות, כתיב, וגם ניסוח קל: חלק משורה או סדר מילים, בערך בשורה אחת מכל שלוש',
+  synKind_word: 'מילה נרדפת', synKind_spelling: 'כתיב', synKind_phrasing: 'ניסוח',
   synUndo: 'בטל', synRedo: 'החזר', synHide: 'הסתר סימון', synFail: 'ההחלפה לא הצליחה, הטקסט נשאר כמו שהיה',
   // prepare for Suno
   fxRun: 'הכן לסונו', fxAgain: 'בדוק שוב לסונו', fxBusy: 'מכין לסונו…',

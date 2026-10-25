@@ -2,10 +2,13 @@
   /** 🔁 Fresh words: run button, the list of swapped words, undo / redo, and hiding the highlight. */
   import { t } from '../../lib/i18n.js';
 
-  /** info: { changes, on, marked } | null — on: the new words are in the text now; marked: the highlight shows */
-  let { info = null, busy = false, disabled = false, onRun, onUndo, onRedo, onHide } = $props();
+  /** info: { changes, on, marked } | null — on: the new words are in the text now; marked: the highlight shows
+   *  level: 'words' | 'spelling' | 'phrasing' — how far the pass goes */
+  let { info = null, busy = false, disabled = false, level = 'words', onLevel, onRun, onUndo, onRedo, onHide } = $props();
 
   let open = $state(false);
+  const LEVELS = [['words', 'synLvWords'], ['spelling', 'synLvSpelling'], ['phrasing', 'synLvPhrasing']];
+  const ICON = { word: '🔁', spelling: '✏️', phrasing: '💬' };
 </script>
 
 <div class="syn" class:done={info}>
@@ -13,6 +16,11 @@
     <button class="run" onclick={onRun} disabled={busy || disabled} title={$t('synTitle')}>
       {#if busy}<span class="spin"></span> {$t('synBusy')}{:else}🔁 {info ? $t('synAgain') : $t('synRun')}{/if}
     </button>
+    <div class="lv" role="radiogroup" aria-label={$t('synLevel')}>
+      {#each LEVELS as [v, k]}
+        <button role="radio" aria-checked={level === v} class:on={level === v} disabled={busy} title={$t(k + 'Title')} onclick={() => onLevel?.(v)}>{$t(k)}</button>
+      {/each}
+    </div>
     {#if info}
       <button class="sum" onclick={() => (open = !open)}>
         {#if info.changes.length}✓ {$t('synSummary', { n: info.changes.length })}{:else}✓ {$t('synNone')}{/if}
@@ -27,7 +35,7 @@
 
   {#if open && info?.changes.length}
     <ul class="list">
-      {#each info.changes as c}<li><span class="b" dir="auto">{c.before}</span><span class="ar">←</span><span class="a" dir="auto">{c.after}</span>{#if c.why}<span class="why">{c.why}</span>{/if}</li>{/each}
+      {#each info.changes as c}<li><span class="k" title={$t('synKind_' + c.kind)}>{ICON[c.kind] || '🔁'}</span><span class="b" dir="auto">{c.before}</span><span class="ar">←</span><span class="a" dir="auto">{c.after}</span>{#if c.why}<span class="why">{c.why}</span>{/if}</li>{/each}
     </ul>
   {/if}
 </div>
@@ -40,6 +48,12 @@
   .run { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 800; color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-bd); }
   .run:hover:not(:disabled) { border-color: var(--accent); }
   .run:disabled { opacity: .6; }
+  .lv { display: inline-flex; border: 1px solid var(--line2); border-radius: 999px; overflow: hidden; }
+  .lv button { font-size: 11px; font-weight: 700; padding: 4px 9px; color: var(--tx1); }
+  .lv button + button { border-inline-start: 1px solid var(--line2); }
+  .lv button.on { color: var(--accent); background: var(--accent-bg); }
+  .lv button:hover:not(:disabled):not(.on) { color: var(--tx0); }
+  .k { flex-shrink: 0; }
   .sum { font-size: var(--fs-xs); font-weight: 700; color: var(--accent); }
   .car { font-size: 10px; margin-inline-start: 2px; }
   .lnk { font-size: var(--fs-xs); font-weight: 700; color: var(--tx1); }
