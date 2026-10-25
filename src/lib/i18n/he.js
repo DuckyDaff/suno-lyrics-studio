@@ -173,6 +173,8 @@ export default {
   arNotesPh: 'למשל: שם הפרסונה של האמן בסונו', arSave: 'שמור אמן', arNameNeeded: 'צריך שם לאמן',
   arConfirmDelete: 'למחוק את האמן "{name}"? השירים שלו נשארים.', arTagFrom: '(של {name})',
   aiIdeaClearTitle: 'מחק את כל הטקסט ב״על מה השיר״', aiIdeaRestore: 'החזר',
+  secWrite: 'כתוב את הסקשן', secWriting: 'כותב… (לחץ לעצירה)', secWriteHint: 'על מה? (לא חובה)',
+  secWriteTitle: 'Claude כותב את הסקשן כך שימשיך את השיר באופן טבעי, בסגנון של ה-Style',
   // fresh words (synonyms)
   synRun: 'מילים נרדפות', synAgain: 'החלף מילים שוב', synBusy: 'מחפש מילים נרדפות…',
   synTitle: 'Claude בוחר מילים בנקודות שונות בשיר ומחליף אותן במילים נרדפות, בלי לשבור חרוז ומשקל. המילים החדשות מסומנות בצבע',

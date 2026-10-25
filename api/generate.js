@@ -470,9 +470,19 @@ function buildUser(b) {
         backing:  `Add backing vocals / ad-libs to the section [${b.section}] in parentheses at the musically right spots. Return the full section with the additions.`,
         polish:   `Polish the section [${b.section}]: fix awkward phrasing, meter and rhyme; keep the meaning and line count.`,
       };
+      // writing a section into an existing song: it must sit in the song as if it was always there
+      const fit = b.op === 'write' ? [
+        b.prev_name || b.next_name ? `Placement: this section comes${b.prev_name ? ` right after [${clean(b.prev_name, 60)}]` : ' at the start of the song'}${b.next_name ? ` and right before [${clean(b.next_name, 60)}]` : ' and ends the song'}. Continue naturally from what the section before it says, and lead into the next one, so the song flows as one story.` : '',
+        b.prev_text ? `The section before it:\n${clean(b.prev_text, 1500)}` : '',
+        b.next_text ? `The section after it:\n${clean(b.next_text, 1500)}` : '',
+        `Its role follows its tag: a verse moves the story forward with new images, a pre-chorus builds toward the chorus, a chorus carries the hook, a bridge brings a turn (a new angle, a confession, a time jump), an outro closes the song. Do not repeat lines from other sections (except a chorus, which repeats the song's chorus).`,
+        `Fit the song: the same voice and point of view, the same vocabulary and register, the line length and meter of the song's sections of the same kind, and its rhyme scheme.`,
+        b.style ? `Write it in the color of the Style: the vocabulary, flow, delivery and energy of exactly that genre, so the words sound like they were written for this track (rap bars with internal rhymes for rap, short punchy chantable lines and call-and-response for reggaeton and dancehall, warm plain lines for a ballad …). When the song's other sections were written for another genre (a cover in a new style), split the roles: the song decides the story, the voice and the images; the Style decides the line length, the rhythm, the delivery and the energy.` : '',
+      ] : [];
       return [
         ops[b.op] || ops.rewrite,
         `Language: ${lang}.`,
+        ...fit,
         b.section_text ? `Current text of [${b.section}]:\n${clean(b.section_text, 3000)}` : `The section is currently empty.`,
         musicText(b),
         b.bars ? `This section is ${parseInt(b.bars, 10)} bars — match the line count to the bars using the line mapping.` : '',

@@ -3,10 +3,9 @@
   import { homographs, kbdFor } from '../../lib/ui.js';
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
-  import { generate, busy } from '../../lib/ai.js';
-  import { genState } from '../../lib/genState.js';
-  import { nikudWithHomographs, nakdan, nikudLyrics } from '../../lib/hebrew/nikud.js';
-  import { settings } from '../../lib/settings.js';
+  import { busy } from '../../lib/ai.js';
+  import { runSectionOp } from '../../lib/sectionWrite.js';
+  import { nikudWithHomographs, nakdan } from '../../lib/hebrew/nikud.js';
   import { latinize, phonetic } from '../../lib/hebrew/translit.js';
   import { wordAtCursor } from '../../lib/hebrew/marks.js';
   import Button from '../ui/Button.svelte';
@@ -67,22 +66,8 @@
     aiOpen = false;
     if (running) { abort?.abort(); return; }
     running = true; abort = new AbortController();
-    const base = op === 'continue' ? (sec.text || '').replace(/\s+$/, '') : '';
-    const lang = /[א-ת]/.test(sec.text || $song.sections.map(s => s.text).join('')) ? 'Hebrew' : 'English';
     try {
-      const r = await generate(
-        { mode: 'section', op, section: sec.name, section_text: sec.text, language: lang,
-          ...($genState.musicOn ? { music: { ...$genState.music, bars: [] }, bars: $genState.music.bars.find(r => r.name.toLowerCase() === sec.name.split(':')[0].trim().toLowerCase())?.bars } : {}) },
-        (_, full) => actions.setText(sec.id, base ? `${base}\n${full}` : full),
-        { signal: abort.signal }
-      );
-      let out = base ? `${base}\n${r.text}` : r.text;
-      if ($settings.autoNikud && /[א-ת]/.test(r.text) && op !== 'translate' && op !== 'backing') {
-        working = 'nikud';
-        try { out = await nikudLyrics(out); } catch {}
-        finally { working = ''; }
-        actions.setText(sec.id, out);
-      }
+      await runSectionOp(sec, op, { signal: abort.signal, onNikud: on => (working = on ? 'nikud' : '') });
       toast($t('aiDone'), 'success');
     } catch (e) {
       if (e.code !== 'aborted') toast($t('aiErr_' + e.code) !== 'aiErr_' + e.code ? $t('aiErr_' + e.code) : $t('aiErr_api_error'), 'error');

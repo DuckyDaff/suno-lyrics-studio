@@ -12,6 +12,9 @@
   import { letterAtCaret } from '../../lib/hebrew/letterNikud.js';
   import { NIKUD_RE } from '../../lib/hebrew/nikud.js';
   import { synMarks, markRuns } from '../../lib/synonyms.js';
+  import { runSectionOp } from '../../lib/sectionWrite.js';
+  import { busy } from '../../lib/ai.js';
+  import { toast } from '../../lib/toast.js';
 
   let { sec, index, total } = $props();
   let ta = $state(null);
@@ -41,6 +44,24 @@
   const lines = $derived((sec.text || '').split('\n').filter(l => l.trim()).length);
   /* words swapped by "fresh words": shown while the text is still the one they were marked on */
   const marks = $derived($synMarks[sec.id]?.text === sec.text ? markRuns(sec.text, $synMarks[sec.id].ranges) : null);
+
+  /* an empty sung section offers "write it": Claude writes it to fit the song and its Style */
+  const empty = $derived(!(sec.text || '').trim());
+  const instrumental = $derived(/instrumental|no vocals/i.test(sec.name));
+  let hint = $state('');
+  let writing = $state(false);
+  let wAbort = null;
+  async function writeIt() {
+    if (writing) { wAbort?.abort(); return; }
+    writing = true; wAbort = new AbortController();
+    try {
+      await runSectionOp(sec, 'write', { hint, signal: wAbort.signal });
+      hint = '';
+      toast($t('aiDone'), 'success');
+    } catch (e) {
+      if (e.code !== 'aborted') toast($t('aiErr_' + e.code) !== 'aiErr_' + e.code ? $t('aiErr_' + e.code) : $t('aiErr_api_error'), 'error');
+    } finally { writing = false; }
+  }
 
   function resize() {
     if (!ta) return;
@@ -79,6 +100,17 @@
               onkeydown={e => { if (pop && (e.key === 'Escape' || e.key.length === 1 || e.key === 'Backspace')) pop = null; }}
               onfocus={() => activeSectionId.set(sec.id)}></textarea>
   </div>
+  {#if (empty || writing) && !instrumental}
+    <div class="write">
+      <button class="wbtn" onclick={writeIt} disabled={$busy && !writing} title={$t('secWriteTitle')}>
+        {#if writing}<span class="spin"></span> {$t('secWriting')}{:else}✨ {$t('secWrite')}{/if}
+      </button>
+      {#if !writing}
+        <input class="hint" dir="auto" bind:value={hint} placeholder={$t('secWriteHint')}
+               onkeydown={e => { if (e.key === 'Enter') writeIt(); }} />
+      {/if}
+    </div>
+  {/if}
   {#if pop}<div bind:this={popNode}><NikudPop {ta} hit={pop} onclose={() => (pop = null)} /></div>{/if}
 
   <HomographBar {sec} />
@@ -106,6 +138,14 @@
   .card:hover .acts, .card.active .acts { opacity: 1; }
   .dir { font-size: 10px; font-weight: 700; }
   .tawrap { position: relative; }
+  .write { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .wbtn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font-size: var(--fs-xs); font-weight: 800; color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-bd); }
+  .wbtn:hover:not(:disabled) { border-color: var(--accent); }
+  .wbtn:disabled { opacity: .6; }
+  .hint { flex: 1; min-width: 160px; font-size: var(--fs-xs); padding: 6px 10px; border-radius: 999px; background: var(--bg2); border: 1px solid var(--line2); color: var(--tx0); outline: none; }
+  .hint:focus { border-color: var(--accent); }
+  .spin { width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--accent); border-top-color: transparent; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
   textarea, .hl {
     width: 100%; border: none;
     font-size: 16px; line-height: 1.85; padding: 4px 2px; min-height: 84px;
