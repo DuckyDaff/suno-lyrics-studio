@@ -6,7 +6,7 @@
   import { toast } from '../../lib/toast.js';
   import { generate, busy, phase } from '../../lib/ai.js';
   import { nikudLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
-  import { genState as g, setGen, blankMix, genAbort } from '../../lib/genState.js';
+  import { genState as g, setGen, blankMix, genAbort, resetGen } from '../../lib/genState.js';
   import { parseLyrics, parseWild, parseLines, parseCover } from '../../lib/lyricsParse.js';
   import { copyText } from '../../lib/clipboard.js';
   import Button from '../ui/Button.svelte';
@@ -205,6 +205,13 @@
   }
   function applyTitle(tt) { actions.setTitle(tt); toast(tt, 'success'); }
   async function copyOut() { (await copyText($g.output)) ? toast($t('toastAllCopied'), 'success') : toast($t('toastCopyFail'), 'error'); }
+  /* ↺ reset: an empty Create form and no result (the open song is not touched) */
+  function resetAll() {
+    if ($busy) return;
+    if (!confirm($t('resetConfirmCreate'))) return;
+    resetGen(); ideas = []; error = ''; errorDetail = '';
+    toast($t('resetDone'), 'success');
+  }
   function clearOut() { setGen({ output: '', outMode: '', usage: null }); }
 
   /* wide layout: no empty result column; the brief takes the room until there is a result */
@@ -312,6 +319,8 @@
       <Button icon="dice" onclick={() => run('wild')} disabled={$busy}>{$t('aiWild')}</Button>
       <Button variant="ghost" icon="pen" onclick={() => run('titles')} disabled={$busy}>{$t('aiTitles')}</Button>
       <Button variant="ghost" onclick={() => run('cover')} disabled={$busy} title={$t('aiCoverTitle')}>🎨 {$t('aiCover')}</Button>
+      <span class="grow"></span>
+      <Button variant="ghost" onclick={resetAll} disabled={$busy} title={$t('resetTitleCreate')}>↺ {$t('reset')}</Button>
     </div>
   </section>
 
@@ -456,6 +465,7 @@
   .model button { padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; color: var(--tx2); border: 1px solid var(--line); }
   .model button.on { color: var(--accent); background: var(--accent-bg); border-color: var(--accent-bd); }
   .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+  .grow { flex: 1; }
   .err { display: flex; align-items: center; gap: 6px; color: var(--err); font-size: var(--fs-sm); background: color-mix(in srgb, var(--err) 10%, transparent); border: 1px solid color-mix(in srgb, var(--err) 30%, transparent); border-radius: var(--r2); padding: 8px 10px; line-height: 1.4; }
   .out { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
   .hd { display: flex; align-items: center; gap: 8px; }

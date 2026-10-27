@@ -3,7 +3,7 @@
   import { song, actions } from '../../lib/song.js';
   import { songList, songs, newSong, openSong } from '../../lib/songs.js';
   import { settings, setSetting } from '../../lib/settings.js';
-  import { coverState as cv, setCover } from '../../lib/coverState.js';
+  import { coverState as cv, setCover, resetCover } from '../../lib/coverState.js';
   import { RECIPES, TOUCH, COVER_LANGS, recipe as getRecipe, touch as getTouch } from '../../lib/coverRecipes.js';
   import { GENRES, GENRE_GROUPS } from '../../lib/data/genres.js';
   import { generate, busy, phase } from '../../lib/ai.js';
@@ -107,6 +107,13 @@
     finally { ctrl = null; }
   }
   function revertFix() { if (!$cv.fix?.before) return; setCover({ output: $cv.fix.before, fix: null }); }
+  /* ↺ reset: an empty Cover form and no result */
+  function resetAll() {
+    if ($busy || ideasBusy) return;
+    if (!confirm($t('resetConfirmCover'))) return;
+    resetCover(); error = '';
+    toast($t('resetDone'), 'success');
+  }
   function useIdea(line) { setCover({ recipe: 'free', notes: line, outMode: '', output: '' }); toast($t('cvUseIdea'), 'success'); }
 
   function applyNew() {
@@ -199,6 +206,8 @@
     <div class="actions">
       <Button variant={$busy ? 'danger' : 'primary'} icon="sparkles" onclick={run}>{$busy ? $t('aiStop') : $t('cvRun')}</Button>
       <Button variant="ghost" onclick={suggest} disabled={ideasBusy || $busy}>💡 {ideasBusy ? $t('cvIdeasBusy') : $t('cvIdeas')}</Button>
+      <span class="grow"></span>
+      <Button variant="ghost" onclick={resetAll} disabled={$busy || ideasBusy} title={$t('resetTitleCover')}>↺ {$t('reset')}</Button>
     </div>
     {#if error}<div class="err"><Icon name="alert" size={14} /> {error}</div>{/if}
   </div>
@@ -261,6 +270,7 @@
   .warn { font-size: var(--fs-xs); color: var(--warn); font-weight: 700; }
   .small { font-size: var(--fs-xs); line-height: 1.5; }
   .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .grow { flex: 1; }
   .err { display: flex; gap: 6px; align-items: flex-start; font-size: var(--fs-sm); color: var(--err); }
   .out { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--r3); background: var(--bg1); border: 1px solid var(--line); }
   .hd { display: flex; align-items: center; gap: 6px; }

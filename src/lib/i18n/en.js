@@ -197,4 +197,9 @@ export default {
   vpFixed: 'Nikud updated in {n} words for who sings to whom', vpNothing: 'No gender-dependent words to update',
   fxLong: '{n} lines with no breath', fxLongTitle: 'Too long for one breath: Suno sings it without a pause. "Prepare for Suno" splits it at the breath point',
   panelClose: 'Fold the panel',
+  reset: 'Reset', resetDone: 'Form reset',
+  resetTitleCreate: 'Clears the whole Create form and the result. The open song, its lyrics and Style stay',
+  resetConfirmCreate: 'Reset the whole Create form and the result? The open song is not touched.',
+  resetTitleCover: 'Clears the whole Cover form and the result',
+  resetConfirmCover: 'Reset the whole Cover form and the result?',
 };
