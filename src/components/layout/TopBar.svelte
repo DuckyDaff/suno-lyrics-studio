@@ -9,10 +9,19 @@
   import { saveVersion } from '../../lib/songs.js';
   import { nikudWithHomographs, nakdan } from '../../lib/hebrew/nikud.js';
   import { latinize, phonetic } from '../../lib/hebrew/translit.js';
+  import { applyVoice, voiceBusy } from '../../lib/voice.js';
   import Button from '../ui/Button.svelte';
   import Icon from '../ui/Icon.svelte';
 
   let menuOpen = $state(false);
+
+  /* who sings to whom: a property of the song, so it lives next to the title */
+  const VOICE_OPTS = [['m>f', 'vpMF'], ['m>m', 'vpMM'], ['f>m', 'vpFM'], ['f>f', 'vpFF']];
+  async function pickVoice(v) {
+    const n = await applyVoice(v);
+    if (n > 0) toast($t('vpFixed', { n }), 'success');
+    else if (n < 0) toast($t('toastNikudFail'), 'error');
+  }
 
   function newSong() {
     if ($hasContent && !confirm($t('confirmNew'))) return;
@@ -62,6 +71,12 @@
 
   <input class="title" placeholder={$t('songTitle')} value={$song.title}
          oninput={e => actions.setTitle(e.target.value)} />
+
+  <select class="ver voice" class:unset={!$song.voice} value={$song.voice || ''} disabled={$voiceBusy}
+          onchange={e => pickVoice(e.target.value)} title={$t('vpTitle')}>
+    <option value="">🎙 {$t('vpLabel')}?</option>
+    {#each VOICE_OPTS as [v, k]}<option value={v}>🎙 {$t(k)}</option>{/each}
+  </select>
 
   <select class="ver" value={$settings.sunoVersion} onchange={e => setSetting('sunoVersion', e.target.value)} title={$t('sunoVersionHint')}>
     {#each SUNO_VERSIONS as v}<option value={v.id}>{v.label}</option>{/each}
@@ -116,6 +131,9 @@
     padding: 6px 8px; font-size: var(--fs-xs); font-weight: 700; color: var(--tx1); cursor: pointer; flex-shrink: 0;
   }
   .ver option { background: var(--bg2); color: var(--tx0); }
+  .voice.unset { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+  .voice:disabled { opacity: .6; cursor: progress; }
+  @media (max-width: 768px) { .voice { max-width: 120px; } }
   .group { display: flex; gap: 2px; flex-shrink: 0; }
   .menuWrap { position: relative; flex-shrink: 0; }
   .menu {

@@ -196,4 +196,5 @@ export default {
   vpTitle: 'Sets nikud and wording: what the singer says about themself follows their gender, what is said to the listener follows the listener’s',
   vpFixed: 'Nikud updated in {n} words for who sings to whom', vpNothing: 'No gender-dependent words to update',
   fxLong: '{n} lines with no breath', fxLongTitle: 'Too long for one breath: Suno sings it without a pause. "Prepare for Suno" splits it at the breath point',
+  panelClose: 'Fold the panel',
 };

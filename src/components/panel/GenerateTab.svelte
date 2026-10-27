@@ -5,8 +5,7 @@
   import { t } from '../../lib/i18n.js';
   import { toast } from '../../lib/toast.js';
   import { generate, busy, phase } from '../../lib/ai.js';
-  import { nikudLyrics, regenderLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
-  import VoicePick from '../ui/VoicePick.svelte';
+  import { nikudLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
   import { genState as g, setGen, blankMix, genAbort } from '../../lib/genState.js';
   import { parseLyrics, parseWild, parseLines, parseCover } from '../../lib/lyricsParse.js';
   import { copyText } from '../../lib/clipboard.js';
@@ -188,13 +187,6 @@
     } catch (e) { if (e.code !== 'aborted') toast($t('fxFail'), 'error', 5000); }
     finally { if (genAbort.current === ctrl) genAbort.current = null; }
   }
-  let vBusy = $state(false);
-  async function regenderOut(v) {
-    if (!$g.output || !HEBREW_RE.test($g.output) || !($g.outMode === 'song' || $g.outMode === 'wild') || $busy) return;
-    vBusy = true;
-    try { const r = await regenderLyrics($g.output, v); if (r.changed) { setGen({ output: r.text }); toast($t('vpFixed', { n: r.changed }), 'success'); } }
-    catch {} finally { vBusy = false; }
-  }
   function revertFix() { if (!$g.fix?.before) return; setGen({ output: $g.fix.before, fix: null }); }
 
   function applyLyrics(replace) {
@@ -215,10 +207,12 @@
   async function copyOut() { (await copyText($g.output)) ? toast($t('toastAllCopied'), 'success') : toast($t('toastCopyFail'), 'error'); }
   function clearOut() { setGen({ output: '', outMode: '', usage: null }); }
 
+  /* wide layout: no empty result column; the brief takes the room until there is a result */
+  const hasResult = $derived(!!($g.output || $busy || error || nikudBusy || fixBusy));
   const errText = $derived(error ? ($t('aiErr_' + error) !== 'aiErr_' + error ? $t('aiErr_' + error) : $t('aiErr_api_error')) : '');
 </script>
 
-<div class="tab" class:wide={wide}>
+<div class="tab" class:wide={wide} class:solo={wide && !hasResult}>
   <section class="brief">
     <ArtistBar />
     <div class="ideaHd">
@@ -256,7 +250,6 @@
     <StyleBox {buildFields} />
 
     <div class="lyrHd">📝 {$t('aiLyricsBox')}</div>
-    <VoicePick onChange={regenderOut} busy={vBusy} compact />
     <input class="field" bind:value={$g.persona} placeholder={$t('aiPersonaPh')} />
     <input class="field" bind:value={$g.extra} placeholder={$t('aiExtraPh')} />
 
@@ -327,9 +320,6 @@
     <div class="err"><Icon name="alert" size={14} /> <span>{errText}{#if errorDetail}<span class="detail mono">{errorDetail}</span>{/if}</span></div>
   {/if}
 
-  {#if !$g.output && !$busy && wide}
-    <div class="placeholder"><Icon name="sparkles" size={26} /><p>{$t('resultHere')}</p></div>
-  {/if}
 
   {#if $g.output || $busy}
     <section class="out">
@@ -400,6 +390,8 @@
 <style>
   .tab { padding: 14px 14px 28px; display: flex; flex-direction: column; gap: 14px; }
   .tab.wide { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: 22px; align-items: start; padding: 18px 22px 32px; max-width: 1500px; margin: 0 auto; }
+  .tab.wide.solo { grid-template-columns: minmax(0, 920px); justify-content: center; }
+  .tab.wide.solo .result { display: none; }
   .tab.wide .grid { grid-template-columns: repeat(4, 1fr); }
   .tab.wide textarea.field { min-height: 120px; font-size: var(--fs-lg); }
   .tab.wide .box { font-size: var(--fs-sm); }

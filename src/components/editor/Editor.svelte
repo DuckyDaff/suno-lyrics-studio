@@ -4,8 +4,7 @@
   import { buildLyrics } from '../../lib/suno.js';
   import { parseLyrics } from '../../lib/lyricsParse.js';
   import { runSunoFix } from '../../lib/sunoFix.js';
-  import { nikudLyrics, regenderLyrics, HEBREW_RE } from '../../lib/hebrew/nikud.js';
-  import VoicePick from '../ui/VoicePick.svelte';
+  import { nikudLyrics, HEBREW_RE } from '../../lib/hebrew/nikud.js';
   import { genState as g } from '../../lib/genState.js';
   import { busy } from '../../lib/ai.js';
   import { t } from '../../lib/i18n.js';
@@ -39,18 +38,6 @@
       toast($t('fxDone'), 'success');
     } catch (e) { if (e.code !== 'aborted') toast($t('fxFail'), 'error', 5000); }
     finally { fixBusy = false; }
-  }
-  /* who sings to whom changed: re-vocalize only the gendered words of every section */
-  let vBusy = $state(false);
-  async function regender(v) {
-    const secs = $song.sections.filter(x => HEBREW_RE.test(x.text || ''));
-    if (!secs.length) return;
-    vBusy = true; let n = 0;
-    try {
-      for (const x of secs) { const r = await regenderLyrics(x.text, v); if (r.changed) { actions.setText(x.id, r.text); n += r.changed; } }
-      toast(n ? $t('vpFixed', { n }) : $t('vpNothing'), 'success');
-    } catch { toast($t('toastNikudFail'), 'error'); }
-    finally { vBusy = false; }
   }
   function revert() {
     if (!fix || fix.songId !== $song.id) return;
@@ -105,7 +92,6 @@
 </script>
 
 <div class="editor">
-  <VoicePick onChange={regender} busy={vBusy} />
   {#if hasText}
     <SunoFixPanel info={fix && fix.songId === $song.id ? fix : null} busy={fixBusy} disabled={$busy} text={lyrics} onRun={run} onRevert={revert} />
     <SynonymPanel info={syn && syn.songId === $song.id ? { ...syn, marked } : null} busy={synBusy} disabled={$busy}

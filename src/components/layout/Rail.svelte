@@ -19,14 +19,14 @@
     view.set('editor');
     if (id === 'ai' || id === 'style' || id === 'cover') { wsTab.set(id); editorFocus.set(false); }
     else if (id === 'editor') { if ($settings.editorCollapsed) setSetting('editorCollapsed', false); else editorFocus.update(v => !v); }
-    else leftTab.set(id);
+    else { leftTab.set(id); setSetting('leftCollapsed', false); }
   }
   const isActive = id =>
     id === 'songs' || id === 'kid' ? $view === id
     : $view !== 'editor' ? false
     : id === 'editor' ? !$settings.editorCollapsed
     : id === 'ai' || id === 'style' || id === 'cover' ? $wsTab === id && !$editorFocus
-    : $leftTab === id;
+    : !$settings.leftCollapsed && $leftTab === id;
 </script>
 
 <nav class="rail">

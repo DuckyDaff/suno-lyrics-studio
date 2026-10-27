@@ -28,7 +28,7 @@
   });
 </script>
 
-<div class="shell" class:phone={$isPhone} class:focus={$editorFocus && !$settings.editorCollapsed} class:collapsed={$settings.editorCollapsed} style="--editor-w:{$settings.editorW}px">
+<div class="shell" class:phone={$isPhone} class:focus={$editorFocus && !$settings.editorCollapsed} class:collapsed={$settings.editorCollapsed} class:lc={$settings.leftCollapsed} style="--editor-w:{$settings.editorW}px">
   {#if !$isPhone}<div class="rail"><Rail /></div>{/if}
   <div class="top"><TopBar /></div>
 
@@ -84,6 +84,8 @@
   }
   .shell.focus { grid-template-columns: var(--rail-w) minmax(0, 1fr) 460px var(--panel-w); }
   .shell.collapsed { grid-template-columns: var(--rail-w) 40px minmax(0, 1fr) var(--panel-w); }
+  /* library / studio folded into a strip: the workspace gets the room */
+  .shell.lc { --panel-w: 44px !important; }
 
   .rail   { grid-column: 1; grid-row: 1 / -1; border-inline-end: 1px solid var(--line); background: var(--bg1); }
   .top    { grid-column: 2 / -1; grid-row: 1; border-bottom: 1px solid var(--line); background: var(--bg1); position: relative; }

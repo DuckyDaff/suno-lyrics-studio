@@ -8,6 +8,7 @@ export const settings = persisted('melodraft_v2_settings', {
   aiModel: 'fast',      // fast | quality
   editorW: 440,         // desktop editor panel width (px)
   editorCollapsed: true, // desktop editor panel starts collapsed
+  leftCollapsed: true,   // desktop library / studio panel starts as a thin strip
   bookmarkletSeen: false, // shown the Suno bookmarklet setup once
   producerTag: "It's a Denver Production", // signature ad-lib in every intro
   producerTagOn: true,

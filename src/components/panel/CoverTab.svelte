@@ -9,12 +9,11 @@
   import { generate, busy, phase } from '../../lib/ai.js';
   import { parseLyrics, parseWild, parseLines } from '../../lib/lyricsParse.js';
   import { buildLyrics } from '../../lib/suno.js';
-  import { nikudLyrics, regenderLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
+  import { nikudLyrics, unvocalizedWords, HEBREW_RE } from '../../lib/hebrew/nikud.js';
   import { copyText } from '../../lib/clipboard.js';
   import { toast } from '../../lib/toast.js';
   import { t } from '../../lib/i18n.js';
   import { homographs } from '../../lib/ui.js';
-  import VoicePick from '../ui/VoicePick.svelte';
   import { ORIGINAL } from '../../lib/data/languages.js';
   import SunoFixPanel from './SunoFixPanel.svelte';
   import { runSunoFix } from '../../lib/sunoFix.js';
@@ -107,13 +106,6 @@
     } catch (e) { if (e.code !== 'aborted') toast($t('fxFail'), 'error', 5000); }
     finally { ctrl = null; }
   }
-  let vBusy = $state(false);
-  async function regenderOut(v) {
-    if (!$cv.output || !HEBREW_RE.test($cv.output) || $cv.outMode !== 'cover' || $busy) return;
-    vBusy = true;
-    try { const r = await regenderLyrics($cv.output, v); if (r.changed) { setCover({ output: r.text }); toast($t('vpFixed', { n: r.changed }), 'success'); } }
-    catch {} finally { vBusy = false; }
-  }
   function revertFix() { if (!$cv.fix?.before) return; setCover({ output: $cv.fix.before, fix: null }); }
   function useIdea(line) { setCover({ recipe: 'free', notes: line, outMode: '', output: '' }); toast($t('cvUseIdea'), 'success'); }
 
@@ -136,10 +128,12 @@
   }
   async function copyOut() { (await copyText([wild.style, wild.lyrics].filter(Boolean).join('\n\n'))) ? toast($t('toastAllCopied'), 'success') : toast($t('toastCopyFail'), 'error'); }
   async function vocalize() { nikudBusy = true; try { const w = parseWild($cv.output); const l = await nikudLyrics(w.lyrics); setCover({ output: `TITLE: ${w.title}\nSTYLE: ${w.style}\n\n${l}` }); } catch {} nikudBusy = false; }
+  /* wide layout: no empty result column until there is a result */
+  const hasResult = $derived(!!($cv.output || $busy || ideasBusy || error || nikudBusy || fixBusy));
   const groups = GENRE_GROUPS.map(g => ({ g, items: GENRES.filter(x => x.group === g) }));
 </script>
 
-<div class="tab" class:wide>
+<div class="tab" class:wide class:solo={wide && !hasResult}>
   <div class="brief">
     <h2 class="ttl">🎤 {$t('cvTitle')}</h2>
 
@@ -201,7 +195,6 @@
       <p class="faint small">{$t('cvHint')}</p>
     </div>
 
-    <VoicePick onChange={regenderOut} busy={vBusy} compact />
     <label class="fxchk" title={$t('fxTitle')}><input type="checkbox" checked={$settings.autoSunoFix} onchange={e => setSetting('autoSunoFix', e.target.checked)} /> 🗣 {$t('fxAutoCover')}</label>
     <div class="actions">
       <Button variant={$busy ? 'danger' : 'primary'} icon="sparkles" onclick={run}>{$busy ? $t('aiStop') : $t('cvRun')}</Button>
@@ -240,8 +233,6 @@
           {/if}
         {/if}
       </section>
-    {:else if wide}
-      <div class="placeholder"><Icon name="music" size={26} /><p>{$t('cvTitle')}</p></div>
     {/if}
   </div>
 </div>
@@ -250,6 +241,8 @@
   .tab { display: flex; flex-direction: column; gap: 14px; padding: 12px 12px 24px; }
   .tab.wide { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: 18px; padding: 14px 18px 28px; align-items: start; }
   .tab.wide .result { position: sticky; top: 14px; }
+  .tab.wide.solo { grid-template-columns: minmax(0, 920px); justify-content: center; }
+  .tab.wide.solo .result { display: none; }
   .brief { display: flex; flex-direction: column; gap: 12px; }
   .ttl { font-size: var(--fs-lg); }
   .block { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: var(--r3); background: var(--bg1); border: 1px solid var(--line); }
@@ -286,7 +279,6 @@
   .ideas button { width: 100%; display: flex; gap: 10px; align-items: flex-start; text-align: start; padding: 9px 12px; border-radius: var(--r2); background: var(--bg2); border: 1px solid var(--line); font-size: var(--fs-sm); line-height: 1.5; color: var(--tx0); }
   .ideas button:hover { border-color: var(--accent); }
   .ideas .n { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; background: var(--bg3); color: var(--tx1); }
-  .placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 16px; color: var(--tx2); text-align: center; font-size: var(--fs-sm); border: 1px dashed var(--line); border-radius: var(--r3); }
   .fxchk { display: flex; align-items: center; gap: 6px; font-size: var(--fs-xs); font-weight: 600; color: var(--tx1); cursor: pointer; }
   .fxchk input { accent-color: var(--accent); }
 </style>
